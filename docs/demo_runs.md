@@ -2,11 +2,11 @@
 
 Each run ID links to the files it wrote. A file marked by a higher `_a<k>` number supersedes the earlier attempt.
 
-## Run `20261117T203304Z-r`
+## Run `20261117T210325Z-r`
 
 - Brief idea: Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack
 - Final outcome: `stop`
-- Gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`
+- Gates: phase1_gate: `go`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`
 - Model tiers used: local/llamacpp/gemma-4-26b-a4b-it-q4_k_m
 
 Files:
@@ -57,11 +57,11 @@ Files:
 - [outputs/phase6_step9_run_report_r_a1.md](../outputs/phase6_step9_run_report_r_a1.md)
 - [outputs/phase6_step9_run_report_r_a1.html](../outputs/phase6_step9_run_report_r_a1.html)
 
-## Run `20261117T203949Z-w`
+## Run `20261117T211039Z-w`
 
 - Brief idea: A mobile app that gamifies daily habit tracking with streaks and badges
-- Final outcome: `stop`
-- Gates: phase1_gate: `stop`
+- Final outcome: `pivot_back`
+- Gates: phase1_gate: `pivot_back`
 - Model tiers used: local/llamacpp/gemma-4-26b-a4b-it-q4_k_m
 
 Files:
@@ -75,7 +75,7 @@ Files:
 - [outputs/phase1_step9_run_report_w_a1.md](../outputs/phase1_step9_run_report_w_a1.md)
 - [outputs/phase1_step9_run_report_w_a1.html](../outputs/phase1_step9_run_report_w_a1.html)
 
-## Run `20261117T204125Z-e`
+## Run `20261117T211229Z-e`
 
 - Brief idea: A crypto trading signal bot that posts buy and sell alerts
 - Final outcome: `stop`
@@ -89,7 +89,7 @@ Files:
 - [outputs/phase1_step9_run_report_e_a1.md](../outputs/phase1_step9_run_report_e_a1.md)
 - [outputs/phase1_step9_run_report_e_a1.html](../outputs/phase1_step9_run_report_e_a1.html)
 
-## Run `payment-test-20261117T204126Z`
+## Run `payment-test-20261117T211229Z`
 
 - Brief idea: None
 - Final outcome: `None`

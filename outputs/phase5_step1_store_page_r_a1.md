@@ -4,7 +4,7 @@ STUBBED · NOT PUBLISHED
 
 # Notion Wedding Planner Pack
 
-A structured set of Notion templates designed to organize wedding logistics. This pack includes tools for task management and vendor coordination.
+A structured Notion template set designed to organize wedding logistics. It includes dedicated tools for task management and vendor coordination.
 
 **Price:** 19.0 USD one-time · Checkout: MOCKED (no payment of any kind runs)
 
@@ -17,15 +17,15 @@ A structured set of Notion templates designed to organize wedding logistics. Thi
 
 ## Who it is for
 
-Engaged individuals and independent wedding planners in Egypt looking for organized digital planning tools.
+Independent wedding planners and couples looking for organized digital planning tools.
 
 ## FAQ
 
-**What is the file format?**  
+**What format are the files in?**  
 The pack includes a Markdown checklist and a CSV tracker.
 
 **How is the product delivered?**  
-Digital files are delivered immediately upon purchase via the platform.
+Digital files are delivered immediately upon purchase.
 
 **What is the refund policy?**  
 Refund requests are handled directly by the founder.

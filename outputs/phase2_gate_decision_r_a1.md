@@ -1,5 +1,3 @@
-UNVALIDATED · FOUNDER OVERRIDE
-
 # Phase 2 gate: demand (locked target vs real results)
 
 **Outcome:** `awaiting_evidence`  (pause: nothing decided)

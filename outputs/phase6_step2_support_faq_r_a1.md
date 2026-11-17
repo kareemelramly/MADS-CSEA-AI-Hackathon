@@ -6,29 +6,23 @@ Every answer: DRAFT · AI-written for founder review. Sending any reply is STUBB
 
 **Q: What file formats are included in this pack?**
 
-A: The pack includes a structured Markdown checklist and a CSV tracker for managing your wedding logistics.
+A: The product is delivered as digital files in Markdown (.md) and CSV formats.
 
-_cites: product_docs_
-
-**Q: How do I open and use the tracker file?**
-
-A: The tracker is a CSV file which can be opened in any standard spreadsheet software to log vendor contact details and quotes.
-
-_cites: product_docs_
+_cites: delivery, product_docs_
 
 **Q: How long will my download link remain active?**
 
-A: Escalated to the founder. This assistant gives no legal, health, financial or refund decisions or promises.
+A: For security and system management, your download link will expire after a set number of hours.
 
-_ESCALATED_
+_cites: delivery_
 
-**Q: Will I receive updates to the checklist in the future?**
+**Q: Will I receive updates to these files?**
 
-A: Escalated to the founder. This assistant gives no legal, health, financial or refund decisions or promises.
+A: The provided documentation does not specify an update policy for these files.
 
-_ESCALATED_
+_cites: assumption (ASSUMPTION)_
 
-**Q: Can I request a refund if I have already downloaded the files?**
+**Q: Can I get a refund if I am unhappy with the product?**
 
 A: Escalated to the founder. This assistant gives no legal, health, financial or refund decisions or promises.
 

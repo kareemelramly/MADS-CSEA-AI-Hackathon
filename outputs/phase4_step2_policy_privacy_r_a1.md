@@ -10,7 +10,7 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We collect only your email
 
 ## Purpose
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your email is used solely for order confirmation and delivering the product link.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your email is used solely for order fulfillment and sending your download link.
 
 ## Retention
 

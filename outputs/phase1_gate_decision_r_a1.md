@@ -1,10 +1,10 @@
 # Phase 1 gate: Discover (coverage, evidence, fit)
 
-**Outcome:** `stop`
+**Outcome:** `go`
 
-> STOP: the system recommends not continuing on the current evidence.
+> GO: the evidence meets the thresholds set before the data; the next phase may start.
 
-4 relevant of 45 screened across 1 source; threshold 3 across 2 sources. This means not enough public evidence of the pain, not proof that no market exists. No ranked alternative passes evidence and fit, so the system recommends stopping. What would change it: founder evidence URLs showing the pain, or real answers from the Mom Test interviews in the interview script.
+4 relevant items across 2 sources (threshold 3); fit 4.75 of 5 (threshold 3.0). The idea may continue to a validation experiment. Demand is NOT validated yet, and this public-source sample does not independently establish demand in the founder's target country or region. Validate locally before treating fit as evidence of local demand.
 
 ## What was measured
 
@@ -13,7 +13,7 @@
 | Sources answered | 2 |
 | Items screened | 45 |
 | Relevant items | 4 |
-| Relevant sources | 1 |
+| Relevant sources | 2 |
 | Fit score | 4.75 |
 
 ## Thresholds (locked before any data, ASSUMPTION)
@@ -29,6 +29,6 @@
 | Maximum excerpts to model | 20 |
 | Broadened retries | 1 |
 
-Founder override allowed: yes (typed reason, at least 20 characters; later outputs are stamped UNVALIDATED)
+Founder override allowed: no
 
 Code decided this gate; no model voted. Thresholds are planning values (ASSUMPTION) fixed before the run and logged as criteria before any data.

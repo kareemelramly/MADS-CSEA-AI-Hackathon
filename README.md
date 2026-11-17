@@ -16,8 +16,8 @@ Most AI business tools promise income, lock founders into a closed platform and 
 
 | Brief | What the system decided | Why |
 |---|---|---|
-| **R**: Notion wedding-planning templates for Egypt | Phase 1 **STOP** on thin public evidence; the founder overrode with a typed reason, so the run completed all six phases and every later file is stamped UNVALIDATED | 4 relevant pain points but all from 1 source, below the locked threshold of 3 from 2 sources ([gate](outputs/phase1_gate_decision_r_a1.md)); no real experiment yet, so Phase 6 refuses to recommend persevering ([memo](outputs/phase6_step1_memo_r_a1.md)) |
-| **W**: habit-tracking app, founder without matching skills | **STOP** at Phase 1 | Founder fit 1.6 of 5, below the locked threshold of 3; no alternative passes ([gate](outputs/phase1_gate_decision_w_a1.md)) |
+| **R**: Notion wedding-planning templates for Egypt | Phase 1 **GO**; Phase 2 **waits for real evidence**; the founder overrode it (and a thin Phase 4 price check) with typed reasons to complete all six phases, so every file after Phase 2 is stamped UNVALIDATED | 4 relevant pain points across 2 sources met the locked threshold of 3 from 2, fit 4.75 of 5 ([gate](outputs/phase1_gate_decision_r_a1.md)); no real experiment has run, so Phase 6 refuses to recommend persevering ([memo](outputs/phase6_step1_memo_r_a1.md)) |
+| **W**: habit-tracking app, founder without matching skills | **PIVOT BACK** at Phase 1 to a better-fitting alternative | Founder fit 1.6 of 5, below the locked threshold of 3; the alternative 'Habit-Building Digital Guide' passes evidence and fit ([gate](outputs/phase1_gate_decision_w_a1.md)) |
 | **E**: crypto trading-signal bot | **STOP** that cannot be overridden | Excluded product category, stopped before any search ([gate](outputs/phase1_gate_decision_e_a1.md)) |
 
 Proof of control and honesty: a single-use approval bound to action, content hash, destination, amount ($0) and run ID for every publish, send or release; a MOCKED payment, delivery, refund and reconciliation run ([payment_test_log.md](outputs/payment_test_log.md)); and trick-prompt results on prompts the rules were never tuned on, weaknesses included ([guardrail_eval.md](docs/guardrail_eval.md)).
@@ -32,7 +32,7 @@ Open **http://localhost:8501**. Pick an example brief (R, W or E) or write your 
 
 - No key, account or payment. The first start downloads the default model once (Qwen3 4B Instruct 2507, under 3 GB) into a Docker volume.
 - With an NVIDIA GPU: `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up` (Gemma 4 26B A4B).
-- Offline tests: `docker compose run --rm app pytest -q`. Command line: `python -m orchestrator --brief tests/fixtures/brief_r.json --label r`. Troubleshooting: [docs/how_to_run.md](docs/how_to_run.md).
+- Offline tests: `docker compose run --rm --no-deps app pytest -q`. Command line: `python -m orchestrator --brief tests/fixtures/brief_r.json --label r`. Troubleshooting: [docs/how_to_run.md](docs/how_to_run.md).
 
 ## What works and what is mocked
 
@@ -69,16 +69,16 @@ Open **http://localhost:8501**. Pick an example brief (R, W or E) or write your 
 <!-- runs:start -->
 Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):
 
-- `20261117T203304Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
-- `20261117T203949Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
-- `20261117T204125Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T210325Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `go`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
+- `20261117T211039Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `pivot_back`; gates: phase1_gate: `pivot_back`.
+- `20261117T211229Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
 
 At least one committed run has recorded artifacts in all six phases.
 <!-- runs:end -->
 
 Every hard rule is mapped to code and a test in [docs/requirements_traceability.md](docs/requirements_traceability.md).
 
-**Known limits, stated plainly:** offline tests use a fake model, so real-model quality is shown only by the committed runs. Live search results change between runs; in the committed R run Stack Exchange answered HTTP 400 and was recorded as failed, which is part of why its evidence came from one source. The trick-prompt defence still refuses some honest requests (3 of 10 held out). Policies are DRAFT, not legal advice. No real experiment has been run, so no run recommends persevering. The CPU model setup was not timed.
+**Known limits, stated plainly:** offline tests use a fake model, so real-model quality is shown only by the committed runs. Live search results change between runs; in the committed R run Stack Exchange answered HTTP 400 and was recorded as failed, so its evidence came from HN and GitHub only. The trick-prompt defence still refuses some honest requests (3 of 10 held out). Policies are DRAFT, not legal advice. No real experiment has been run, so no run recommends persevering. The CPU model setup was not timed.
 
 ## Architecture
 
@@ -103,7 +103,7 @@ No paid service, API key or account is needed. Everything runs on your machine.
 **About $0.00 per run** (local open-weight model; the complete six-phase run used 16 model calls and about 19k tokens).
 
 <!-- cost:start -->
-$0.00 in model/API charges observed for complete six-phase run 20261117T203304Z-r (16 model calls, 19389 tokens; 249.3 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
+$0.00 in model/API charges observed for complete six-phase run 20261117T210325Z-r (16 model calls, 19963 tokens; 239.5 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
 <!-- cost:end -->
 
 | Cost item | Per run | Basis |

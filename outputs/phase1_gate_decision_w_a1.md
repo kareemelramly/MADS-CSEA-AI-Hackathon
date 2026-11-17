@@ -1,10 +1,10 @@
 # Phase 1 gate: Discover (coverage, evidence, fit)
 
-**Outcome:** `stop`
+**Outcome:** `pivot_back`
 
-> STOP: the system recommends not continuing on the current evidence.
+> PIVOT BACK: the evidence points to a better-fitting alternative or an earlier phase.
 
-Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
+Founder fit 1.60 of 5 is below the threshold 3.0. Alternative 'Habit-Building Digital Guide' passes evidence and fit. What would change it: more time, budget or matching skills in the brief.
 
 ## What was measured
 
@@ -12,7 +12,7 @@ Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What wo
 |---|---|
 | Sources answered | 2 |
 | Items screened | 42 |
-| Relevant items | 3 |
+| Relevant items | 4 |
 | Relevant sources | 2 |
 | Fit score | 1.6 |
 

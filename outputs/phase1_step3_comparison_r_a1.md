@@ -1,8 +1,8 @@
 # Phase 1 · Step 3 · Idea vs alternatives
 
-**Segment:** Engaged individuals and independent wedding planners in Egypt seeking planning tools [S002]. [S002](https://news.ycombinator.com/item?id=16506549) (Egypt: ASSUMPTION, no cited source mentions it)
+**Segment:** Independent wedding planners and couples in Egypt seeking smoother planning experiences [S002, S028, S035]. [S002](https://news.ycombinator.com/item?id=16506549) [S028](https://github.com/monliu99/wedding-planner/issues/8) [S035](https://github.com/monliu99/wedding-planner/issues/18) (Egypt: ASSUMPTION, no cited source mentions it)
 
-**Market:** The market shows demand for planning tools, but local demand in Egypt is not explicitly validated by the English-language excerpts provided. (ASSUMPTION) (Egypt: ASSUMPTION, no cited source mentions it) Market size is unknown unless a source above states it.
+**Market:** The market shows demand for better planning tools and checklist management, though local demand in Egypt is not explicitly validated by the English-language excerpts [S002, S028, S035]. [S002](https://news.ycombinator.com/item?id=16506549) [S028](https://github.com/monliu99/wedding-planner/issues/8) [S035](https://github.com/monliu99/wedding-planner/issues/18) (Egypt: ASSUMPTION, no cited source mentions it) Market size is unknown unless a source above states it.
 
 **Target region (Egypt):** 0 of 4 demand excerpts mention it. Demand in the target region is an ASSUMPTION until local interviews or a local experiment confirm it.
 
@@ -10,27 +10,27 @@ Fit is weighted in code: skills 35 %, budget 25 %, time 25 %, values 15 % (weigh
 
 | Option | Skills | Budget | Time | Values | Weighted fit (1-5) | Cites relevant evidence |
 |---|---|---|---|---|---|---|
-| Notion Wedding Planner Pack | 5 | 5 | 4 | 5 | 4.75 | 1 |
-| Visual Wedding Moodboard Service | 4 | 5 | 3 | 5 | 4.15 | 2 |
-| Wedding Vendor Directory & Review Platform | 2 | 2 | 2 | 5 | 2.45 | 1 |
+| Notion Wedding Planner Pack | 5 | 5 | 4 | 5 | 4.75 | 2 |
+| Wedding Vendor Directory & Review Site | 3 | 2 | 2 | 4 | 2.65 | 1 |
+| Collaborative Wedding Planning Web App | 1 | 1 | 1 | 5 | 1.6 | 1 |
 
 ## Reasons
 
 **Notion Wedding Planner Pack**: A set of Notion templates including a planning checklist and vendor tracker specifically for wedding planners and couples.
 - skills: The founder is a Notion power user and has practical experience organizing weddings.
-- budget: A $200 budget is sufficient for creating and distributing digital Notion templates.
-- time: 10 hours per week is adequate for template design and marketing for a digital product.
-- values: The product is a utility tool that aligns with honesty and no-hype values.
+- budget: A 200 USD budget is sufficient for creating and distributing digital Notion templates.
+- time: 10 hours per week is adequate for template design and marketing, assuming no heavy coding is required.
+- values: ASSUMPTION: Digital templates are low-hype and do not require collecting sensitive user data beyond Notion's own infrastructure.
 
-**Visual Wedding Moodboard Service**: A curated digital service providing organized visual boards and aesthetic guides for wedding elements.
-- skills: Leverages the founder's graphic design skills and understanding of visual organization [S016].
-- budget: ASSUMPTION: Low overhead costs fit within the $200 budget.
-- time: ASSUMPTION: Curating high-quality visual content may require more than 10 hours per week to maintain.
-- values: Directly addresses the need for organization without hype.
+**Wedding Vendor Directory & Review Site**: A curated digital directory of wedding vendors to replace poor quality SEO lead generation [S005].
+- skills: ASSUMPTION: Requires more web development and database management than template creation.
+- budget: ASSUMPTION: Building and marketing a directory platform may exceed the 200 USD budget.
+- time: ASSUMPTION: Maintaining a directory and vetting vendors likely requires more than 10 hours per week.
+- values: Aligns with honesty by providing useful tools instead of SEO hype [S005].
 
-**Wedding Vendor Directory & Review Platform**: A transparent, non-SEO-driven digital directory for finding high-quality wedding vendors.
-- skills: ASSUMPTION: Building a directory platform requires more technical development skills than the founder currently lists.
-- budget: ASSUMPTION: Developing and hosting a directory platform may exceed the $200 budget.
-- time: ASSUMPTION: Managing vendor data and reviews likely requires more than 10 hours per week.
-- values: Addresses the complaint regarding low-quality, SEO-dominated lead generation sites [S005].
+**Collaborative Wedding Planning Web App**: A dedicated web application allowing multiple users to share a single plan via individual logins [S035].
+- skills: The founder's skills are in Notion and design, not full-stack software engineering.
+- budget: ASSUMPTION: Developing a custom web app with user authentication is significantly more expensive than 200 USD.
+- time: Building a custom app with login features is unlikely to be achieved in 10 hours per week.
+- values: Directly addresses the need for secure, multi-user collaboration [S035].
 

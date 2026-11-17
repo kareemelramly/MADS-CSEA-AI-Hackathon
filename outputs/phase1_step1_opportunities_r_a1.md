@@ -4,25 +4,25 @@ Query: `wedding planning` · sources answered: 2 · items screened: 45 · broade
 
 ## Summary
 
-- **4 demand signals** passed screening out of 45 items, from 1 of 2 sources that answered (hn_algolia).
-- Signal mix: 1 complaint, 1 request, 2 workaround. Only requests, complaints and workarounds count as demand; launches and ads never do.
+- **4 demand signals** passed screening out of 45 items, from 2 of 2 sources that answered (github_issues, hn_algolia).
+- Signal mix: 1 complaint, 3 request. Only requests, complaints and workarounds count as demand; launches and ads never do.
 - Each line below is one pain point in the model's words, tied by code to the fetched item it came from.
 
 ## Pain points
 
-- Engaged individuals are seeking recommendations for apps or services to facilitate the wedding planning process. [S002](https://news.ycombinator.com/item?id=16506549)
-- The wedding planning industry is perceived as low quality and dominated by SEO-optimized lead generation sites. [S005](https://news.ycombinator.com/item?id=4853598)
-- Users use Pinterest as a visual pinboard to organize various wedding elements like dresses and locations. [S016](https://news.ycombinator.com/item?id=9489126)
-- Brides use Pinterest as a primary tool for wedding planning before engagement. [S019](https://news.ycombinator.com/item?id=9215411)
+- Couples need a way to view, manage, and track the progress of their wedding checklist. [S028](https://github.com/monliu99/wedding-planner/issues/8)
+- Newly engaged individuals are looking for apps or services to smooth out the wedding planning experience. [S002](https://news.ycombinator.com/item?id=16506549)
+- The wedding planning industry relies on poor quality, SEO-optimized lead generation rather than useful tools. [S005](https://news.ycombinator.com/item?id=4853598)
+- Wedding planners or partners need a way to share a single plan with multiple users via individual logins. [S035](https://github.com/monliu99/wedding-planner/issues/18)
 
 ## Evidence table
 
 | ID | Source | Signal | Title of the fetched item | Fetched (UTC) |
 |---|---|---|---|---|
-| [S002](https://news.ycombinator.com/item?id=16506549) | hn_algolia | request | Ask HN: Wedding planning? | 2026-11-17T20:33:05Z |
-| [S005](https://news.ycombinator.com/item?id=4853598) | hn_algolia | complaint | Ask HN: Wedding planning tools for nerds? | 2026-11-17T20:33:05Z |
-| [S016](https://news.ycombinator.com/item?id=9489126) | hn_algolia | workaround | Is It OK for Employers to Seek Out ‘Digital Natives’? | 2026-11-17T20:33:05Z |
-| [S019](https://news.ycombinator.com/item?id=9215411) | hn_algolia | workaround | Pinterest Raises $367M at $11B valuation | 2026-11-17T20:33:05Z |
+| [S028](https://github.com/monliu99/wedding-planner/issues/8) | github_issues | request | Manage Wedding Cheklist | 2026-11-17T21:03:27Z |
+| [S002](https://news.ycombinator.com/item?id=16506549) | hn_algolia | request | Ask HN: Wedding planning? | 2026-11-17T21:03:27Z |
+| [S005](https://news.ycombinator.com/item?id=4853598) | hn_algolia | complaint | Ask HN: Wedding planning tools for nerds? | 2026-11-17T21:03:27Z |
+| [S035](https://github.com/monliu99/wedding-planner/issues/18) | github_issues | request | Invite Partners and Family to Our Wedding | 2026-11-17T21:03:27Z |
 
 ## Search coverage
 

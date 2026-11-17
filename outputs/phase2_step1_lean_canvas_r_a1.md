@@ -1,41 +1,39 @@
-UNVALIDATED · FOUNDER OVERRIDE
-
 # Phase 2 · Step 1 · Lean Canvas
 
 Every box cites source IDs or is labelled ASSUMPTION.
 
 ## Problem
 
-Wedding planning in Egypt is often disorganized and dominated by low-quality, SEO-driven lead generation sites. Engaged individuals struggle to find reliable tools to facilitate the planning process effectively. [S002](https://news.ycombinator.com/item?id=16506549) [S005](https://news.ycombinator.com/item?id=4853598) (Egypt: ASSUMPTION, no cited source mentions it)
+Couples and planners struggle to manage complex wedding checklists and track vendor progress effectively. Existing industry tools often focus on lead generation rather than practical utility. [S028](https://github.com/monliu99/wedding-planner/issues/8) [S002](https://news.ycombinator.com/item?id=16506549) [S005](https://news.ycombinator.com/item?id=4853598)
 
 ## Customer Segments
 
-Engaged individuals in Egypt and independent wedding planners looking for structured organization tools. [S002](https://news.ycombinator.com/item?id=16506549) (Egypt: ASSUMPTION, no cited source mentions it)
+Independent wedding planners in Egypt and newly engaged couples seeking organized planning tools. [S002](https://news.ycombinator.com/item?id=16506549) [S035](https://github.com/monliu99/wedding-planner/issues/18) (Egypt: ASSUMPTION, no cited source mentions it)
 
 ## Unique Value Proposition
 
-A streamlined, privacy-respecting Notion workspace designed to replace chaotic planning methods with a professional checklist and vendor tracker. (ASSUMPTION)
+A streamlined, privacy-respecting Notion ecosystem designed to centralize wedding checklists and vendor management for the Egyptian market. (ASSUMPTION)
 
 ## Solution
 
-A digital Notion template pack containing a comprehensive wedding planning checklist and a specialized vendor tracking system. (ASSUMPTION)
+A Notion template pack featuring a comprehensive planning checklist and a centralized vendor tracker. [S028](https://github.com/monliu99/wedding-planner/issues/8)
 
 ## Channels
 
-Visual discovery through Pinterest and social media platforms where wedding inspiration is shared. [S016](https://news.ycombinator.com/item?id=9489126) [S019](https://news.ycombinator.com/item?id=9215411)
+Social media marketing (Instagram/TikTok), wedding planning communities in Egypt, and SEO-optimized content. (ASSUMPTION)
 
 ## Revenue Streams
 
-A one-time digital purchase of the Notion template pack. (ASSUMPTION)
+A one-time digital purchase of the Notion Wedding Planner Pack. (ASSUMPTION)
 
 ## Cost Structure
 
-Minimal costs including Notion subscription fees and small amounts for digital marketing or design assets. (ASSUMPTION)
+Minimal costs including Notion subscription fees and small digital marketing expenditures. (ASSUMPTION)
 
 ## Key Metrics
 
-Number of template downloads and customer feedback ratings regarding organization efficiency. (ASSUMPTION)
+Number of template downloads and customer satisfaction ratings from the Egyptian wedding community. (ASSUMPTION)
 
 ## Unfair Advantage
 
-Personal experience organizing multiple family weddings combined with advanced Notion power-user skills and graphic design capabilities. (ASSUMPTION)
+Deep domain expertise in Notion combined with personal experience organizing multiple weddings and local market cultural awareness. (ASSUMPTION)

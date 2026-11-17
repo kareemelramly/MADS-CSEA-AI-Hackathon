@@ -82,12 +82,14 @@ def hn(q, timeout):
 
 
 def stackexchange(q, timeout, sites=("webapps", "stackoverflow")):
-    items, last = [], 0
+    items, any_ok, last_err = [], False, 0
     for site in sites:
         url = "https://api.stackexchange.com/2.3/search/excerpts?" + urllib.parse.urlencode(
             {"order": "desc", "sort": "relevance", "q": q, "site": site, "pagesize": 15})
         st, body = _get(url, timeout)
-        last = st if st != 200 or not last else last
+        if st != 200:
+            last_err = st          # one site failing (e.g. a rate limit) must not discard another site's results
+            continue
         if st == 200:
             for it in json.loads(body).get("items", []):
                 qid = it.get("question_id")
@@ -95,8 +97,8 @@ def stackexchange(q, timeout, sites=("webapps", "stackoverflow")):
                     continue
                 items.append({"url": f"https://{site}.stackexchange.com/q/{qid}" if site != "stackoverflow" else f"https://stackoverflow.com/q/{qid}",
                               "title": it.get("title", ""), "excerpt": clean(it.get("title", "")) + " " + clean(it.get("excerpt", ""))})
-            last = 200
-    return last, items
+            any_ok = True
+    return (200 if any_ok else last_err), items
 
 
 def github(q, timeout):

@@ -10,11 +10,11 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. These files are provided u
 
 ## No guarantees
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We do not guarantee any specific wedding outcome, organization level, or financial savings through the use of these tools.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We do not guarantee any specific wedding outcome, organizational success, or financial savings through the use of these tools.
 
 ## Limitation of liability
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. To the maximum extent permitted by law, the founder is not liable for any damages arising from the use or inability to use these digital files.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. To the maximum extent permitted by law, the founder is not liable for any damages, losses, or errors arising from the use of these digital files.
 
 ## Changes
 

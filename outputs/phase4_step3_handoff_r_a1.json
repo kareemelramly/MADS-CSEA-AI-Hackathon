@@ -6,19 +6,19 @@
   "policies": {
     "terms": {
       "path": "outputs/phase4_step2_policy_terms_r_a1.md",
-      "sha256": "10c6e13ec7ae06e53aeb02c1958fdc2b3c7d698c852bd5ee5a27fa2c8d0d5176"
+      "sha256": "cb52b2abc39c48fa67b7fecd490e45b3ad463dffa8e0dd35c6a8a8d6294373f0"
     },
     "privacy": {
       "path": "outputs/phase4_step2_policy_privacy_r_a1.md",
-      "sha256": "1e1dbd900746730e146033d1a612079cb015a98f967b7fb8fdd80872ad2d7a77"
+      "sha256": "43dd24a5e841f6723e1a666d4859b0bf5f168773fd083e31d0c560ab7d15226b"
     },
     "refund": {
       "path": "outputs/phase4_step2_policy_refund_r_a1.md",
-      "sha256": "0c01278077a69495f83715674646d1afe756f579217fd94ec3a347dac5f5b37e"
+      "sha256": "c47fb96cdb88dca52ccf01350623416b21b23d63cb7bc29ec004cd6af4a08078"
     },
     "delivery": {
       "path": "outputs/phase4_step2_policy_delivery_r_a1.md",
-      "sha256": "d8abbd3b712f320cb0ff3030c95e762614f4c70a0bcd9fc5b335908b7b6e4801"
+      "sha256": "5c073c49d447b04a759977826d052500e3aacf0d6ae90872b5f3e4c90827621f"
     }
   },
   "policy_status": "DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice",

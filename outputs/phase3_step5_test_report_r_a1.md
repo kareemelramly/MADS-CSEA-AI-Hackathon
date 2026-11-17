@@ -7,9 +7,9 @@ Attempt 1. Archetype A1: 14 applicable checks; QA-07 not applicable.
 | Check | Name | Result | Evidence |
 |---|---|---|---|
 | QA-01 | Manifest complete | pass | 4 files |
-| QA-02 | Size | pass | total 7715 bytes; too big: [] |
+| QA-02 | Size | pass | total 7428 bytes; too big: [] |
 | QA-03 | Format validity | pass | CSV column counts [5]; checklist headings present: True |
-| QA-04 | Journey trace | pass | 5 steps traced |
+| QA-04 | Journey trace | pass | 4 steps traced |
 | QA-05 | Internal links | pass | all resolve |
 | QA-06 | No external resources | pass | none |
 | QA-07 | Script integrity | n/a | A1 has no HTML or scripts |
@@ -24,9 +24,9 @@ Attempt 1. Archetype A1: 14 applicable checks; QA-07 not applicable.
 
 ## Acceptance criteria
 
-1. Given The user opens the Markdown checklist, when They review the wedding milestones, then They can check off completed tasks to track progress. (automated via QA-04, QA-05)
-2. Given The user opens the CSV tracker, when They input vendor details like name, service, and contact info, then The data is structured for easy import into spreadsheet software. (automated via QA-04, QA-05)
-3. Given The user is managing multiple vendors, when They use the tracker, then They can see a consolidated list of all service providers in one place. (automated via QA-04, QA-05)
+1. Given The user has downloaded the product pack, when they open the Markdown file, then they can see a structured list of wedding planning tasks to check off. (automated via QA-04, QA-05)
+2. Given The user needs to manage vendor contacts, when they import the CSV tracker into their preferred tool, then all vendor columns (name, contact, service, status) are correctly mapped. (automated via QA-04, QA-05)
+3. Given The user is planning a wedding in Egypt, when they use the checklist, then they can track the completion status of every major planning milestone. (automated via QA-04, QA-05)
 
 ## MANUAL (not checked, never reported as passed)
 

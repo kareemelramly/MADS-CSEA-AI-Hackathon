@@ -1,6 +1,5 @@
 {
-  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
-  "run_id": "20261117T203304Z-r",
+  "run_id": "20261117T210325Z-r",
   "gate": {
     "gate": "phase2_gate",
     "outcome": "awaiting_evidence",
@@ -31,15 +30,15 @@
     "signups": 0,
     "attempt": 1,
     "min_visitors": 200,
-    "value_proposition": "A streamlined, privacy-respecting Notion workspace designed to replace chaotic planning methods with a professional checklist and vendor tracker.",
+    "value_proposition": "A streamlined, privacy-respecting Notion ecosystem designed to centralize wedding checklists and vendor management for the Egyptian market.",
     "validation_status": "AWAITING_EVIDENCE",
     "landing_ref": {
       "path": "outputs/phase2_step3_landing_page_r_a1.html",
-      "sha256": "6fc70fbd657e1733ca4573e86bc309a3dabad6af157d0ade2ff9447bf039cff2"
+      "sha256": "276000b7e09501b9b01ba2a628223a1490bf548476d063887a700d246fa4d659"
     },
     "plan_ref": {
       "path": "outputs/phase2_step2_locked_plan_r_a1.json",
-      "sha256": "08c34a4f7c0821b50c7c0ce73cc4d3a951c116976c53417c6f22f72a275b3d87"
+      "sha256": "63eebf7a8cf49d1b2d42ec950a599ee2e5d59208bfedfd2af58cc8ac926bc0cb"
     }
   }
 }

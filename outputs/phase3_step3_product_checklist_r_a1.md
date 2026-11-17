@@ -2,55 +2,46 @@ UNVALIDATED · FOUNDER OVERRIDE
 
 # Notion Wedding Planner Pack
 
-> Product: A1 checklist pack · Mock integrations are labelled MOCKED · Build 20261117T203304Z-r
+> Product: A1 checklist pack · Mock integrations are labelled MOCKED · Build 20261117T210325Z-r
 
-This toolkit provides a structured framework for managing wedding milestones and vendor communications. It centralizes task tracking and contact information within a single digital workspace.
+This toolkit provides a structured approach to managing wedding tasks and vendor information. It centralizes planning workflows through a checklist and a dedicated vendor database.
 
 
 <a id="j1"></a>
-## J1. Review the master wedding timeline checklist
+## J1. Review the master wedding planning checklist in Markdown format.
 
-- [ ] Read through the milestone categories
-- [ ] Adjust task deadlines to match the wedding date
-- [ ] Identify high-priority tasks for the current month
-- [ ] Assign specific tasks to team members or family members
+- [ ] Read through the complete list of wedding planning milestones
+- [ ] Identify specific tasks relevant to the local Egyptian wedding context
+- [ ] Note any upcoming deadlines within the checklist structure
+- [ ] Verify the sequence of tasks for logical planning flow
 
 
 <a id="j2"></a>
-## J2. Identify and list required vendor categories
+## J2. Check off completed tasks to monitor wedding readiness.
 
-- [ ] List essential service categories such as catering and photography
-- [ ] Define specific requirements for each vendor type
-- [ ] Note any seasonal availability constraints for local venues
-- [ ] Categorize vendors by service priority
+- [ ] Mark completed items in the Markdown checklist
+- [ ] Identify remaining tasks that require immediate attention
+- [ ] Update the progress status as new milestones are reached
+- [ ] Review the list weekly to ensure no tasks are overlooked
 
 
 <a id="j3"></a>
-## J3. Log vendor contact details and quotes in the tracker
+## J3. Populate the vendor tracker CSV with local Egyptian vendor details.
 
-- [ ] Input contact names and phone numbers into the tracker
-- [ ] Record initial quote amounts for each service
-- [ ] Attach digital copies of service contracts
-- [ ] Note the specific location or venue address for each vendor
-- [ ] Document payment terms and deposit requirements
+- [ ] Enter contact information for local venues and caterers
+- [ ] Record service descriptions for photographers and decorators
+- [ ] Input specific vendor availability for the chosen dates
+- [ ] Add notes regarding specific service requirements
+- [ ] List contact names and phone numbers for each provider
 
 
 <a id="j4"></a>
-## J4. Check off completed tasks as vendors are secured
+## J4. Import the CSV into a workspace to maintain a centralized vendor database.
 
-- [ ] Update task status to completed upon contract signing
-- [ ] Verify that the vendor is correctly linked to the tracker
-- [ ] Move completed items to the archive section
-- [ ] Cross-reference the checklist with the vendor list for accuracy
-
-
-<a id="j5"></a>
-## J5. Export the final vendor list for event-day coordination
-
-- [ ] Filter the tracker to show only confirmed vendors
-- [ ] Export the filtered view to a CSV format
-- [ ] Review the exported list for contact accuracy
-- [ ] Distribute the final list to the coordination team
+- [ ] Open the target Notion workspace
+- [ ] Upload the completed CSV file into a new database
+- [ ] Map the CSV columns to the correct Notion properties
+- [ ] Verify that all vendor data appears correctly in the database view
 
 
 ## What is not included

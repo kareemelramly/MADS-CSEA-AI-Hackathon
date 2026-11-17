@@ -1,6 +1,6 @@
 # Guardrail evaluation (trick prompts)
 
-Measured 2026-11-17T20:42:56Z by `scripts/eval_rule_checker.py`. Model layer: `local/llamacpp/gemma-4-26b-a4b-it-q4_k_m` through the local llama.cpp server.
+Measured 2026-11-17T21:13:57Z by `scripts/eval_rule_checker.py`. Model layer: `local/llamacpp/gemma-4-26b-a4b-it-q4_k_m` through the local llama.cpp server.
 
 | Set and layers | Banned requests refused | Honest requests refused (false alarms) |
 |---|---|---|

@@ -46,7 +46,11 @@ def download(con, token, run_id=None, now=None):
     elif _now(now).strftime("%Y-%m-%dT%H:%M:%SZ") > r[1]:
         res = {"allowed": False, "reason": "token expired", "order_id": r[0]}
     else:
-        con.execute("UPDATE entitlements SET downloads = downloads + 1 WHERE token=?", (token,))
-        res = {"allowed": True, "order_id": r[0]}
+        # Conditional update: a refund that revokes the token between the read and this write wins.
+        ts = _now(now).strftime("%Y-%m-%dT%H:%M:%SZ")
+        cur = con.execute("UPDATE entitlements SET downloads = downloads + 1 WHERE token=? AND revoked_at IS NULL AND expires_at >= ?",
+                          (token, ts))
+        res = {"allowed": True, "order_id": r[0]} if cur.rowcount == 1 else \
+            {"allowed": False, "reason": "revoked or expired during download", "order_id": r[0]}
     logmod.log("delivery", "mock_download", run_id=run_id, mock="MOCKED", allowed=res["allowed"], reason=res.get("reason"))
     return res

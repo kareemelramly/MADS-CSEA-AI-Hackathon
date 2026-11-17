@@ -10,9 +10,9 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. The product is delivered a
 
 ## Timing
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Delivery occurs immediately via a digital download link sent to your provided email address.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your download link is sent to your provided email address immediately following successful payment.
 
 ## Access expiry
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. The download link provided is temporary and will expire after a set number of hours.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. For security and system management, your download link will expire after a set number of hours.
 

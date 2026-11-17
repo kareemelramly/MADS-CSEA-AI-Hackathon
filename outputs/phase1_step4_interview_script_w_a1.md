@@ -3,18 +3,18 @@
 Ask about past behaviour only. No answers are invented; record real answers yourself.
 
 1. Tell me about the last time you tried to start a new daily habit or routine.  
-   _Why:_ To understand the actual triggers and context of habit formation rather than theoretical intentions.
-2. What specific methods or tools are you currently using to keep track of your daily activities?  
-   _Why:_ To identify existing competitors (analog or digital) and see if they are actually being used.
-3. Walk me through the last time you failed to stick to a habit you were working on. What happened?  
-   _Why:_ To identify the specific friction points and reasons for abandonment without asking for opinions on why they fail.
-4. How much time or money have you spent in the last month trying to improve your productivity or habit consistency?  
-   _Why:_ To gauge actual commitment and willingness to pay for a solution, moving beyond 'I would pay for this'.
-5. When you use habit-tracking apps or tools, what is the most frustrating part of the experience?  
-   _Why:_ To uncover pain points related to design, privacy, or engagement that the user has actually encountered.
-6. Tell me about a time you felt motivated to complete a task. What specifically triggered that feeling?  
-   _Why:_ To understand what kind of 'rewards' or 'gamification' actually work in real life versus what sounds good in theory.
-7. How do you currently manage your data or privacy when signing up for new lifestyle or health apps?  
-   _Why:_ To validate if 'privacy' is a real pain point they act upon or just a nice-to-have preference.
+   _Why:_ To understand if they are actually actively trying to change behavior or if they are just thinking about it.
+2. What specific tools, apps, or physical methods did you use to track that habit?  
+   _Why:_ To identify current competitors and see what kind of solutions they naturally gravitate towards (analog vs. digital).
+3. Walk me through how you managed to stay consistent (or why you stopped) with that specific habit.  
+   _Why:_ To identify the actual friction points and triggers that cause habit failure in real life.
+4. How much time or money have you spent in the last six months trying to improve your productivity or habit consistency?  
+   _Why:_ To gauge their actual commitment and willingness to pay for a solution, rather than asking if they 'would' pay.
+5. What is the most frustrating thing about the current way you track your progress?  
+   _Why:_ To find the specific pain points that a new app must solve to be competitive.
+6. When you use habit-tracking apps, what are the specific things that make you want to delete them or stop using them?  
+   _Why:_ To validate the importance of 'no manipulative design' and 'privacy' by seeing if these are actual deal-breakers or just theoretical preferences.
+7. Tell me about a time you felt a sense of accomplishment regarding a personal goal. What triggered that feeling?  
+   _Why:_ To understand what kind of 'rewards' actually resonate with them, helping to design the gamification elements effectively.
 
 Hypothetical or leading questions removed by code: 0.
