@@ -1,0 +1,17 @@
+# {{ title }}
+
+> Product: A1 checklist pack · Mock integrations are labelled MOCKED · Build {{ run_id }}
+
+{{ intro }}
+
+{% for s in sections %}
+<a id="{{ s.anchor }}"></a>
+## J{{ s.n }}. {{ s.step }}
+
+{% for it in s.entries %}- [ ] {{ it }}
+{% endfor %}
+{% endfor %}
+## What is not included
+
+{% for m in mocked %}- {{ m }}
+{% endfor %}

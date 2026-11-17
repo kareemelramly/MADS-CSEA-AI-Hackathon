@@ -1,0 +1,50 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "faq": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "question": {
+      "type": "string"
+     },
+     "answer": {
+      "type": "string"
+     },
+     "cites": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "product_docs",
+        "terms",
+        "privacy",
+        "refund",
+        "delivery",
+        "assumption"
+       ]
+      },
+      "minItems": 1,
+      "maxItems": 3
+     },
+     "escalate": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "question",
+     "answer",
+     "cites",
+     "escalate"
+    ]
+   },
+   "minItems": 3,
+   "maxItems": 6
+  }
+ },
+ "required": [
+  "faq"
+ ]
+}

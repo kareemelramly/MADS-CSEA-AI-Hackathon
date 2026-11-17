@@ -1,0 +1,41 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "personas": {
+   "type": "array",
+   "minItems": 5,
+   "maxItems": 5,
+   "items": {
+    "type": "object",
+    "properties": {
+     "persona": {
+      "type": "string"
+     },
+     "context": {
+      "type": "string"
+     },
+     "likely_reaction": {
+      "type": "string"
+     },
+     "would_join_waitlist": {
+      "type": "boolean"
+     },
+     "main_doubt": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "persona",
+     "context",
+     "likely_reaction",
+     "would_join_waitlist",
+     "main_doubt"
+    ]
+   }
+  }
+ },
+ "required": [
+  "personas"
+ ]
+}

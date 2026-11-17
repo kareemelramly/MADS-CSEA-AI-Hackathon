@@ -1,0 +1,75 @@
+{
+  "idea": "Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack",
+  "skills": "Notion power user, graphic design, organised two family weddings",
+  "budget_amount": 200,
+  "budget_currency": "USD",
+  "hours_per_week": 10,
+  "target_market": "Independent wedding planners and couples planning weddings",
+  "countries": "Egypt",
+  "values": "Honesty, no hype, respect for buyers' privacy",
+  "search_terms": "wedding planning",
+  "founder_evidence": [],
+  "founder_inputs": {
+    "p2_counts": {
+      "experiment_status": "not_started"
+    },
+    "p2_persona_test": {
+      "run": true
+    },
+    "override_reasons": {
+      "1": "Founder accepts weak public evidence to see the rest of the pipeline in a demo run",
+      "2": "No experiment has run yet; founder overrides to see the remaining phases in a demo run"
+    },
+    "p4_quotes": [
+      {
+        "name": "Wedding Planner Template (bujobees)",
+        "url": "https://bujobees.gumroad.com/l/ILcNH",
+        "amount": 20,
+        "currency": "USD",
+        "kind": "one_time",
+        "display": "$20"
+      },
+      {
+        "name": "Notion Template - Wedding Plan",
+        "url": "https://illananemard.gumroad.com/l/wedding-plan",
+        "amount": 20,
+        "currency": "USD",
+        "kind": "one_time",
+        "display": "$20"
+      },
+      {
+        "name": "Ultimate Wedding Planner Notion Template (scalify)",
+        "url": "https://scalify.gumroad.com/l/wedding-planner-notion",
+        "amount": 15,
+        "currency": "USD",
+        "kind": "one_time",
+        "display": "$15"
+      },
+      {
+        "name": "Notion - Wedding Planner SOPs",
+        "url": "https://generous.gumroad.com/l/Wedding-Planner-SOPs",
+        "amount": 29,
+        "currency": "USD",
+        "kind": "one_time",
+        "display": "$29"
+      },
+      {
+        "name": "Wedding Planner Notion Template (free)",
+        "url": "https://designedbylinda.gumroad.com/l/wedding-planner-notion-template",
+        "amount": 0,
+        "currency": "USD",
+        "kind": "free",
+        "display": "$0"
+      }
+    ],
+    "p5_mock_sale": {
+      "simulate_purchase": true,
+      "simulate_refund": true
+    },
+    "p6_targets": {
+      "waitlist_signups": 100,
+      "paying_customers": 5
+    },
+    "p6_metrics": []
+  }
+}

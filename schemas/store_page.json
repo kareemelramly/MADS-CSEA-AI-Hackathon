@@ -1,0 +1,50 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "title": {
+   "type": "string"
+  },
+  "short_description": {
+   "type": "string"
+  },
+  "what_you_get": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "minItems": 3,
+   "maxItems": 6
+  },
+  "who_its_for": {
+   "type": "string"
+  },
+  "faq": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "q": {
+      "type": "string"
+     },
+     "a": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "q",
+     "a"
+    ]
+   },
+   "minItems": 2,
+   "maxItems": 4
+  }
+ },
+ "required": [
+  "title",
+  "short_description",
+  "what_you_get",
+  "who_its_for",
+  "faq"
+ ]
+}

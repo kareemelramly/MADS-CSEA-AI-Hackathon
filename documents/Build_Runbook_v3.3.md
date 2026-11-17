@@ -1,4 +1,4 @@
-MADS × CSEA AI Hackathon · Build guide · 17 Nov 2026 · Version 3.3
+MADS × CSEA AI Hackathon · Build guide · 17 Nov 2026 · Version 3.4 (3.3 + implementation changes, section 0.5)
 
 # Build Runbook v3.3: Empty Repo to Submission
 
@@ -95,6 +95,41 @@ SRS v1.3 is now the authoritative specification and `ARCHITECTURE.md` is written
 | 11 Fresh clone | Full suite + output checker on a clean clone without `.env`                                              | QUAL-1, QUAL-2, REPO-3                                                           |
 
 New files this adds: `tests/conftest.py`, `tests/fixtures/` (briefs W, E, R; recorded source responses; fake model replies), `tests/test_repo_layout.py`, `tests/test_phase4_commercial.py`, `tests/test_e2e_pipeline.py`, `tests/test_ui_smoke.py`, `scripts/smoke_llm.py`, `scripts/check_outputs.py`, `scripts/check_docs.py`. `orchestrator.py` also gets a small CLI (`--brief`, `--until-gate`, `--log`, `--label`) so stages can be tested headless.
+
+
+### v3.4 0.5 Changes made during implementation (17 Nov 2026)
+
+**In one line:** the build follows this runbook except where the founder or a real constraint required a change; every change and its reason is listed here, and SRS v1.4 Appendix F carries the same table.
+
+| # | Topic | Planned | As built | Why |
+|---|---|---|---|---|
+| 1 | Local model server | Ollama (`ollama` + `model-pull` services, `hf.co/bartowski/...` tag pulled on first start) | llama.cpp `llama-server` (OpenAI-compatible) serving the team's existing GGUF `gemma-4-26B-A4B-it-UD-Q4_K_M.gguf` (unsloth). Compose service `llm` loads it from `LOCAL_MODEL_DIR` with no download; on a machine without the file it downloads `unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M` once into a volume. | Founder instruction (17 Nov, 17:22): use the llama.cpp command that already runs Q4_K_M on the 16 GB GPU, no download. Same model and quantization family, so X2/MOD-2 keep their meaning; `LLM_ORDER` value `local` replaces `ollama` (both accepted). |
+| 2 | GPU flags | `docker-compose.gpu.yml` with Ollama | `docker-compose.gpu.yml` uses `ghcr.io/ggml-org/llama.cpp:server-cuda` with the measured flags `-ngl 99 --n-cpu-moe 6 -fa on --cache-type-k q8_0 --cache-type-v q8_0`; `docker-compose.host-llm.yml` uses a host `llama-server` (`scripts/start_local_llm.sh`). | Keeps MoE expert layers that do not fit on the CPU instead of spilling the whole model; matches the team's working command. |
+| 3 | Readiness line | `{OLLAMA_URL}/api/tags` | `{LOCAL_BASE_URL}/../health` (llama-server): ready / loading / unreachable. | Server change. |
+| 4 | Structured output (MOD-6) | Ollama `format` = schema | llama-server `response_format: json_schema` (grammar-constrained). If the server rejects a schema (HTTP 400) the call retries once in JSON mode with the schema in the prompt; still validated by jsonschema. | Same guarantee, server-specific parameter. |
+| 5 | Committed outputs vs UI runs | App container mounts `.:/app`, so UI runs write to the clone's `outputs/` | UI runs write to the `app_state` volume (`/app/state/outputs`, `ui_decision_log.json`). Only `scripts/demo_runs.sh` writes the committed `outputs/` and `decision_log.json`. | Stops judges' or teammates' UI clicks from mixing into the committed demo log (CM: commit the demo run's log only). |
+| 6 | Demo runs (Step 9) | Run in the Docker app container | `bash scripts/demo_runs.sh` on the team laptop: starts the host llama-server, creates `.venv`, runs `pytest -q` and `model_check.py`, resets outputs (old files moved to `state/`, not deleted), runs W, E, R with the founder typing every answer, then the payment log, index, cost report and `check_outputs.py --all`. It never commits or pushes. | The assistant building the repo had no shell on the laptop, and the founder asked for no model download. |
+| 7 | Founder control in headless runs | CLI not specified beyond flags | `python -m orchestrator` asks the founder at every pause; approvals need the typed word `approve`; data forms can be pre-filled from the brief file's `founder_inputs` but must be confirmed with `y`. With no terminal it fails closed (nothing approved). | Hard requirement: approval enforced in code, UI or CLI. |
+| 8 | Step 2b notebook | `notebooks/llm_cascade_check.ipynb` | Built as `notebooks/llm_cascade_check.ipynb` (sections 1–6 as specified, scratch log only), plus `scripts/check_keys.py` (lists each provider's models, swaps to the nearest served Qwen model in `.env` if the configured ID is missing, one test call) and `scripts/model_check.py`. | Done after the founder supplied keys. Cascade logic is covered offline by `tests/test_llm_cascade.py` (14 cases incl. budget, sticky tier, no key in logs). |
+| 9 | model_check.py | Ollama `/api/chat`, single `passed` flag | Rewritten for the OpenAI-compatible llama.cpp endpoint; writes `correctness` and `performance` separately plus `local_tier` (runbook Step 0, item 4); enum and 0-10 integer checks added. | Server change; runbook fix 4. |
+| 10 | Phase 1 interview call | Always 6 calls | The interview script call runs only when G1 is `go` or `pivot_back`; thin coverage makes no model call at all. | Saves calls and time on weak briefs; the gate result is unchanged. |
+| 11 | Phase 2 target | From a cited benchmark or ASSUMPTION | Set by code from `VALIDATE_TARGET_SIGNUPS` (100), `VALIDATE_TARGET_DAYS` (14), `VALIDATE_MIN_VISITORS` (200), labelled ASSUMPTION; the model never sets it. | Organizers' example numbers; BR-3. |
+| 12 | Persona stress test (VAL-9) | Low priority, optional | Built as an optional founder choice: one call returns five third-person personas, written to `phase2_step4_persona_stress_test` labelled SIMULATED; the would-join count is stored as `simulated_signups` and excluded by the gate. | Founder asked for it to be built. |
+| 13 | Canvas self-check | Up to 2 model revisions | Code forces every unsourced box to ASSUMPTION; no extra model call. | Same guarantee, fewer calls. |
+| 14 | User-doc headings (BLD-3) | Setup, Quick start, Usage examples, Troubleshooting, What is mocked, Known limitations | Overview, Quick start, How to use, What is mocked, Troubleshooting, Limitations (checked in order by QA-12). | A1 needs no setup step; six headings kept. |
+| 15 | G3, G4, G5 `pivot_back` | Routes to Phase 2, 3, 4 | Built: G3 re-plans the MVP once when attempts run out on non-safety checks; G4 founder rejection → re-price or back to Phase 3 (once); G5 rejected drafts → redraft or back to Phase 4 (once). Tests in `tests/test_pivot_routes.py`. | Founder asked for them to be built. |
+| 16 | CORE-11 | Pause after two consecutive model errors | Stricter: every model or budget error pauses with Try again / Stop and the tier reasons. | Never retries silently. |
+| 17 | Output names | Listed per phase in the cards | Actual names: see ARCHITECTURE.md Phases tables (e.g. `phase4_step2_policy_terms`, `phase5_step3_mock_sale`, `phase6_step1_memo`). | One file per policy keeps each file small and checkable. |
+| 18 | TBD-4 Gemma 4 licence | Open | Closed: Google's Gemma 4 model card states Apache 2.0 (https://ai.google.dev/gemma/docs/core/model_card_4). | Checked 17 Nov 2026. |
+| 19 | Guardrail eval numbers (GRD-3) | Quote after running | 35-case set, latest run: recall 1.00 (27/27), false-positive rate 0.00 (0/8). The set was written by the team, so the number is in-sample; paraphrases outside it can still pass. | Honest reporting. |
+| 20 | Price quotes for brief R | Founder-entered | Five Gumroad listings for Notion wedding-planner templates (four paid one-time, one free) are pre-filled in `tests/fixtures/brief_r.json`; the founder confirms them, each page is fetched live and counted only if it loads. | Gives COM-1 real sources; a blocked page lowers the count honestly to `repeat`. |
+
+**Open issues found while building (not solved in code):**
+
+- PERF-1 (full run ≤ 180 s) cannot be met on the local tier alone: about 15 calls at local speed take several minutes. It needs the remote tiers with keys; without keys the run is measured and published instead (PERF-5).
+- Groq's `qwen/qwen3.8-27b` model ID and NVIDIA hosting (TBD-12) are still unverified; the client retries without optional parameters on HTTP 400 so a rejected `reasoning_effort` or `chat_template_kwargs` does not disable a tier.
+- `git mv Claude/CLAUDE.md CLAUDE.md` and `git rm --cached` of the PDF, PPTX, `Claude outputs/` and `Phases-Research/` must still be run by a team member (Step 1, item 1; Step 10, item 7). A root `CLAUDE.md` copy is in place.
+- The demo video (TBD-11) is not recorded; README says so.
 
 ## 1. How to use this runbook
 
@@ -939,3 +974,7 @@ Check before citing (unverified today)
 - Streamlit's `/_stcore/health` path and Compose healthcheck syntax: test on the first build.
 - Whether the organizers' checker reads subfolders of `outputs/`: unknown, hence flat names.
 - Every time value, threshold and budget in this runbook is a planning value (ASSUMPTION) until Steps 0, 2b, 8 and 9 measure it. Deadline timezone and "all phases vs one deep part": confirm on Slack.
+
+### v3.4 0.6 Running the app with one command on the team laptop
+
+`.env` sets `COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml`, `LOCAL_MODEL_DIR=/home/hachathon/models/gemma4` and `LOCAL_CTX=16384`, so plain `docker compose up` starts the GPU llama.cpp container with the existing GGUF and the UI. The container model is published on host port 8081 so it never clashes with a host `llama-server` on 8080; only one of them should run at a time on the 16 GB GPU (`scripts/stop_local_llm.sh`). `scripts/doctor.sh` checks Docker, the NVIDIA Container Toolkit, the model file, ports and disk before the first start. Plain-language steps: `docs/how_to_run.md`.

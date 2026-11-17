@@ -1,0 +1,36 @@
+{% if overrides %}## Override section
+
+This run continued past a gate by founder override. Every result below is UNVALIDATED.
+{% for o in overrides %}- Phase {{ o.phase }}: original outcome `{{ o.original_outcome }}`; reason given: "{{ o.reason }}" ({{ o.at }})
+{% endfor %}
+{% endif %}# Persevere-or-pivot memo
+
+Run {{ run_id }} · validation status: {{ validation_status }} · memo filled by code from a template (no model call).
+
+## Recommendation
+
+**Outcome:** `{{ gate.outcome }}`
+
+{{ gate.verdict }}
+{% if awaiting %}
+No real demand data yet; no persevere recommendation is possible. Next experiment to run: the Phase 2 landing-page test with its locked target.
+{% endif %}
+## Targets (set and logged before any metric was accepted)
+
+| Metric | Target |
+|---|---|
+{% for k, v in targets.items() %}| {{ k }} | {{ v }} |
+{% endfor %}
+## Metrics
+
+| Metric | Value | Label | Evidence |
+|---|---|---|---|
+{% for r in rows %}| {{ r.name }} | {{ r.value if r.value is not none else "none" }} | {{ r.label }} | {{ r.evidence }} |
+{% endfor %}
+Only values labelled `real` can support a recommendation. MOCKED and SIMULATED values are shown for completeness and ignored by the gate.
+{% if decision %}
+## Founder decision
+
+The founder chose **{{ decision.choice }}**{% if decision.choice != gate.outcome %} (differs from the system recommendation `{{ gate.outcome }}`; both are kept){% endif %}.
+{% endif %}
+No income or success is promised.

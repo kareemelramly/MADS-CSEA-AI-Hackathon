@@ -1,0 +1,14 @@
+# Optional NVIDIA GPU override (CPU stays the default). Flags are the team's measured 16 GB VRAM setup.
+# docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+services:
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    environment:
+      - LLAMA_ARGS_EXTRA=-ngl 99 --n-cpu-moe 6 -fa on --cache-type-k q8_0 --cache-type-v q8_0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

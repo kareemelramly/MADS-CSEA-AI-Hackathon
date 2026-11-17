@@ -4,7 +4,7 @@
 
 The system is an open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, target market, values) through six gated phases: Discover, Validate, Build, Commercial setup, Launch, and Operate and learn. It aims at a validated, sellable **digital** product, and it says "stop" when the evidence is weak. A fixed Python state machine (`orchestrator.py`) runs the phases in order. Each agent is a role function (`agents/<role>.py`) with its own prompt (`prompts/<role>.md`), JSON schema and log entry. The agents only propose text and JSON; plain code decides every gate, checks every rule, keeps the MOCKED ledger, and runs an approval executor that is the only path to any external effect. Nothing is published, sent, spent or released without the founder approving that exact action. No payment of any kind runs, including sandbox and test mode.
 
-Models: every agent uses one model chain (`llm.py`). Tier 1 is Groq `qwen/qwen3.8-27b` (Apache-2.0, free tier, no card). Tier 2 is NVIDIA Build (free developer tier). Tier 3 is local **Gemma 4 26B A4B, Q4_K_M** through Ollama, used as the backup and as the only tier when no API key is set, so `docker compose up` on a fresh clone works without keys. All calls of one agent task stay on one tier. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
+Models: every agent uses one model chain (`llm.py`). Tier 1 is Groq `qwen/qwen3.8-27b` (Apache-2.0, free tier, no card). Tier 2 is NVIDIA Build (free developer tier). Tier 3 is local **Gemma 4 26B A4B, Q4_K_M** served by llama.cpp's `llama-server` (OpenAI-compatible API), used as the backup and as the only tier when no API key is set, so `docker compose up` on a fresh clone works without keys. All calls of one agent task stay on one tier. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
 
 ```mermaid
 flowchart TD
@@ -40,7 +40,7 @@ flowchart TD
     P6 --> G6{"Operate gate + founder decision"}
     G6 -->|persevere / pivot / stop| E["Memo and decision"]
     X["Approval executor<br/>action, content, destination, amount, run ID"] -.-> P2 & P3 & P4 & P5 & P6
-    L["llm.py: Groq → NVIDIA → local Gemma"] -.-> P1 & P2 & P3 & P4 & P5 & P6
+    L["llm.py: Groq → NVIDIA → local Gemma (llama.cpp)"] -.-> P1 & P2 & P3 & P4 & P5 & P6
     D[("SQLite: runs, sources, artifacts, gates, approvals, ledger, action_log")] -.-> J[("decision_log.json")]
 ```
 
@@ -69,7 +69,7 @@ Every phase writes its files to `outputs/` as `phase<N>_step<M>_<name>-<label>-a
 |---|---|
 | Agents | `researcher` (search and evidence), `opportunity_analyst` (relevance, comparison, fit), `interview_planner` (Mom Test script) |
 | Tools | HN Algolia search, Stack Exchange search, GitHub issues search (keyless, fetched in parallel by code); Wikipedia for background only, never demand evidence; founder-supplied URLs, fetched and registered like any source |
-| Model calls | 6: four excerpt batches (≤ 5 excerpts each, ≤ 20 total), one comparison and fit call, one interview-script call |
+| Model calls | Up to 6: four excerpt batches (≤ 5 excerpts each, ≤ 20 total, picked by a keyword pre-screen in code), one comparison and fit call, one interview-script call (only when the gate is `go` or `pivot_back`; thin coverage makes no model call) |
 | Outputs | `phase1_step1_opportunities`, `phase1_step2_evidence.json` (source registry), `phase1_step3_comparison`, `phase1_step4_interview_script`, `phase1_gate_decision` (.md and .json, contract H1) |
 
 Method, in order:
@@ -88,18 +88,18 @@ Method, in order:
 
 | Item | Detail |
 |---|---|
-| Agents | `strategist` (Lean Canvas), `landing_writer` (page copy); optional `persona_simulator`, off by default, output labelled `SIMULATED` and never counted |
+| Agents | `strategist` (Lean Canvas, target lock), `landing_writer` (page copy), `persona_simulator` (optional, founder chooses; output labelled `SIMULATED`, its would-join count stored apart and never counted), `validation_kit` (code) |
 | Tools | `gates.lock_target()`, Jinja2 template with autoescape, `guardrails.py`, approval executor, `publish_stub()`, mock waitlist (`MOCKED`), Validation Kit export |
-| Model calls | 2 (canvas, page copy), plus at most 2 canvas self-check revisions |
-| Outputs | `phase2_step1_lean_canvas`, `phase2_step2_validation_plan.json`, `phase2_step3_landing_page.html`, three `phase2_step6_*` kit files, `phase2_gate_decision` (contract H2) |
+| Model calls | 2 (canvas, page copy), plus 1 if the founder runs the persona stress test. The canvas self-check is done by code: any unsourced box is forced to `ASSUMPTION` |
+| Outputs | `phase2_step1_lean_canvas`, `phase2_step2_locked_plan.json`, `phase2_step3_landing_page.html`, `phase2_step4_persona_stress_test` (SIMULATED, optional), `phase2_step6_experiment_plan`, `phase2_step6_tracking.csv`, `phase2_step6_results_form.json`, `phase2_gate_decision` (.md and .json, contract H2) |
 
 Method:
 
 1. **Lean Canvas:** nine boxes, each with Phase 1 source URLs or `ASSUMPTION`; code forces any still-unsourced box to `ASSUMPTION`.
-2. **Lock the target:** "N sign-ups in D days" plus `min_visitors`, from a cited benchmark or labelled `ASSUMPTION` (illustration: 100 in 14 days). Code stores a SHA-256 of the plan and `locked_at` in the log before any page exists.
+2. **Lock the target:** "N sign-ups in D days" plus `min_visitors`, set by code from configuration and labelled `ASSUMPTION` (defaults follow the organizers' example: 100 in 14 days, 200 visitors). The model never sets the target. Code stores a SHA-256 of the plan and `locked_at` in the log before any page exists.
 3. **Landing page:** headline, three benefits tied to cited pains, FAQ. The template has no slots for testimonials, counts, ratings or countdowns, and `guardrails.py` rejects them in free text. Email-only form posting to the mock waitlist; footer "Waitlist: MOCKED".
 4. **Publish approval:** action `publish_landing_page`, the page, destination "none: publishing is STUBBED", amount $0.00, run ID. Approval only logs `would_publish`.
-5. **Validation Kit:** the page, the Phase 1 interview script and a measurement checklist whose field names match the form.
+5. **Validation Kit:** an experiment plan restating the locked target and its hash, a daily tracking sheet and the results form, whose field names match the gate input.
 6. **Real results form:** `experiment_status` (default `not_started`), start and end dates, visitors (default unknown), real sign-ups (default 0). Simulated counts are stored apart and cannot reach the gate.
 7. **Gate** (see Gates). With no completed experiment the phase waits; the founder may continue by override, which marks every later output as unvalidated.
 
@@ -112,14 +112,14 @@ Method:
 | Agents | `mvp_planner`, `builder`, `doc_writer` (model); `qa`, `packager` (code only) |
 | Tools | A1 template, Jinja2 renderer with autoescape, QA checks (standard library), SHA-256 manifest, approval executor |
 | Model calls | 3: MVP definition, slot content, user docs. Archetype, manifest and traceability matrix come from the A1 template in code |
-| Outputs | `phase3_step1_mvp_definition`, `phase3_step2_build_plan`, `phase3_step3_product_*` and licence file, `phase3_step4_user_docs`, `phase3_step5_test_report`, `phase3_gate_tests`, `phase3_step6_release_package`, `phase3_step6_handoff.json` (H3) |
+| Outputs | `phase3_step1_mvp_definition` (plan, journey, traceability matrix), `phase3_step3_product_checklist.md`, `phase3_step3_product_tracker.csv`, `phase3_step3_product_license.txt`, `phase3_step4_user_docs`, `phase3_step5_test_report`, `phase3_gate_decision` (one per attempt), `phase3_step6_handoff.json` (H3, with the release manifest) |
 
 Method:
 
 1. **Entry rule:** runs only after a Phase 2 `go` (mode `mvp`) or a founder override (mode `minimal`: one Must feature, override banner, feedback sheet of past-behaviour questions).
-2. **Define the MVP:** one user story, 2 to 5 journey steps, at most 3 Must features each tied to a Phase 1 evidence ID, 3 to 6 Given/When/Then acceptance criteria each mapped to a check or marked `MANUAL`. Thresholds are logged first (`set_phase3_thresholds`).
+2. **Define the MVP:** one user story, 3 to 6 journey steps, at most 3 Must features each tied to a Phase 1 evidence ID, 3 to 6 Given/When/Then acceptance criteria each mapped to a check or marked `MANUAL`. Thresholds are logged first (`set_phase3_thresholds`).
 3. **Build:** the model returns JSON text for named slots; the renderer escapes and inserts it. Model output is never executed; the builder never calls `eval`, `exec` or `subprocess`.
-4. **Docs:** six fixed headings (Setup, Quick start, Usage examples, Troubleshooting, What is mocked, Known limitations); "What is mocked" is copied from the plan by code.
+4. **Docs:** six fixed headings in order (Overview, Quick start, How to use, What is mocked, Troubleshooting, Limitations); "What is mocked" is copied from the plan by code, and Quick start links every journey step to its checklist anchor.
 5. **Test (no model):** 14 checks apply to A1: manifest complete, size, format validity, journey trace, internal links, no external resources, banned content, excluded category, claims sourced, mocks and override labelled, docs headings, licence, acceptance criteria, naming. Script integrity is not applicable because A1 contains no scripts. A "tested MVP" means all 14 pass and every automated criterion passes; real-user completion stays an unchecked `MANUAL` item.
 6. **Release approval:** action `release_product`, content = manifest with hashes, destination "none: internal hand-off to Phase 4", amount $0.00, run ID.
 
@@ -129,16 +129,16 @@ Method:
 
 | Item | Detail |
 |---|---|
-| Agents | `pricer` (classification and rationale; arithmetic in code), `policy_drafter` |
-| Tools | Founder-entered competitor quotes with URLs (fetched and registered), `statistics.median` and `decimal` in code, required-section checklist, approval executor |
+| Agents | `pricer` (code only: fetch, register, median), `policy_drafter` (model) |
+| Tools | Founder-entered competitor quotes with URLs (each page fetched; registered only if it loads; whether the quoted price text appears on the page is recorded), `statistics.median` in code, required-section and compliance-claim checks, approval executor |
 | Model calls | 1 (policies); pricing is code |
-| Outputs | `phase4_step1_pricing`, `phase4_step2_policies`, `phase4_gate_commercial`, `phase4_step3_handoff.json` (H4) |
+| Outputs | `phase4_step1_pricing`, `phase4_step2_policy_terms`, `_privacy`, `_refund`, `_delivery`, `phase4_gate_decision`, `phase4_step3_handoff.json` (H4) |
 
 Method:
 
 1. **Pricing:** log `define_pricing_criteria` first; accept only one-time paid prices in one currency with working URLs; price = median of at least 3; free comparables are counted and shown, never dropped. Fewer than 3 → `repeat`; the founder may set an experimental price only by override, labelled `ASSUMPTION` all the way to the store page.
-2. **Policies:** Terms (consistent with the product licence chosen at release), Privacy, Refund, Delivery. Each starts "DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice", flags jurisdictions from the brief's countries, and makes no compliance claim.
-3. **Commercial approval:** action `commercial_setup`, price and drafts, destination "none: internal hand-off to Phase 5; nothing is published, sent or signed", the price as a listed amount with "no charge is made", run ID. Approval releases H4 only; it is not a signature or legal acceptance.
+2. **Policies:** Terms (consistent with the MIT product licence), Privacy, Refund, Delivery. Each starts "DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice"; code rejects any compliance claim or banned content.
+3. **Commercial approval:** action `commercial_setup`, content = canonical JSON of price and drafts, destination "none: STUBBED (internal hand-off to Phase 5; nothing signed)", amount 0 (no charge is ever made), run ID. Approval releases H4 only; it is not a signature or legal acceptance.
 
 ### Phase 5: Launch
 
@@ -147,9 +147,9 @@ Method:
 | Item | Detail |
 |---|---|
 | Agents | `launcher` (store page and launch post copy); `payments.py`, `delivery.py`, `refunds.py`, `reconcile.py` are code |
-| Tools | Jinja2 store template, guardrails, approval executor (one approval per item), SQLite ledger |
+| Tools | Guardrails, approval executor (one approval per item), SQLite ledger, founder's "Simulate purchase (MOCKED)" input |
 | Model calls | 2 (store page, launch post); the ledger never calls a model and no ledger data is sent to one |
-| Outputs | `phase5_step1_store_page`, `phase5_step2_launch_post`, `phase5_gate_launch` (H5, "go" means mock run only), `outputs/payment_test_log.md` |
+| Outputs | `phase5_step1_store_page`, `phase5_step2_launch_post`, `phase5_step3_mock_sale`, `phase5_gate_launch` (.md and .json, H5: "go" means mock run only), `outputs/payment_test_log.md` |
 
 Method: each draft gets its own approval with its own destination, both marked "STUBBED · NOT PUBLISHED". After approval of the store page, the mocked sale-to-cash flow runs (see Sale to cash).
 
@@ -162,7 +162,7 @@ No Core step. Support users, measure what is real, and write a persevere-or-pivo
 | Agents | `support_agent` (FAQ and reply drafts); `analyst` and `gates.operate_gate()` are code |
 | Tools | Real-metrics form (founder-entered, evidence link required), Phase 6 targets logged before data, Jinja2 memo template, approval executor for replies |
 | Model calls | 1 (FAQ); the memo's numbers, labels and outcome are filled by code |
-| Outputs | `phase6_step1_metrics`, `phase6_step2_support_faq`, `phase6_step3_memo`, `phase6_gate_decision` |
+| Outputs | `phase6_step1_memo` (metrics table and recommendation), `phase6_step2_support_faq`, `phase6_gate_decision` (with the founder's decision) |
 
 Method: every metric is labelled real, `MOCKED` or `SIMULATED`, and only real values reach the recommendation. Support drafts cite the docs or DRAFT policies, are labelled "DRAFT · AI-written for founder review", never speak as the founder or a named person, and send legal, health, financial and refund questions to the founder without advice or promises. Sending a reply is `STUBBED` behind approval. The founder's persevere, pivot or stop choice is logged with `approved_by: "founder"`; if it differs from the recommendation, the memo keeps both.
 
@@ -174,11 +174,11 @@ Every phase ends in a gate, and every core step has a step gate recorded the sam
 
 | Gate | Checks | go | repeat | pivot_back | stop |
 |---|---|---|---|---|---|
-| G1 Evidence (Discover) | Coverage, then relevant sourced items, then fit | All pass | Thin coverage after one broadened search (inconclusive); missing brief fields; first evidence shortfall | Evidence or fit below threshold on adequate coverage, a ranked alternative passes | Excluded product; values conflict; weak evidence or fit on adequate coverage with no alternative left |
+| G1 Evidence (Discover) | Coverage, then relevant sourced items, then fit | All pass | Thin coverage after one broadened search (inconclusive); missing brief fields; source outage; model error | Evidence or fit below threshold on adequate coverage, a ranked alternative passes | Excluded product; values conflict; weak evidence or fit on adequate coverage with no alternative left |
 | G2 Demand (Validate) | Target hash, experiment status, exposure, ratio r = real sign-ups ÷ N | r ≥ 1 | Experiment abandoned or seen by fewer than `min_visitors`; 0.5 ≤ r < 1 with an attempt left | r < 0.5, or 0.5 ≤ r < 1 after the final attempt, with an alternative left | Same with no alternative left; target tampered |
-| G3 Tests (Build) | 14 checks, acceptance criteria | All pass | A check fails, attempt < 3 | Scope cannot be traced to evidence | Attempts used up; excluded category |
-| G4 Commercial | Asset hashes, price evidence, DRAFT labels, approval | All present and approved | < 3 quotes; missing sections; founder rejects price or terms | Founder rejects the product; free comparables at least as many as paid | Excluded product; forbidden action requested |
-| G5 Launch | Per-item approvals, mock ledger tests | Both pass ("mock run only") | A draft rejected or a ledger test fails | Offer needs changing (Phase 4) | Excluded product |
+| G3 Tests (Build) | 14 checks, acceptance criteria | All pass | A check fails, attempt < 3 (failures fed back) | Attempts used up on traceability or format checks: re-plan the MVP from the evidence (once) | Attempts used up with banned content (QA-08) or an excluded category (QA-09); or after the re-plan |
+| G4 Commercial | Price evidence, DRAFT labels and sections, approval | All present and approved | < 3 verified paid quotes; missing sections or a compliance claim; founder chooses to re-price | Founder rejects the offer and chooses to change the product → Phase 3 (once) | Founder stops |
+| G5 Launch | Per-item approvals, mock ledger checks | Both pass ("mock run only") | Guardrail refusal or a ledger check fails; founder chooses to redraft | Founder rejects a draft and chooses to change the offer → Phase 4 (once) | Founder stops |
 | G6 Operate | Real metrics against pre-set targets | All targets met by real values (persevere) | Only mocked or simulated data, or no completed experiment (no recommendation possible) | Target missed, something to pivot to | Targets missed, nothing left |
 
 The Discover and Demand gates never default to `go`.
@@ -190,7 +190,7 @@ The Discover and Demand gates never default to `go`.
 
 **When the system recommends STOP on weak evidence.** Only after the evidence was really examined: Discover with adequate coverage but too few relevant sourced items or too low a fit, once the retry is used and no alternative passes; Validate after a **completed** experiment below target with no alternative left. The organizers' example: target 100 sign-ups in 14 days, 12 real sign-ups, r = 0.12, below the 0.5 floor, so the system recommends pivot back while an alternative remains and stop when none does. The verdict says "not enough evidence to continue", never "no market exists". A source outage, thin coverage, an unrun experiment, a model error or a used-up time budget never produces `stop`.
 
-**Founder override.** After `awaiting_evidence`, `repeat`, `pivot_back` or an evidence-based `stop` in Discover, Validate or the Phase 4 price check, the founder may continue with a typed reason of at least 20 characters. The override is logged, the original verdict stays, an amber bar stays on screen, and every later output starts with "UNVALIDATED · FOUNDER OVERRIDE". It can never pass an excluded product, a guardrail refusal, the Phase 3 test gate, an approval, the payment ban or a failing ledger test.
+**Founder override.** After `awaiting_evidence`, `repeat`, `pivot_back` or an evidence-based `stop` in Discover (only when an idea was scored), Validate or the Phase 4 price check, the founder may continue with a typed reason of at least 20 characters. The override is logged, the original verdict stays, an amber bar stays on screen, and every later output starts with "UNVALIDATED · FOUNDER OVERRIDE". It can never pass an excluded product, a guardrail refusal, the Phase 3 test gate, an approval, the payment ban or a failing ledger test.
 
 **Approval.** Approval is separate from gates: a phase `go` authorizes nothing. Each external-effect action (publish, send, release, commercial hand-off, support reply) is queued with its action, content hash, destination, amount and run ID. The founder approves or rejects explicitly; there is no default and no approval on timeout. The executor recomputes the binding, requires an unconsumed approval for the same run, consumes it in the same transaction as the STUBBED or MOCKED effect, and refuses any changed field. Payments, account creation and credential storage cannot be queued at all.
 
@@ -264,33 +264,36 @@ flowchart LR
 
 - **Time.** In the demo configuration a full run is limited to 180 s of system time (time spent waiting for the founder excluded). The local-only path must finish but is not held to 180 s; its measured time is published in the README.
 - **State and logs.** SQLite (WAL mode) on the `app_state` volume holds runs, steps, sources, claims, artifacts, gates, approvals, the mock ledger and `action_log`. `decision_log.json` is exported atomically from `action_log` for the committed demo runs, with the five required keys plus `run_id`, tier, tokens and wall time. Cost is $0.00 on every tier; it is reported as observed only from a logged run.
-- **Runtime.** `docker compose up` starts `ollama` (weights on a persistent volume), a one-shot `model-pull`, and `app`. The UI opens at once and shows local-model readiness while the weights download. Ports bind to `127.0.0.1`. An optional `docker-compose.gpu.yml` uses an NVIDIA GPU; on a 16 GB card the Q4_K_M weights (about 16–17 GB) mostly fit, with a small spill to system RAM.
+- **Runtime.** `docker compose up` starts `llm` (llama.cpp `llama-server`; it loads the GGUF from `LOCAL_MODEL_DIR` when present, otherwise downloads `unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M` once into a volume) and `app`. The UI opens at once and shows local-model readiness from `/health` while the model loads. Ports bind to `127.0.0.1`. `docker-compose.gpu.yml` switches to the CUDA image with the team's 16 GB VRAM flags (`-ngl 99 --n-cpu-moe 6 -fa on`, q8_0 KV cache: MoE expert layers that do not fit stay on the CPU). `docker-compose.host-llm.yml` uses a `llama-server` already running on the host (`scripts/start_local_llm.sh`). UI runs write to the `app_state` volume; only the demo runs write the committed `outputs/` and `decision_log.json`.
 
 ## Built vs. stubbed
 
-Status words follow one rule: a row says **Working** only when its code exists and its named test passes or a logged run shows it; until then it is **Planned**. **MOCKED** means fake data or service in place of a real one; **STUBBED** means the action is never connected and only logs what it would do. The README table "What works and what is mocked" uses the same rows.
+Status words follow one rule: a row says **Working** only when its code exists and its named test passes (`pytest -q`, offline) or a logged run shows it; otherwise it is **Planned**. **MOCKED** means fake data or service in place of a real one; **STUBBED** means the action is never connected and only logs what it would do. The README table "What works and what is mocked" uses the same rows.
 
-| Step | Status today | Status at release | Verified by |
-|---|---|---|---|
-| Brief intake and exclusion check | Planned | Working | `tests/test_phase1_discover.py` |
-| Source search and registry (HN Algolia, Stack Exchange, GitHub, Wikipedia) | Planned | Working | `scripts/source_check.py`, Phase 1 tests |
-| Opportunity scoring, comparison, interview script | Planned | Working | Phase 1 tests |
-| Lean Canvas and target lock | Planned | Working | `tests/test_phase2_validate.py` |
-| Landing page generation and guardrails | Planned | Working | Phase 2 tests |
-| Waitlist backend | Planned | **MOCKED** | Phase 2 tests |
-| Publishing the landing page | Planned | **STUBBED** (behind approval) | `test_publish_blocked_without_approval` |
-| Real experiment | Not part of the system | Run by the founder outside the system; results entered in the form | Phase 2 tests |
-| Persona stress test | Planned | Optional, output **SIMULATED**, excluded from the gate | Phase 2 tests |
-| MVP build (A1), user docs, 14 QA checks | Planned | Working | `tests/test_phase3_build.py` |
-| Product release | Planned | Internal hand-off after approval; publishing **STUBBED** | Phase 3 tests |
-| Pricing and DRAFT policies | Planned | Working (policies DRAFT, not legal advice) | Phase 4 tests |
-| Store page and launch post | Planned | Drafts working; publishing and posting **STUBBED** | Phase 5 tests |
-| Payment, delivery, refund, reconciliation | Planned | **MOCKED** | `tests/test_phase5_mock.py`, `outputs/payment_test_log.md` |
-| Support FAQ and replies | Planned | Drafts working; sending **STUBBED** | `tests/test_phase6_operate.py` |
-| Metrics and persevere-or-pivot memo | Planned | Working on real, founder-entered data | Phase 6 tests |
-| Founder approval executor and override | Planned | Working | `tests/test_backbone.py` |
-| Model chain (Groq → NVIDIA → local Gemma) | Planned | Working | `tests/test_llm_cascade.py` (fake HTTP) |
-| Guardrails against trick prompts | Planned | Working; recall and false-positive rate quoted only from the eval run | `tests/test_guardrails_eval.py`, `tests/evals/` |
+| Step | Status | Verified by |
+|---|---|---|
+| Brief intake, required fields and exclusion check | Working | `test_excluded_brief_stops_not_overridable`, `test_missing_fields_repeat`, `test_brief_e_stops_on_exclusion` |
+| Source search and registry (HN Algolia, Stack Exchange, GitHub; Wikipedia background) | Working (offline tests on recorded-style fixtures; live check by `scripts/source_check.py`) | `tests/test_phase1_discover.py` |
+| Coverage, evidence and fit gate; opportunity scoring; Mom Test script | Working | `test_thin_coverage_repeats_never_stops`, `test_adequate_coverage_weak_evidence_no_alternative_stops`, `test_interview_drops_hypothetical_questions` |
+| Lean Canvas, target lock, landing page with guardrails | Working | `tests/test_phase2_validate.py` |
+| Waitlist backend | **MOCKED** (form submits nowhere) | landing page template |
+| Publishing the landing page | **STUBBED** behind approval (logs `would_publish`) | `test_publish_blocked_without_approval` |
+| Demand gate with `awaiting_evidence` and override | Working | `test_gate_covers_all_branches`, `test_awaiting_without_override_does_not_start_phase3` |
+| Real experiment | Run by the founder outside the system; results entered in the form | — |
+| Persona stress test | Working (optional); output **SIMULATED**, excluded from the gate | `test_persona_test_is_simulated_and_excluded` |
+| MVP build (A1), user docs, 14 QA checks, release approval | Working | `tests/test_phase3_build.py` |
+| Product release | Internal hand-off after approval; publishing **STUBBED** | `test_release_needs_approval_and_manifest_change_refused` |
+| Pricing (median of ≥ 3 sourced quotes) and DRAFT policies | Working (policies DRAFT, not legal advice) | `tests/test_phase4_commercial.py` |
+| Store page and launch post | Drafts working; publishing and posting **STUBBED** behind separate approvals | `test_brief_r_full_run_with_override` |
+| Payment, delivery, refund, reconciliation, payout | **MOCKED** (local SQLite events only) | `tests/test_phase5_mock.py`, `outputs/payment_test_log.md` |
+| Support FAQ and replies | Drafts working; sending **STUBBED** behind approval | `tests/test_phase6_operate.py` |
+| Metrics and persevere-or-pivot memo | Working on real, founder-entered data; mock data never gives persevere | `test_mock_only_never_persevere` |
+| Founder approval executor and override | Working | `tests/test_backbone.py` |
+| Model chain (Groq → NVIDIA → local llama.cpp) | Working with fake HTTP; local tier measured by `scripts/model_check.py`; remote tiers optional and unmeasured until keys are added | `tests/test_llm_cascade.py` |
+| Guardrails against trick prompts | Working on the team's 35-case eval set (in-sample; paraphrases outside it can be missed) | `tests/test_guardrails_eval.py` |
+| Streamlit UI (brief, verdict, approval panel, override bar, readiness) | Working | `tests/test_ui_smoke.py` |
+| G3/G4/G5 `pivot_back` routes | Working | `tests/test_pivot_routes.py` |
+| Provider check notebook | Working on the host with keys (`notebooks/llm_cascade_check.ipynb`, outputs cleared) | `scripts/check_keys.py`, notebook |
 
 Not in this system at all: real payments of any kind, real publishing or posting, real email, account creation, stored passwords or card details, and any claim of legal compliance.
 
@@ -298,7 +301,8 @@ Not in this system at all: real payments of any kind, real publishing or posting
 
 | When | Item |
 |---|---|
-| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; Groq → NVIDIA → local Gemma chain; tests and guardrail eval set |
+| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; Groq → NVIDIA → local Gemma (llama.cpp) chain; tests and guardrail eval set |
+| Next | A CI workflow running `pytest -q` on every push; persona test with several calls instead of one |
 | Next | Product shapes A2 (short HTML guide) and A3 (template pack), with script-integrity checks for HTML; more keyless or founder-keyed evidence sources; import of real experiment results from the founder's own form provider, behind approval; measured A/B test of an optional critic for page and store copy |
 | Next | Arabic and English output for MENA founders; richer Phase 6 metrics from founder-uploaded exports |
 | Later | Authenticated multi-user approvals with roles; consented real integrations (hosting, store listing, email) through the same executor, each still requiring founder approval; reviewed legal policy templates per jurisdiction; A4 static tools |

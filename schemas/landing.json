@@ -1,0 +1,69 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "headline": {
+   "type": "string"
+  },
+  "subheadline": {
+   "type": "string"
+  },
+  "benefits": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "text": {
+      "type": "string"
+     },
+     "source_ids": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "assumption": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "text",
+     "source_ids",
+     "assumption"
+    ]
+   },
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "faq": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "q": {
+      "type": "string"
+     },
+     "a": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "q",
+     "a"
+    ]
+   },
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "cta": {
+   "type": "string"
+  }
+ },
+ "required": [
+  "headline",
+  "subheadline",
+  "benefits",
+  "faq",
+  "cta"
+ ]
+}

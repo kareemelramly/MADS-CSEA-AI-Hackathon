@@ -1,0 +1,19 @@
+.env
+.venv/
+*.pptx
+*.pdf
+*.gguf
+models/*.gguf
+Claude outputs/
+__pycache__/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+state/
+model_check_result.json
+.pytest_cache/
+~$*
+.ipynb_checkpoints/
+notebook_check_result.json
+scratch*
+.decision_log.*.tmp

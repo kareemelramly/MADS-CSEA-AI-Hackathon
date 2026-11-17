@@ -1,0 +1,42 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "title": {
+   "type": "string"
+  },
+  "intro": {
+   "type": "string"
+  },
+  "sections": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "journey_step": {
+      "type": "string"
+     },
+     "items": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 3,
+      "maxItems": 8
+     }
+    },
+    "required": [
+     "journey_step",
+     "items"
+    ]
+   },
+   "minItems": 3,
+   "maxItems": 6
+  }
+ },
+ "required": [
+  "title",
+  "intro",
+  "sections"
+ ]
+}

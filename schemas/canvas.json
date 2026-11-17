@@ -1,0 +1,223 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "boxes": {
+   "type": "object",
+   "properties": {
+    "problem": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "customer_segments": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "unique_value_proposition": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "solution": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "channels": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "revenue_streams": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "cost_structure": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "key_metrics": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    },
+    "unfair_advantage": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "source_ids": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "assumption": {
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "text",
+      "source_ids",
+      "assumption"
+     ]
+    }
+   },
+   "required": [
+    "problem",
+    "customer_segments",
+    "unique_value_proposition",
+    "solution",
+    "channels",
+    "revenue_streams",
+    "cost_structure",
+    "key_metrics",
+    "unfair_advantage"
+   ]
+  }
+ },
+ "required": [
+  "boxes"
+ ]
+}

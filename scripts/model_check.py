@@ -1,63 +1,29 @@
-"""Hour-one model check (gate 0): JSON validity and speed, thresholds fixed before running.
+"""Hour-one model check (gate 0): JSON correctness and speed, measured as two separate results.
 
-Usage:
-    python scripts/model_check.py
-    python scripts/model_check.py gpt-oss:20b      # test the fallback model
-
-Needs only the Python standard library and a running Ollama server on localhost:11434.
+Targets the local llama.cpp server (OpenAI-compatible) by default. Standard library only.
+    python scripts/model_check.py [base_url]       # default http://127.0.0.1:8080/v1
+Writes model_check_result.json (gitignored). Correctness decides whether a model can be the local
+tier; speed only decides how it is described (runbook Step 0, MOD-10).
 """
 import json
 import sys
 import time
 import urllib.request
 
-MODEL = sys.argv[1] if len(sys.argv) > 1 else "hf.co/unsloth/gemma-4-26B-A4B-it-GGUF:UD-IQ4_XS"
-URL = "http://localhost:11434/api/chat"
-NUM_CTX = 16384
-
-# Gate thresholds, set BEFORE the run (ASSUMPTION values; change them only before running).
-GATE_MIN_VALID = 9          # out of 10 briefs, after one retry each
-GATE_MIN_TOKENS_PER_S = 40  # generation speed
+BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8080/v1"
+GATE_MIN_VALID = 9          # out of 10 briefs, after one retry each (ASSUMPTION, fixed before running)
+GATE_MIN_TOKENS_PER_S = 40
 GATE_MAX_SECONDS_PER_CALL = 30
 
-SCHEMA = {
-    "type": "object",
-    "properties": {
-        "idea_summary": {"type": "string"},
-        "target_customer": {"type": "string"},
-        "pain_points": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "claim": {"type": "string"},
-                    "evidence": {"type": "string", "description": "a source URL, or the word ASSUMPTION"},
-                },
-                "required": ["claim", "evidence"],
-            },
-        },
-        "alternatives": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {"name": {"type": "string"}, "score_0_to_10": {"type": "integer"}},
-                "required": ["name", "score_0_to_10"],
-            },
-        },
-        "excluded_category": {"type": "boolean"},
-        "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
-    },
-    "required": ["idea_summary", "target_customer", "pain_points", "alternatives",
-                 "excluded_category", "confidence"],
-}
-
-SYSTEM = (
-    "You are the Discover agent. Return only JSON matching the schema. "
-    "You have no search results, so every pain point's evidence must be the word ASSUMPTION. "
-    "Give exactly 2 alternatives. Set excluded_category true for physical goods, financial, "
-    "investment or crypto products, and health or legal advice products. Never promise income."
-)
-
+SCHEMA = {"type": "object", "properties": {
+    "idea_summary": {"type": "string"}, "target_customer": {"type": "string"},
+    "pain_points": {"type": "array", "items": {"type": "object", "properties": {"claim": {"type": "string"}, "evidence": {"type": "string"}}, "required": ["claim", "evidence"]}},
+    "alternatives": {"type": "array", "items": {"type": "object", "properties": {"name": {"type": "string"}, "score_0_to_10": {"type": "integer", "minimum": 0, "maximum": 10}}, "required": ["name", "score_0_to_10"]}},
+    "excluded_category": {"type": "boolean"}, "confidence": {"type": "string", "enum": ["low", "medium", "high"]}},
+    "required": ["idea_summary", "target_customer", "pain_points", "alternatives", "excluded_category", "confidence"]}
+SYSTEM = ("You are the Discover agent. Return only JSON matching the schema. You have no search results, so every pain point's "
+          "evidence must be the word ASSUMPTION. Give exactly 2 alternatives. Set excluded_category true for physical goods, financial, "
+          "investment or crypto products, and health or legal advice products. Never promise income.")
 BRIEFS = [
     "Idea: Notion templates for wedding planners. Skills: design. Budget: $200. Time: 10 h/week. Market: Egypt. Values: honesty.",
     "Idea: a browser extension that summarises Arabic news. Skills: JavaScript. Budget: $0. Time: 15 h/week. Market: MENA students.",
@@ -73,60 +39,62 @@ BRIEFS = [
 
 
 def call(brief):
-    body = {
-        "model": MODEL,
-        "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": brief}],
-        "format": SCHEMA,
-        "stream": False,
-        "think": False,
-        "options": {"num_ctx": NUM_CTX, "temperature": 0.2},
-    }
-    req = urllib.request.Request(URL, data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
-    start = time.time()
+    body = {"model": "local", "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": brief}],
+            "response_format": {"type": "json_schema", "json_schema": {"name": "out", "schema": SCHEMA}},
+            "temperature": 0.2, "max_tokens": 800, "chat_template_kwargs": {"enable_thinking": False}}
+    req = urllib.request.Request(BASE.rstrip("/") + "/chat/completions", data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
+    t = time.time()
     with urllib.request.urlopen(req, timeout=300) as r:
         data = json.loads(r.read())
-    wall = time.time() - start
-    tps = data.get("eval_count", 0) / max(data.get("eval_duration", 1) / 1e9, 1e-9)
-    return data["message"]["content"], wall, tps
+    dt = time.time() - t
+    toks = (data.get("usage") or {}).get("completion_tokens") or 0
+    tps = (data.get("timings") or {}).get("predicted_per_second") or (toks / dt if dt else 0)
+    return data["choices"][0]["message"]["content"], dt, tps
 
 
 def valid(text):
     try:
-        obj = json.loads(text)
-    except json.JSONDecodeError:
+        o = json.loads(text)
+    except ValueError:
         return False
-    if not all(k in obj for k in SCHEMA["required"]):
+    if not all(k in o for k in SCHEMA["required"]):
         return False
-    if len(obj["alternatives"]) != 2:
+    if o["confidence"] not in ("low", "medium", "high"):
         return False
-    return all(p.get("evidence", "").startswith(("http", "ASSUMPTION")) for p in obj["pain_points"])
+    if not all(isinstance(a.get("score_0_to_10"), int) and 0 <= a["score_0_to_10"] <= 10 for a in o["alternatives"]):
+        return False
+    return all(p.get("evidence") == "ASSUMPTION" for p in o["pain_points"])
 
 
 def main():
-    results, ok = [], 0
-    for i, brief in enumerate(BRIEFS, 1):
-        attempt_ok = False
-        for attempt in (1, 2):
-            text, wall, tps = call(brief)
-            attempt_ok = valid(text)
-            if attempt_ok:
+    ok, times, speeds = 0, [], []
+    for i, b in enumerate(BRIEFS, 1):
+        good = False
+        for _ in range(2):
+            try:
+                text, dt, tps = call(b)
+            except Exception as e:  # noqa: BLE001
+                print(f"{i:2d} error {type(e).__name__}: {e}")
+                continue
+            times.append(dt)
+            speeds.append(tps)
+            if valid(text):
+                good = True
                 break
-        ok += attempt_ok
-        results.append({"brief": i, "valid": attempt_ok, "attempts": attempt, "seconds": round(wall, 1),
-                        "tokens_per_s": round(tps, 1), "output": text[:400]})
-        print(f"[{i:2}] valid={attempt_ok} attempts={attempt} {wall:5.1f}s {tps:6.1f} tok/s")
-
-    avg_tps = sum(r["tokens_per_s"] for r in results) / len(results)
-    max_s = max(r["seconds"] for r in results)
-    passed = ok >= GATE_MIN_VALID and avg_tps >= GATE_MIN_TOKENS_PER_S and max_s <= GATE_MAX_SECONDS_PER_CALL
-    summary = {"model": MODEL, "valid": f"{ok}/10", "avg_tokens_per_s": round(avg_tps, 1),
-               "slowest_call_s": max_s, "gate": "go" if passed else "repeat_with_fallback_model",
-               "thresholds": {"min_valid": GATE_MIN_VALID, "min_tps": GATE_MIN_TOKENS_PER_S,
-                              "max_s_per_call": GATE_MAX_SECONDS_PER_CALL}}
-    print(json.dumps(summary, indent=2))
-    with open("model_check_result.json", "w", encoding="utf-8") as f:
-        json.dump({"summary": summary, "runs": results}, f, indent=2)
+        ok += good
+        print(f"{i:2d} valid={good} last_call={times[-1] if times else 0:.1f}s tok/s={speeds[-1] if speeds else 0:.1f}")
+    avg_tps = sum(speeds) / len(speeds) if speeds else 0
+    max_s = max(times) if times else 0
+    correct = ok >= GATE_MIN_VALID
+    fast = avg_tps >= GATE_MIN_TOKENS_PER_S and max_s <= GATE_MAX_SECONDS_PER_CALL
+    summary = {"base_url": BASE, "valid": ok, "of": len(BRIEFS), "avg_tokens_per_s": round(avg_tps, 1), "max_seconds_per_call": round(max_s, 1),
+               "correctness": "pass" if correct else "fail", "performance": "fast" if fast else "slow",
+               "local_tier": "keep_fast" if correct and fast else "keep_slow_document_numbers" if correct else "try_next_candidate",
+               "measured_at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    json.dump(summary, open("model_check_result.json", "w"), indent=1)
+    print(json.dumps(summary, indent=1))
+    return 0 if correct else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

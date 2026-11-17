@@ -1,0 +1,257 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "segment": {
+   "type": "object",
+   "properties": {
+    "text": {
+     "type": "string"
+    },
+    "source_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "assumption": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "text",
+    "source_ids",
+    "assumption"
+   ]
+  },
+  "market_note": {
+   "type": "object",
+   "properties": {
+    "text": {
+     "type": "string"
+    },
+    "source_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "assumption": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "text",
+    "source_ids",
+    "assumption"
+   ]
+  },
+  "idea": {
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "description": {
+     "type": "string"
+    },
+    "skills": {
+     "type": "object",
+     "properties": {
+      "score": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 5
+      },
+      "reason": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "score",
+      "reason"
+     ]
+    },
+    "budget": {
+     "type": "object",
+     "properties": {
+      "score": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 5
+      },
+      "reason": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "score",
+      "reason"
+     ]
+    },
+    "time": {
+     "type": "object",
+     "properties": {
+      "score": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 5
+      },
+      "reason": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "score",
+      "reason"
+     ]
+    },
+    "values": {
+     "type": "object",
+     "properties": {
+      "score": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 5
+      },
+      "reason": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "score",
+      "reason"
+     ]
+    },
+    "source_ids": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "assumption": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "name",
+    "description",
+    "skills",
+    "budget",
+    "time",
+    "values",
+    "source_ids",
+    "assumption"
+   ]
+  },
+  "alternatives": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "skills": {
+      "type": "object",
+      "properties": {
+       "score": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+       },
+       "reason": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "score",
+       "reason"
+      ]
+     },
+     "budget": {
+      "type": "object",
+      "properties": {
+       "score": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+       },
+       "reason": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "score",
+       "reason"
+      ]
+     },
+     "time": {
+      "type": "object",
+      "properties": {
+       "score": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+       },
+       "reason": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "score",
+       "reason"
+      ]
+     },
+     "values": {
+      "type": "object",
+      "properties": {
+       "score": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+       },
+       "reason": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "score",
+       "reason"
+      ]
+     },
+     "source_ids": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "assumption": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "skills",
+     "budget",
+     "time",
+     "values",
+     "source_ids",
+     "assumption"
+    ]
+   },
+   "minItems": 2,
+   "maxItems": 2
+  }
+ },
+ "required": [
+  "segment",
+  "market_note",
+  "idea",
+  "alternatives"
+ ]
+}

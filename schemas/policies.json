@@ -1,0 +1,96 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "terms": {
+   "type": "object",
+   "properties": {
+    "use_license": {
+     "type": "string"
+    },
+    "no_guarantees": {
+     "type": "string"
+    },
+    "limitation_of_liability": {
+     "type": "string"
+    },
+    "changes": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "use_license",
+    "no_guarantees",
+    "limitation_of_liability",
+    "changes"
+   ]
+  },
+  "privacy": {
+   "type": "object",
+   "properties": {
+    "data_collected": {
+     "type": "string"
+    },
+    "purpose": {
+     "type": "string"
+    },
+    "retention": {
+     "type": "string"
+    },
+    "contact": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "data_collected",
+    "purpose",
+    "retention",
+    "contact"
+   ]
+  },
+  "refund": {
+   "type": "object",
+   "properties": {
+    "eligibility": {
+     "type": "string"
+    },
+    "process": {
+     "type": "string"
+    },
+    "revocation_of_access": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "eligibility",
+    "process",
+    "revocation_of_access"
+   ]
+  },
+  "delivery": {
+   "type": "object",
+   "properties": {
+    "format": {
+     "type": "string"
+    },
+    "timing": {
+     "type": "string"
+    },
+    "access_expiry": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "format",
+    "timing",
+    "access_expiry"
+   ]
+  }
+ },
+ "required": [
+  "terms",
+  "privacy",
+  "refund",
+  "delivery"
+ ]
+}

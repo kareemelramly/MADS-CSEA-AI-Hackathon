@@ -1,0 +1,85 @@
+# One-command setup: docker compose up  ->  open http://localhost:8501
+# Services: llm (llama.cpp server with Gemma 4 26B A4B Q4_K_M, the local tier) and app (Streamlit UI,
+# orchestrator, agents, gates, approval, MOCKED ledger). Groq and NVIDIA tiers are optional (keys in .env).
+name: venture-builder
+
+services:
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server            # CPU build; docker-compose.gpu.yml switches to CUDA
+    ports: ["127.0.0.1:8081:8080"]            # 8081 on the host, so a host llama-server on 8080 does not clash
+    environment:
+      - LOCAL_MODEL_FILE=${LOCAL_MODEL_FILE:-gemma-4-26B-A4B-it-UD-Q4_K_M.gguf}
+      - LOCAL_MODEL_HF=${LOCAL_MODEL_HF:-unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M}
+      - LLAMA_ARGS_EXTRA=${LLAMA_ARGS_EXTRA:-}
+      - LLAMA_CACHE=/cache
+    volumes:
+      - ${LOCAL_MODEL_DIR:-./models}:/models:ro           # put the .gguf here (or point LOCAL_MODEL_DIR at it): no download
+      - llm_cache:/cache                                  # otherwise the first start downloads it once into this volume
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        F="/models/$$LOCAL_MODEL_FILE"; [ -f "$$F" ] || F=$$(ls /models/*Q4_K_M*.gguf 2>/dev/null | head -1);
+        if [ -n "$$F" ] && [ -f "$$F" ]; then echo "Loading local model $$F (no download)"; SRC="-m $$F";
+        else echo "No local GGUF at /models/$$LOCAL_MODEL_FILE: downloading $$LOCAL_MODEL_HF once"; SRC="-hf $$LOCAL_MODEL_HF"; fi;
+        exec /app/llama-server $$SRC --alias gemma-4-26b-a4b-it-q4_k_m -c ${LOCAL_CTX:-8192} -np 1 --jinja
+        --host 0.0.0.0 --port 8080 $$LLAMA_ARGS_EXTRA
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 240
+      start_period: 30s
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports: ["127.0.0.1:8501:8501"]
+    environment:
+      - LLM_ORDER=${LLM_ORDER:-groq,nvidia,local}
+      - LOCAL_BASE_URL=${LOCAL_BASE_URL:-http://llm:8080/v1}
+      - LOCAL_MODEL=${LOCAL_MODEL:-gemma-4-26b-a4b-it-q4_k_m}
+      - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      - GROQ_MODEL=${GROQ_MODEL:-qwen/qwen3.8-27b}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - NVIDIA_BASE_URL=${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      - NVIDIA_MODEL=${NVIDIA_MODEL:-qwen/qwen3.8-27b}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+      - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-2000}
+      - LLM_REMOTE_TIMEOUT_S=${LLM_REMOTE_TIMEOUT_S:-20}
+      - LLM_LOCAL_TIMEOUT_S=${LLM_LOCAL_TIMEOUT_S:-300}
+      - LLM_MAX_ATTEMPTS_PER_CALL=${LLM_MAX_ATTEMPTS_PER_CALL:-4}
+      - LLM_MIN_ATTEMPT_S=${LLM_MIN_ATTEMPT_S:-5}
+      - LLM_COOLDOWN_DEFAULT_S=${LLM_COOLDOWN_DEFAULT_S:-60}
+      - LLM_TIMEOUT_COOLDOWN_S=${LLM_TIMEOUT_COOLDOWN_S:-30}
+      - WORKFLOW_TIME_BUDGET_S=${WORKFLOW_TIME_BUDGET_S:-1800}
+      - RUN_TIME_BUDGET_S=${RUN_TIME_BUDGET_S:-0}
+      - DISCOVER_MIN_SOURCES_OK=${DISCOVER_MIN_SOURCES_OK:-2}
+      - DISCOVER_MIN_ITEMS_SCREENED=${DISCOVER_MIN_ITEMS_SCREENED:-20}
+      - DISCOVER_MIN_RELEVANT=${DISCOVER_MIN_RELEVANT:-3}
+      - DISCOVER_MIN_FIT=${DISCOVER_MIN_FIT:-3.0}
+      - VALIDATE_TARGET_SIGNUPS=${VALIDATE_TARGET_SIGNUPS:-100}
+      - VALIDATE_TARGET_DAYS=${VALIDATE_TARGET_DAYS:-14}
+      - VALIDATE_MIN_VISITORS=${VALIDATE_MIN_VISITORS:-200}
+      - VALIDATE_REPEAT_FLOOR=${VALIDATE_REPEAT_FLOOR:-0.5}
+      - VALIDATE_MAX_ATTEMPTS=${VALIDATE_MAX_ATTEMPTS:-2}
+      - MAX_BUILD_ATTEMPTS=${MAX_BUILD_ATTEMPTS:-3}
+      - MOCK_FEE_RATE=${MOCK_FEE_RATE:-0.05}
+      - MOCK_TOKEN_EXPIRY_HOURS=${MOCK_TOKEN_EXPIRY_HOURS:-24}
+      - DECISION_LOG_PATH=/app/state/ui_decision_log.json
+      - STATE_DIR=/app/state
+      - OUTPUTS_DIR=/app/state/outputs
+    volumes:
+      - app_state:/app/state            # approval queue, mock ledger, UI runs; never in git
+    depends_on:
+      llm:
+        condition: service_started      # the UI opens at once and shows local-model readiness
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8501/_stcore/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  llm_cache:
+  app_state:

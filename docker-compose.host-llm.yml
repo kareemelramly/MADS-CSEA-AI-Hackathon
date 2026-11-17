@@ -1,0 +1,13 @@
+# Team laptop setup: the model runs on the host GPU with llama-server (scripts/start_local_llm.sh) and
+# Docker runs only the app. Linux only (host networking). Used by scripts/start_app.sh, or set in .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.host-llm.yml
+services:
+  llm:
+    profiles: ["container-llm"]          # the llm container is not started
+  app:
+    network_mode: host
+    ports: !reset []
+    depends_on: !reset {}
+    environment:
+      - LOCAL_BASE_URL=http://127.0.0.1:8080/v1
+    command: ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=127.0.0.1", "--server.headless=true", "--browser.gatherUsageStats=false"]

@@ -1,0 +1,80 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "user_story": {
+   "type": "string"
+  },
+  "must_features": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "source_ids": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1,
+      "maxItems": 4
+     },
+     "assumption": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "source_ids",
+     "assumption"
+    ]
+   },
+   "minItems": 1,
+   "maxItems": 3
+  },
+  "acceptance_criteria": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "given": {
+      "type": "string"
+     },
+     "when": {
+      "type": "string"
+     },
+     "then": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "given",
+     "when",
+     "then"
+    ]
+   },
+   "minItems": 3,
+   "maxItems": 6
+  },
+  "journey": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "minItems": 3,
+   "maxItems": 6
+  }
+ },
+ "required": [
+  "user_story",
+  "must_features",
+  "acceptance_criteria",
+  "journey"
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "overview": {
+   "type": "string"
+  },
+  "quick_start": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "minItems": 3,
+   "maxItems": 6
+  },
+  "how_to_use": {
+   "type": "string"
+  },
+  "troubleshooting": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "minItems": 2,
+   "maxItems": 5
+  },
+  "limitations": {
+   "type": "string"
+  }
+ },
+ "required": [
+  "overview",
+  "quick_start",
+  "how_to_use",
+  "troubleshooting",
+  "limitations"
+ ]
+}

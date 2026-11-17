@@ -1,0 +1,19 @@
+.env
+.git
+.venv
+state/
+models/
+notebooks/
+Claude outputs/
+Claude/
+Phases-Research/
+documents/
+*.pptx
+*.pdf
+*.gguf
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+model_check_result.json
+notebook_check_result.json
+scratch*

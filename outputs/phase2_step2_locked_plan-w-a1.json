@@ -1,0 +1,18 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "plan": {
+    "signups_target": 100,
+    "days": 14,
+    "min_visitors": 200,
+    "basis": "ASSUMPTION: planning values set before any data (problem statement example: 100 sign-ups in 14 days)"
+  },
+  "lock": {
+    "sha256": "2d28b0835a8b8a66da2ee9f03b84e0b713e5bb9144fc5c775e8d0ef08ec2327f",
+    "locked_at": "2026-11-17T16:58:18Z",
+    "plan": {
+      "days": 14,
+      "min_visitors": 200,
+      "signups_target": 100
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 **Decision date:** 17 November 2026
 **Version:** 2, aligned with the requirements on 17 November 2026
-**Status:** decision record for implementation; nothing in it is implemented or benchmarked yet
+**Status:** implemented on 17 Nov 2026 with the changes in rows A17 to A19 (full list: SRS v1.4 Appendix F); benchmarks come from the logged demo runs
 **Decision horizon:** four Python developers; about seven build hours; final submission tonight
 **Authority, in order:** (1) `CLAUDE.md`, including its Hard Requirements, and the organizers' problem statement; (2) **SRS v1.1** (the requirements base) and the shared cross-phase decisions X1–X19 in `Phases-Research/`; (3) this report; (4) Build Runbook v3.1 (planning input). Where this report and SRS v1.1 differed, the SRS was kept unless the difference exposed a real problem; those cases are listed in section 0 with the fix.
 
@@ -28,6 +28,10 @@ Version 1 of this report was written against an older instruction that asked for
 | A14 | Phase 5 approvals | Separate approvals for store page and post | LCH-1 | Agree. |
 | A15 | Runbook notebook | Do not spend time on the Groq/NVIDIA notebook | Step 2b owned by Member 4 | **Requirements win**: the notebook stays, because the remote tiers are now part of the design. |
 | A16 | Critic | Optional, off by default, 1 critic + 1 revision | Not specified | Agree; off by default, never a safety gate. |
+| A17 | Local model server | — | Ollama in compose (SRS 2.1, 3.3) | **Changed at build time** on the founder's instruction: llama.cpp `llama-server` serves the same Gemma 4 26B A4B Q4_K_M GGUF already on the laptop, so nothing is downloaded there; judges' machines download it once. The OpenAI-compatible API lets the local tier share the remote tiers' code path. |
+| A18 | Committed outputs | — | App mounts the repo | **Changed:** UI runs write to the `app_state` volume; only `scripts/demo_runs.sh` writes `outputs/` and `decision_log.json`, so the committed log holds the demo runs only (CM). |
+| A19 | Unbuilt routes | — | G3–G5 `pivot_back` routes | **Built on the founder's request** (17 Nov, evening): G3 re-plan, G4 → Phase 3, G5 → Phase 4 routes, each at most once; optional SIMULATED persona test (+1 call, 16 total, still within PERF-4); Step 2b notebook plus `check_keys.py`. |
+
 
 ## 1. Decision summary
 
