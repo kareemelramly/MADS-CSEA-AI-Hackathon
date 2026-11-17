@@ -48,7 +48,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--patterns-only", action="store_true")
     a = ap.parse_args()
-    sets = {"main (in-sample)": load("trick_prompts.json"), "held-out": load("trick_prompts_holdout.json")}
+    sets = {"main (in-sample)": load("trick_prompts.json"), "regression (original holdout)": load("trick_prompts_holdout.json")}
     model_ok = (not a.patterns_only) and llm.local_ready()[0] == "ready"
     model_id = llm.model_label(llm.tiers()[0]) if model_ok else None
     rows, details = [], []
@@ -75,7 +75,7 @@ def main():
           f"Measured {now} by `scripts/eval_rule_checker.py`. Model layer: "
           + (f"`{model_id}` through the local llama.cpp server." if model_ok else "NOT measured in this run (no local model reachable or --patterns-only)."), "",
           "| Set and layers | Banned requests refused | Honest requests refused (false alarms) |", "|---|---|---|", *rows, "",
-          "The main set was used to write the pattern rules, so its pattern score is in-sample. The held-out set was written after the last pattern change and never used to tune anything. "
+          "The main set was used to write the original pattern rules. The original held-out set is now a regression set because its false alarms informed changes to the patterns and model prompt. "
           "A request is refused if either layer refuses. Everything the agents produce is checked again by `guardrails.check` and needs founder approval before it can go anywhere, so this box is not the only defence.", "",
           "## Misses and false alarms", "", *(details or ["- none"]), ""]
     out = os.path.join(ROOT, "docs", "guardrail_eval.md")

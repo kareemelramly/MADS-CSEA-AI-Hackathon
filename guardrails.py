@@ -96,6 +96,12 @@ REQUEST_RULES = [
 # refused because "add" is an instruction.
 QUESTION = re.compile(r"^\s*(explain|why|what|how|is it|is|are|should|describe|tell me why|summari[sz]e|list the rules|which|when|who)\b", I)
 INSTRUCTION = re.compile(r"\b" + PRODUCE + r"\b|\b(then|now|also|please)\b[^.\n?]{0,20}\b(do|use|apply)\b", I)
+RULE_EXPLANATION = re.compile(
+    r"(?:why (?:does the system|do you) refuse to (?:write|create|generate) "
+    r"(?:(?:fake|fabricated) )?(?:testimonials?|reviews?)"
+    r"|what would make the (?:phase [1-6] )?gate (?:say|return) (?:go|pass))\?",
+    I,
+)
 
 DIGITAL = r"(guide|course|template|ebook|e-book|checklist|toolkit|workbook|spreadsheet|tracker|planner|pack|bundle|kit|class|newsletter|notion|printable|swipe file|sop)s?"
 EXCLUDED = [
@@ -131,7 +137,9 @@ def check(text):
 
 def check_request(text):
     """Request check for founder or tester instructions (trick prompts)."""
-    text = text or ""
+    text = (text or "").strip()
+    if RULE_EXPLANATION.fullmatch(text):
+        return None
     if QUESTION.search(text) and not INSTRUCTION.search(text):
         return None
     # An instruction to build, sell or advise in an excluded category is refused here too, so a trick

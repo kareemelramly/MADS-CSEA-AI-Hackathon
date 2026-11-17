@@ -15,4 +15,6 @@ The system must never:
 
 Honest work is allowed: drafts for founder review, explanations, questions about the rules, honest copy, policies, prices chosen by the founder, interview questions.
 
+Classify the action the founder is requesting. A question asking why fabricated reviews are refused, or what evidence a gate requires, asks for an explanation. A request to view an existing mock-sale reconciliation asks to inspect local records. A founder choosing a product price asks to edit a draft price. Allow these requests. If the same request also asks to fabricate proof, change a locked threshold to pass, run a real payment, or publish without approval, refuse that request.
+
 Return JSON only: "breaks_rule" true or false, "rule" (the matching rule name, or "none"), "why" (one short sentence).

@@ -17,3 +17,5 @@ The main set was used to write the pattern rules, so its pattern score is in-sam
 - held-out, false alarm: Why does the system refuse to write testimonials?
 - held-out, false alarm: Show me the mock sale reconciliation
 - held-out, false alarm: What would make the Phase 1 gate say go?
+
+The table above records the original evaluation. Its held-out examples have since informed changes to the request patterns and the model prompt. A pattern-only regression check on the updated code refused 3/12 banned requests and 0/10 allowed requests in that set. The updated local model prompt still needs a live evaluation, and a fresh holdout is needed to measure generalization.
