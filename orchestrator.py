@@ -211,10 +211,32 @@ def _p1_outputs(ctx, r, relevant, scored, questions, g):
              f"Query: `{cov['query']}` · sources answered: {cov['sources_ok']} · items screened: {cov['items_screened']} · "
              f"broadened retry used: {cov['retry_used']} · failed: {', '.join(cov['failed']) or 'none'}", ""]
     if relevant:
+        srcs = sorted({x.get("source") or ctx.sources[x["source_id"]]["source"] for x in relevant})
+        sig = {}
+        for x in relevant:
+            sig[x.get("signal", "other")] = sig.get(x.get("signal", "other"), 0) + 1
+        lines += ["## Summary", "",
+                  f"- **{len(relevant)} demand signals** passed screening out of {cov['items_screened']} items, from {len(srcs)} of {cov['sources_ok']} sources that answered ({', '.join(srcs)}).",
+                  f"- Signal mix: {', '.join(f'{v} {k}' for k, v in sorted(sig.items()))}. Only requests, complaints and workarounds count as demand; launches and ads never do.",
+                  "- Each line below is one pain point in the model's words, tied by code to the fetched item it came from.", "",
+                  "## Pain points", ""]
         for x in relevant:
             lines.append(f"- {render_claim(ctx, {'text': x['pain_point'], 'source_ids': [x['source_id']]})}")
+        lines += ["", "## Evidence table", "", "| ID | Source | Signal | Title of the fetched item | Fetched (UTC) |", "|---|---|---|---|---|"]
+        for x in relevant:
+            r = ctx.sources[x["source_id"]]
+            title = (r.get("title") or "").replace("|", "/")[:90]
+            lines.append(f"| [{x['source_id']}]({r['url']}) | {r['source']} | {x.get('signal', 'other')} | {title} | {r.get('fetched_at', '')} |")
     else:
         lines.append("- No relevant pain points were found in the screened items. This is a statement about the search, not about the market.")
+    raw = cov.get("raw_hits") or {}
+    if raw:
+        lines += ["", "## Search coverage", "", "| Source | Items returned | Used as |", "|---|---|---|"]
+        lines += [f"| {k} | {v} | {'background only, never demand' if k == 'wikipedia' else 'demand evidence (after screening)'} |" for k, v in raw.items()]
+    lines += ["", "## What this evidence does not show", "",
+              "- Market size, willingness to pay or demand in the founder's target country, unless a cited item says so (otherwise ASSUMPTION).",
+              "- That nobody wants the product: too few signals means the public search was thin, not that the market is empty.",
+              "- Anything about real customers of this product; that needs the Mom Test interviews and the Phase 2 experiment."]
     ctx.out("phase1_step1_opportunities", "md", "\n".join(lines) + "\n")
     ctx.out("phase1_step2_evidence", "json", {"run_id": ctx.run_id, "coverage": cov, "registry": list(ctx.sources.values()),
                                                "relevant": relevant, "note": "Source IDs are assigned by code; excerpts are untrusted data."})
@@ -472,7 +494,24 @@ def phase4(ctx, prog):
         for r in pr["rows"]:
             counted = bool(r["registered"]) and r["kind"] == "one_time" and r["currency"] == pr["currency"]
             rows.append(f"| {r['name']} | {r['url']} | {r['amount']} | {r['currency']} | {r['kind']} | {r['http_status'] == 200} | {r['price_text_on_page']} | {counted} |")
-        rows += ["", "Prices are founder-entered quotes; a quote counts only if its page loaded (registered as a source). No payment of any kind is set up."]
+        counted_amounts = sorted(float(r["amount"]) for r in pr["rows"]
+                                 if bool(r["registered"]) and r["kind"] == "one_time" and r["currency"] == pr["currency"])
+        all_paid = sorted(float(r["amount"]) for r in pr["rows"] if r["kind"] == "one_time" and float(r["amount"] or 0) > 0)
+        rows += ["", "## Price position", "", "| Measure | Value |", "|---|---|",
+                 f"| Competitor quotes entered | {len(pr['rows'])} |",
+                 f"| Paid one-time quotes whose page loaded (counted) | {len(counted_amounts)} (rule: at least 3) |",
+                 f"| Counted range | {f'{counted_amounts[0]:g} to {counted_amounts[-1]:g} {currency}' if counted_amounts else 'none'} |",
+                 f"| Range of all paid quotes entered | {f'{all_paid[0]:g} to {all_paid[-1]:g} {currency}' if all_paid else 'none'} |",
+                 f"| Free alternatives entered | {sum(1 for r in pr['rows'] if r['kind'] == 'free')} |",
+                 f"| Chosen price | {price:g} {currency} one-time ({basis}) |"]
+        if all_paid:
+            below = sum(1 for a in all_paid if a < price)
+            rows.append(f"| Position | {below} of {len(all_paid)} paid competitors are cheaper |")
+        rows += ["", "## How the price was set", "",
+                 "1. The founder entered competitor products and prices; each URL was fetched and registered as a source.",
+                 "2. Code counts only paid one-time prices in one currency whose page loaded; the model never sets the price.",
+                 "3. With 3 or more counted prices the price is their median; with fewer the gate says `repeat`, and only a founder override with a typed reason can set an experimental price, labelled ASSUMPTION.",
+                 "", "No checkout or payment of any kind is set up; Phase 5 uses a MOCKED ledger. Free alternatives exist, so the product must earn its price with real buyers before this price is treated as validated."]
         ctx.out("phase4_step1_pricing", "md", "\n".join(rows) + "\n")
         for key in ("terms", "privacy", "refund", "delivery"):
             ctx.out(f"phase4_step2_policy_{key}", "md", docs[key])
@@ -587,13 +626,36 @@ def _mock_sale(ctx, sim):
                         f"matched={rec['matched']}; payout {rec['payout_batch']} {rec['payout_status']}")
     out["ok"] &= d1["allowed"] and r2.get("duplicate", False) and rec["matched"] and ok_hash
     out["reconcile"] = {k: rec[k] for k in ("orders", "gross_minor", "fees_minor", "refunds", "refunds_minor", "net_minor")}
+    out["currency"] = ev["currency"]
+    out["payout"] = f"{rec['payout_batch']} {rec['payout_status']}"
     con.close()
     return out
 
 
 def _sale_md(res):
-    return "# Phase 5 · Step 3 · Sale to cash (MOCKED)\n\nNo payment of any kind runs: these are local mock events.\n\n" + \
-        "\n".join(f"- {l}" for l in res["lines"]) + "\n"
+    steps = ["Payment event received", "Product files verified", "Automatic delivery", "Duplicate event (idempotency)",
+             "Refund and access revoked", "Reconciliation"]
+    lines = ["# Phase 5 · Step 3 · Sale to cash (MOCKED)", "",
+             "No payment of any kind runs: every event below is a local MOCKED record in SQLite. No card field, payment SDK or network call exists.", "",
+             "## Event trail", "", "| # | Step | Result |", "|---|---|---|"]
+    trail = [l for l in res["lines"]]
+    labels = steps if len(trail) == len(steps) else [""] * len(trail)
+    for i, (lab, l) in enumerate(zip(labels, trail), 1):
+        lines.append(f"| {i} | {lab or 'Event'} | {l.replace('|', '/')} |")
+    rec, cur = res.get("reconcile") or {}, res.get("currency", "")
+    if rec:
+        m = lambda v: f"{v / 100:,.2f} {cur}"  # noqa: E731
+        lines += ["", "## Cash summary (MOCKED)", "", "| Line | Amount |", "|---|---|",
+                  f"| Orders | {rec['orders']} |", f"| Gross | {m(rec['gross_minor'])} |",
+                  f"| Processor fees (mock rate, ASSUMPTION) | {m(rec['fees_minor'])} |",
+                  f"| Refunds ({rec['refunds']}) | {m(rec['refunds_minor'])} |", f"| Net | {m(rec['net_minor'])} |",
+                  f"| Payout | {res.get('payout', '')} |"]
+    lines += ["", "## What this shows", "",
+              "- A payment event triggers delivery automatically, only after the product files match the released hashes.",
+              "- Replaying the same event does not deliver twice; a refund revokes future downloads.",
+              "- Orders, payments, fees, refunds and the payout batch reconcile to the cent.",
+              "", "It does not show that anyone will buy: no real customer was involved."]
+    return "\n".join(lines) + "\n"
 
 
 # ====================================================================== Phase 6

@@ -1,16 +1,26 @@
 # Agentic Venture Builder · Team Delulu
 
-An open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, market, values) through six gated phases toward a validated, sellable **digital** product, and says **stop** when the evidence is weak. Code decides every gate; every business effect needs the founder's approval of that exact action. Publishing is STUBBED and payments are MOCKED. Every run ends with a report (Markdown, web page and PDF) built from the decision log.
+**An open-source AI venture team that tells first-time founders the truth: build it, change it, or stop.**
 
-**Model provider:** a local [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` on your own machine. No hosted or paid model API is called, so no API key exists anywhere in this project. **Models:** Qwen3 4B Instruct 2507 (Q4_K_M) by default in Docker (runs on a laptop CPU); Gemma 4 26B A4B (Q4_K_M) on an NVIDIA GPU, which is the model behind the committed demo runs. The decision log names the model the server actually loaded on every call.
+Most AI business tools promise income, lock founders into a closed platform and stop at a generic business plan. This one takes a founder's brief (idea, skills, budget, hours per week, target market, values) through the six phases a careful startup coach would use (Discover, Validate, Build, Commercial setup, Launch, Operate and learn) and attaches sourced evidence to every recommendation. Code, not the model, decides every gate. The founder approves every action that could leave the machine. It runs on an open-weight model on the founder's own laptop for **$0.00 per run**.
 
-**At a glance (all evidence is in this repository):**
+| | |
+|---|---|
+| **Customer** | First-time and student founders selling a *digital* product (templates, guides, toolkits): one person, a budget near $200, about 10 hours a week, often outside the US (our demo market is Egypt) |
+| **Their problem** | They build first and test demand later, if at all. Generic AI tools flatter the idea, invent market numbers and push them to pay for a platform |
+| **What they get** | For a weak idea: a reasoned **STOP** or **pivot** with the numbers behind it. For an idea worth testing: a Lean Canvas, a locked demand target, a landing page draft, a tested product pack, priced against real competitors, DRAFT policies, a store page, a MOCKED sale-to-cash ledger and a persevere-or-pivot memo, in one report (Markdown, web page, PDF) |
+| **Why open beats closed** | MIT licence, local model, the founder's brief never goes to a model provider, every gate and threshold is readable code, and nothing is behind a paywall |
+| **Business model** | None charged to founders: the full system stays free and open. Sustainability comes from maintainers, community contributions and grants (see the last section) |
 
-- **It says stop.** The weak idea (W) ends in `pivot_back`, the excluded crypto idea (E) in a stop no one can override, and even the reasonable idea (R) gets a Phase 1 **STOP** on thin public evidence: [outputs/phase1_gate_decision_r_a1.md](outputs/phase1_gate_decision_r_a1.md).
-- **The founder stays in control.** Every publish, send or release needs a single-use approval bound to the action, content hash, destination, amount ($0) and run ID; overrides need a typed reason and stamp every later file UNVALIDATED.
-- **Nothing real moves.** The sale → delivery → refund → revoke → reconcile chain is MOCKED in local SQLite: [outputs/payment_test_log.md](outputs/payment_test_log.md). Publishing and sending are STUBBED.
-- **Honest numbers.** Every claim links a fetched source or says ASSUMPTION; guardrail scores are reported on a held-out set, weaknesses included: [docs/guardrail_eval.md](docs/guardrail_eval.md).
-- **$0.00 per run** on an open-weight model on your own machine; offline tests: `pytest -q`.
+**Results of the committed demo runs** (real runs with Gemma 4 26B A4B; files in [`outputs/`](outputs/), log in [`decision_log.json`](decision_log.json)):
+
+| Brief | What the system decided | Why |
+|---|---|---|
+| **R**: Notion wedding-planning templates for Egypt | Phase 1 **STOP** on thin public evidence; the founder overrode with a typed reason, so the run completed all six phases and every later file is stamped UNVALIDATED | 3 relevant pain points from 1 source, below the locked threshold of 3 from 2 sources ([gate](outputs/phase1_gate_decision_r_a1.md)); no real experiment yet, so Phase 6 refuses to recommend persevering ([memo](outputs/phase6_step1_memo_r_a1.md)) |
+| **W**: habit-tracking app, founder without matching skills | **STOP** at Phase 1 | Founder fit 1.3 of 5, below the locked threshold of 3; no alternative passes ([gate](outputs/phase1_gate_decision_w_a1.md)) |
+| **E**: crypto trading-signal bot | **STOP** that cannot be overridden | Excluded product category, stopped before any search ([gate](outputs/phase1_gate_decision_e_a1.md)) |
+
+Proof of control and honesty: a single-use approval bound to action, content hash, destination, amount ($0) and run ID for every publish, send or release; a MOCKED payment, delivery, refund and reconciliation run ([payment_test_log.md](outputs/payment_test_log.md)); and trick-prompt results on prompts the rules were never tuned on, weaknesses included ([guardrail_eval.md](docs/guardrail_eval.md)).
 
 ## Quickstart
 
@@ -18,42 +28,43 @@ An open-source team of AI agents that takes a founder's brief (idea, skills, bud
 docker compose up
 ```
 
-Open http://localhost:8501. Pick an example brief (R: reasonable idea, W: weak idea, E: excluded idea) or write your own, then press **Start the agents**. At every checkpoint you read a plain verdict and press a button. When the run ends, the page shows the full report with a **Download the report (PDF)** button.
+Open **http://localhost:8501**. Pick an example brief (R, W or E) or write your own, press **Start the agents**, and answer each checkpoint with a button. At the end the page shows the full report with a **Download the report (PDF)** button.
 
-- **No keys, no account, no payment.** The first start downloads the default model once (Qwen3 4B Instruct 2507, Q4_K_M, under 3 GB) into a Docker volume. If the `.gguf` is already in `./models` (or in `LOCAL_MODEL_DIR` from `.env`), nothing is downloaded.
-- **NVIDIA GPU (bigger model, faster):** `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up` serves Gemma 4 26B A4B instead.
-- Check your machine first: `bash scripts/doctor.sh`. Step-by-step guide with fixes for common errors: [docs/how_to_run.md](docs/how_to_run.md).
-- Tests (offline, no model, no network): `docker compose run --rm app pytest -q`.
-- Command line with typed founder answers: `python -m orchestrator --brief tests/fixtures/brief_r.json --label r`.
-- Rebuild the committed demo evidence on a GPU laptop: `bash scripts/demo_runs.sh` (it never commits).
+- No key, account or payment. The first start downloads the default model once (Qwen3 4B Instruct 2507, under 3 GB) into a Docker volume.
+- With an NVIDIA GPU: `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up` (Gemma 4 26B A4B).
+- Offline tests: `docker compose run --rm app pytest -q`. Command line: `python -m orchestrator --brief tests/fixtures/brief_r.json --label r`. Troubleshooting: [docs/how_to_run.md](docs/how_to_run.md).
 
 ## What works and what is mocked
 
-Status rule: **Working** means the code exists and the named offline test passes (`pytest -q`, with a fake model and fake sources, so it proves the workflow, not the quality of real model output). What a real model produced is in the committed demo runs listed under the table. **MOCKED** = fake service or data in place of a real one; **STUBBED** = never connected, only logs what it would do; **SIMULATED** = model-made stand-in for people, never counted as evidence.
+**Working** = built and covered by an offline test (`pytest -q`, fake model and fake sources). **MOCKED** = a local stand-in for a real service. **STUBBED** = never connected; it only records what it would do after founder approval. Persona tests are model-made, labelled SIMULATED and never counted as demand.
 
-| Step | Status | Verified by |
-|---|---|---|
-| 1 Discover: exclusion check, criteria logged before search, HN Algolia / Stack Exchange / GitHub search, source registry | Working | `test_thresholds_logged_before_first_search`, `test_excluded_brief_stops_not_overridable` |
-| 1 Discover: coverage → evidence → fit gate, two ranked alternatives, Mom Test script | Working | `test_thin_coverage_repeats_never_stops`, `test_adequate_coverage_weak_evidence_no_alternative_stops` |
-| 1 Discover: evidence hygiene (duplicates and repeated pain points count once; launches, ads and developer-exercise repos are not demand; a target country no source mentions is ASSUMPTION) | Working | `test_launches_and_duplicates_do_not_count_as_demand`, `test_hobby_repos_and_repeated_pain_points_do_not_count` |
-| 2 Validate: Lean Canvas (sourced or ASSUMPTION), target locked by SHA-256 before any page | Working | `test_canvas_boxes_sourced_or_assumption`, `test_target_tamper_stops` |
-| 2 Validate: landing page with guardrails | Working | `test_banned_landing_elements_refused` |
-| 2 Validate: waitlist form | **MOCKED** (submits nowhere) | landing template footer "Waitlist: MOCKED" |
-| 2 Validate: publishing the page | **STUBBED** behind approval | `test_publish_blocked_without_approval` |
-| 2 Validate: demand gate (`awaiting_evidence` until a completed real experiment) | Working | `test_gate_covers_all_branches`, `test_not_started_awaits_evidence` |
-| 2 Validate: persona stress test (optional, founder chooses) | Working; output **SIMULATED**, never counted as sign-ups | `test_persona_test_is_simulated_and_excluded` |
-| 3 Build: A1 checklist pack, user docs, 14 QA checks, test gate, release approval | Working | `test_fixture_passes_all_applicable_checks`, `test_income_promise_repeats_then_stops` |
-| 4 Commercial: median of ≥ 3 sourced competitor prices; DRAFT Terms, Privacy, Refund, Delivery | Working (drafts, not legal advice) | `test_median_of_three_in_code`, `test_policies_start_with_draft_banner` |
-| 5 Launch: store page and launch post drafts, each with its own approval | Working (drafts); publishing **STUBBED** | `test_brief_r_full_run_with_override` |
-| 5 Launch: pay → deliver → refund → revoke → reconcile → payout | **MOCKED** (local SQLite events; no payment of any kind) | `test_refund_revokes_and_second_refund_refused`, `test_reconcile_matches_and_flags_one_cent` |
-| 6 Operate: support FAQ drafts (escalates legal, health, financial, refund) | Working (drafts); sending **STUBBED** | `test_support_refuses_advice_and_promises` |
-| 6 Operate: metrics labelled real / MOCKED / SIMULATED, template memo, founder decision | Working | `test_mock_only_never_persevere`, `test_founder_decision_logged` |
-| `pivot_back` routes: Build re-plan, Commercial → Build, Launch → Commercial | Working | `test_g3_rescope_once_then_stop`, `test_g4_rejected_offer_pivots_to_phase3`, `test_g5_rejected_drafts_retry` |
-| Founder approval executor (action, content, destination, amount, run ID; single use) | Working | `test_approval_refused_after_any_field_change`, `test_consumed_approval_cannot_run_twice` |
-| Local model client: JSON-schema output, one repair retry, time budget, failures become `repeat` (never `stop`) | Working (fake HTTP and a fake llama-server on 127.0.0.1) | `test_llm_cascade`, `test_full_run_over_local_http` |
-| Trick-prompt defence, two layers: fixed pattern rules, then a local-model rule check that can only add refusals | Working. Patterns: 60/60 refused on the main set (in-sample, they were written from it) but only 3/12 on a held-out set written afterwards, with 2/10 honest questions wrongly refused. Model layer and full numbers: [docs/guardrail_eval.md](docs/guardrail_eval.md) | `test_every_banned_case_refused_and_benign_allowed`, `test_model_layer_refuses_a_paraphrase_the_patterns_miss` |
-| Final run report: Markdown and HTML in `outputs/`, PDF download in the app | Working | `test_full_run_writes_report_in_three_forms`, `test_finished_run_shows_final_report_and_no_raw_json` |
-| Streamlit UI: plain verdict before buttons, approval panel, amber override bar, readable tables (no raw JSON) | Working | `test_approval_panel_shows_five_fields`, `test_amber_bar_after_override` |
+| Phase | Step | Status | What happens | Proof |
+|---|---|---|---|---|
+| 1 Discover | Find opportunities (core step) | **Working** | Thresholds logged before search; keyless search of HN, Stack Exchange and GitHub issues; every item registered as a source; duplicates, ads and hobby repos do not count | `test_thresholds_logged_before_first_search`, [opportunities](outputs/phase1_step1_opportunities_r_a1.md) |
+| 1 Discover | Score idea vs two alternatives, define the market | **Working** | Model scores skills, budget, time and values; code weights them; a region no source mentions is ASSUMPTION | [comparison](outputs/phase1_step3_comparison_r_a1.md) |
+| 1 Discover | Customer interviews (Mom Test) | **Working** | Past-behaviour questions only; code drops hypothetical ones | [script](outputs/phase1_step4_interview_script_r_a1.md) |
+| 1 Discover | Evidence gate | **Working** | go / repeat / pivot_back / stop from coverage, evidence and fit | `test_adequate_coverage_weak_evidence_no_alternative_stops` |
+| 2 Validate | Design the business: Lean Canvas (core step) | **Working** | Nine boxes, each sourced or ASSUMPTION | [canvas](outputs/phase2_step1_lean_canvas_r_a1.md) |
+| 2 Validate | Demand target | **Working** | 100 sign-ups in 14 days, 200 visitors, locked by SHA-256 before any page exists | `test_target_tamper_stops` |
+| 2 Validate | Landing page draft | **Working** | Template has no slot for reviews, counts or countdowns; guardrails check the text | [page](outputs/phase2_step3_landing_page_r_a1.html) |
+| 2 Validate | Publishing the landing page | **STUBBED** | Approval only logs `would_publish` | `test_publish_blocked_without_approval` |
+| 2 Validate | Waitlist form | **MOCKED** | Submits nowhere | landing page footer |
+| 2 Validate | Demand gate | **Working** | Waits (`awaiting_evidence`) until a real experiment finishes; simulated sign-ups excluded | [gate](outputs/phase2_gate_decision_r_a1.md) |
+| 3 Build | Build the product (core step) | **Working** | MVP definition, checklist and tracker pack, user docs | [MVP](outputs/phase3_step1_mvp_definition_r_a1.md) |
+| 3 Build | Test gate and release approval | **Working** | 14 automated QA checks; release bound to the file hashes | [test report](outputs/phase3_step5_test_report_r_a1.md) |
+| 4 Commercial | Set the price (core step) | **Working** | Median of at least 3 competitor prices whose pages loaded; otherwise `repeat` | [pricing](outputs/phase4_step1_pricing_r_a1.md) |
+| 4 Commercial | Policies (core step) | **Working** | DRAFT Terms, Privacy, Refund, Delivery; not legal advice | [terms](outputs/phase4_step2_policy_terms_r_a1.md) |
+| 5 Launch | Open the store (core step) | **Working** | Store page and launch post drafts, each with its own approval | [store page](outputs/phase5_step1_store_page_r_a1.md) |
+| 5 Launch | Publishing and posting | **STUBBED** | Nothing is posted anywhere | `test_brief_r_full_run_with_override` |
+| 5 Launch | Payment triggers delivery (core step) | **MOCKED** | Local SQLite payment event issues a download token; no payment of any kind runs | [mock sale](outputs/phase5_step3_mock_sale_r_a1.md) |
+| 5 Launch | Refund revokes access; replayed event is not delivered twice | **MOCKED** | Idempotent events; second refund refused | `test_refund_revokes_and_second_refund_refused` |
+| 5 Launch | Reconciliation of orders, payments, fees, payout | **MOCKED** | Matches to the cent; a 1-cent mismatch is flagged | [payment test log](outputs/payment_test_log.md) |
+| 6 Operate | Support FAQ drafts | **Working** | Legal, health, financial and refund questions escalated to the founder | [FAQ](outputs/phase6_step2_support_faq_r_a1.md) |
+| 6 Operate | Sending support replies | **STUBBED** | Behind approval | `test_support_refuses_advice_and_promises` |
+| 6 Operate | Metrics and persevere-or-pivot memo | **Working** | Only real metrics count; MOCKED and SIMULATED values are shown but ignored | `test_mock_only_never_persevere` |
+| All | Founder approval executor | **Working** | Single use; any change to action, content, destination, amount or run ID is refused | `test_approval_refused_after_any_field_change` |
+| All | Trick-prompt defence | **Working** | Pattern rules, then a local-model rule check that can only add refusals | [eval](docs/guardrail_eval.md) |
+| All | Decision log and run report | **Working** | One log entry per agent action; report in Markdown, HTML and PDF | `test_full_run_writes_report_in_three_forms` |
 
 <!-- runs:start -->
 Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):
@@ -65,29 +76,40 @@ Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.p
 At least one committed run has recorded artifacts in all six phases.
 <!-- runs:end -->
 
+Every hard rule is mapped to code and a test in [docs/requirements_traceability.md](docs/requirements_traceability.md).
+
 ## Architecture
 
-A fixed Python state machine (`orchestrator.py`) runs Discover, Validate, Build, Commercial setup, Launch and Operate in order, pausing whenever the founder must decide. Agents are role functions (`agents/<role>.py`) with one prompt each (`prompts/`) and a JSON schema per call (`schemas/`); they cite fetched sources only by ID, and code renders the URLs. Gates (`gates.py`) check hard rules, data completeness and thresholds locked before the data. The only model is a local llama.cpp server, and only idea-derived search words leave the machine. Business actions use a single-use approval executor (`approval.py`), and the sale-to-cash flow is a MOCKED SQLite ledger. Full design, diagrams and gate rules: [ARCHITECTURE.md](ARCHITECTURE.md). Hard rules and tested behavior are mapped in [docs/requirements_traceability.md](docs/requirements_traceability.md); the design choices are in [docs/design_decisions.md](docs/design_decisions.md).
+A fixed Python state machine (`orchestrator.py`) runs the six phases in order and pauses whenever the founder must decide. Eighteen agent roles are functions (`agents/<role>.py`), each with one prompt in `prompts/` and a JSON schema per call in `schemas/`; they cite fetched sources by ID and code turns IDs into URLs, so the model cannot invent a link. Gates (`gates.py`) check hard rules, then data completeness, then thresholds locked before the data, then the founder's choice. Every business action goes through the single-use approval executor (`approval.py`), and sale to cash is a MOCKED SQLite ledger (`payments.py`, `delivery.py`, `refunds.py`, `reconcile.py`). Diagrams, gate rules and data flow: [ARCHITECTURE.md](ARCHITECTURE.md); design choices and rejected alternatives: [docs/design_decisions.md](docs/design_decisions.md).
 
 ## Models and free resources
 
 No paid service, API key or account is needed. Everything runs on your machine.
 
-| Setup | Model (open weights) | Runtime / provider | Licence (source) | Cost |
+| Setup | Model (open weights) | Runtime | Licence | Cost |
 |---|---|---|---|---|
-| `docker compose up` (default, CPU) | Qwen3 4B Instruct 2507, GGUF Q4_K_M ([model](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507), [GGUF](https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF)) | llama.cpp `llama-server`, local | Apache 2.0 ([model card](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)) | $0 |
-| GPU override, and the committed demo runs | Gemma 4 26B A4B instruction-tuned, GGUF `UD-Q4_K_M` ([GGUF](https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF)) | llama.cpp `llama-server` with CUDA, local | Apache 2.0 ([Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4)) | $0 |
+| `docker compose up` (default, CPU) | Qwen3 4B Instruct 2507, GGUF Q4_K_M ([model](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507), [GGUF](https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF)) | llama.cpp `llama-server`, local | Apache 2.0 | $0 |
+| GPU override, used for the committed demo runs | Gemma 4 26B A4B instruction-tuned, GGUF `UD-Q4_K_M` ([GGUF](https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF)) | llama.cpp `llama-server` with CUDA, local | Apache 2.0 ([model card](https://ai.google.dev/gemma/docs/core/model_card_4)) | $0 |
 
 - llama.cpp is MIT-licensed ([repository](https://github.com/ggml-org/llama.cpp)). Qwen is one of the free model families the organizers list.
-- **Measured local speed (Gemma 4 26B A4B, team laptop, 16 GB GPU):** <!-- speed:start -->measured 2026-11-17T20:07:46 on the team laptop through llama.cpp: 10/10 schema-valid (correctness pass), about 81.6 tokens/s, slowest call 3.3 s (performance fast against the 40 tokens/s and 30 s planning limits).<!-- speed:end --> The speed limits are team planning assumptions, not hackathon requirements. The Qwen3 4B CPU setup is slower and was not timed (ASSUMPTION: a run takes noticeably longer on CPU).
-- **What leaves your machine:** only search words built from the idea, sent to keyless public APIs: [HN Algolia](https://hn.algolia.com/api), [Stack Exchange](https://api.stackexchange.com/docs), [GitHub issue search](https://docs.github.com/en/rest/search/search), and [Wikipedia](https://www.mediawiki.org/wiki/API:Search) for background only. A link the founder adds is fetched. The model, the brief and every draft stay local. Reddit is not used because its [data API terms](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki) require registered credentials.
-- All gate thresholds (20 items screened, 3 relevant demand items from 2 sources, fit 3 of 5, 100 sign-ups in 14 days, 200 visitors) are planning values labelled ASSUMPTION and logged before any data.
+- **Measured speed (Gemma 4 26B A4B, team laptop, 16 GB GPU):** <!-- speed:start -->measured 2026-11-17T20:07:46 on the team laptop through llama.cpp: 10/10 schema-valid (correctness pass), about 81.6 tokens/s, slowest call 3.3 s (performance fast against the 40 tokens/s and 30 s planning limits).<!-- speed:end --> The Qwen3 4B CPU setup was not timed (ASSUMPTION: noticeably slower).
+- **What leaves your machine:** only search words built from the idea, sent to keyless public APIs ([HN Algolia](https://hn.algolia.com/api), [Stack Exchange](https://api.stackexchange.com/docs), [GitHub search](https://docs.github.com/en/rest/search/search), [Wikipedia](https://www.mediawiki.org/wiki/API:Search) for background only), plus any link the founder adds. Reddit is not used because its [data API terms](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki) require registered credentials.
+- Gate thresholds (20 items screened, 3 relevant items from 2 sources, fit 3 of 5, 100 sign-ups in 14 days, 200 visitors) are planning values labelled ASSUMPTION and logged before any data.
 
 ## Cost per run
+
+**About $0.00 per run** (local open-weight model; the complete six-phase run used 16 model calls and about 19k tokens).
 
 <!-- cost:start -->
 $0.00 in model/API charges observed for complete six-phase run 20261117T201525Z-r (16 model calls, 19222 tokens; 230.6 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
 <!-- cost:end -->
+
+| Cost item | Per run | Basis |
+|---|---|---|
+| Model calls | $0.00 | Observed: local llama.cpp, `cost` field in the decision log |
+| Search APIs | $0.00 | Keyless public endpoints |
+| Payments, hosting, publishing | $0.00 | MOCKED or STUBBED; nothing is charged or hosted |
+| Electricity and hardware | not counted | ASSUMPTION: excluded |
 
 ## Demo video
 
@@ -106,7 +128,10 @@ Not recorded yet. The video (at most 3 minutes) shows run W ending in a STOP rec
 
 ## How the project stays alive after the hackathon
 
-- **Maintainers:** the four members of Team Delulu, who built it, keep triaging issues and reviewing pull requests on `main`.
-- **Roadmap:** product shapes A2 (HTML guide) and A3 (template pack); Arabic and English output for MENA founders; consented real integrations behind the same approval executor (see ARCHITECTURE.md, Roadmap).
-- **Community:** contributions through issues and pull requests; every new agent needs a prompt file, a schema and an offline test, and `pytest -q` must pass without keys.
-- **Funding:** none committed. Running it costs $0.00 in model or API charges because the model is local; electricity and hardware are excluded (ASSUMPTION).
+| | Plan |
+|---|---|
+| **Maintainers** | The four members of Team Delulu triage issues and review pull requests on `main`; every change needs a passing `pytest -q` and keeps the approval executor untouched |
+| **Next 3 months** | Arabic and English output for MENA founders; two more product shapes (HTML guide, template pack); a real-results import so Phase 2 and Phase 6 can judge actual experiments |
+| **6 to 12 months** | Consented real integrations (form provider, store, email) behind the same approval executor, still with no payment handled by the system; a public evaluation set of briefs and trick prompts |
+| **Community** | Issues and pull requests; each new agent ships with a prompt file, a schema and an offline test; university entrepreneurship clubs as the first users and testers |
+| **Funding** | None committed today. Running it costs $0.00 in model or API charges, so the project survives on volunteer time; we will apply to university innovation grants and open-source sponsorship. Core features stay free |
