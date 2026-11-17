@@ -2,7 +2,7 @@
 
 Each run ID links to the files it wrote. A file marked by a higher `_a<k>` number supersedes the earlier attempt.
 
-## Run `20261117T201525Z-r`
+## Run `20261117T203304Z-r`
 
 - Brief idea: Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack
 - Final outcome: `stop`
@@ -57,7 +57,7 @@ Files:
 - [outputs/phase6_step9_run_report_r_a1.md](../outputs/phase6_step9_run_report_r_a1.md)
 - [outputs/phase6_step9_run_report_r_a1.html](../outputs/phase6_step9_run_report_r_a1.html)
 
-## Run `20261117T202306Z-w`
+## Run `20261117T203949Z-w`
 
 - Brief idea: A mobile app that gamifies daily habit tracking with streaks and badges
 - Final outcome: `stop`
@@ -75,7 +75,7 @@ Files:
 - [outputs/phase1_step9_run_report_w_a1.md](../outputs/phase1_step9_run_report_w_a1.md)
 - [outputs/phase1_step9_run_report_w_a1.html](../outputs/phase1_step9_run_report_w_a1.html)
 
-## Run `20261117T202438Z-e`
+## Run `20261117T204125Z-e`
 
 - Brief idea: A crypto trading signal bot that posts buy and sell alerts
 - Final outcome: `stop`
@@ -89,7 +89,7 @@ Files:
 - [outputs/phase1_step9_run_report_e_a1.md](../outputs/phase1_step9_run_report_e_a1.md)
 - [outputs/phase1_step9_run_report_e_a1.html](../outputs/phase1_step9_run_report_e_a1.html)
 
-## Run `payment-test-20261117T202438Z`
+## Run `payment-test-20261117T204126Z`
 
 - Brief idea: None
 - Final outcome: `None`

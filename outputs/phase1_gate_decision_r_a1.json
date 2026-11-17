@@ -1,16 +1,16 @@
 {
-  "run_id": "20261117T201525Z-r",
+  "run_id": "20261117T203304Z-r",
   "gate": {
     "gate": "phase1_gate",
     "outcome": "stop",
-    "verdict": "3 relevant of 62 screened across 1 source; threshold 3 across 2 sources. This means not enough public evidence of the pain, not proof that no market exists. No ranked alternative passes evidence and fit, so the system recommends stopping. What would change it: founder evidence URLs showing the pain, or real answers from the Mom Test interviews in the interview script.",
+    "verdict": "4 relevant of 45 screened across 1 source; threshold 3 across 2 sources. This means not enough public evidence of the pain, not proof that no market exists. No ranked alternative passes evidence and fit, so the system recommends stopping. What would change it: founder evidence URLs showing the pain, or real answers from the Mom Test interviews in the interview script.",
     "reasons": [
       "evidence_weak"
     ],
     "numbers": {
-      "sources_answered": 3,
-      "items_screened": 62,
-      "relevant_items": 3,
+      "sources_answered": 2,
+      "items_screened": 45,
+      "relevant_items": 4,
       "relevant_sources": 1,
       "fit_score": 4.75,
       "threshold_min_sources_ok": 2,
@@ -28,13 +28,14 @@
   "handoff": {
     "idea": "Notion Wedding Planner Pack",
     "alternatives": [
-      "Digital Wedding Moodboard Kit",
+      "Visual Wedding Moodboard Service",
       "Wedding Vendor Directory & Review Platform"
     ],
     "evidence_ids": [
       "S002",
       "S005",
-      "S016"
+      "S016",
+      "S019"
     ]
   }
 }

@@ -14,9 +14,9 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We do not guarantee any sp
 
 ## Limitation of liability
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. To the maximum extent permitted by law, the founder is not liable for any damages resulting from the use or inability to use these digital files.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. To the maximum extent permitted by law, the founder is not liable for any damages arising from the use or inability to use these digital files.
 
 ## Changes
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We reserve the right to update these terms at any time. Continued use of the product constitutes acceptance of the new terms.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We reserve the right to update these terms at any time. Continued use of the product constitutes acceptance of any changes.
 

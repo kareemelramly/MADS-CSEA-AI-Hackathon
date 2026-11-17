@@ -2,6 +2,6 @@ UNVALIDATED · FOUNDER OVERRIDE
 
 STUBBED · NOT PUBLISHED
 
-Suggested channel: Egyptian wedding planning and bridal Facebook groups
+Suggested channel: Facebook groups for wedding planning in Egypt
 
-The Notion Wedding Planner Pack is now available, specifically designed for the Egyptian wedding market. This digital toolkit includes a planning checklist and a vendor tracker to help organize wedding logistics. The package contains the checklist, tracker, license, and documentation files.
+The Notion Wedding Planner Pack is now available for wedding planners and engaged couples. This digital toolkit includes a Markdown planning checklist and a CSV vendor tracker to organize wedding logistics. The package also contains documentation and an MIT license file. It is designed to provide a structured framework for managing wedding tasks and vendor information within Notion.

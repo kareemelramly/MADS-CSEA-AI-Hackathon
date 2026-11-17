@@ -1,6 +1,6 @@
 # Payment and delivery test log (MOCKED)
 
-MOCKED · run payment-test-20261117T202438Z · 2026-11-17T20:24:39Z · local SQLite ledger, no payment SDK, no network, no card fields. No payment of any kind runs, including sandbox or test mode.
+MOCKED · run payment-test-20261117T204126Z · 2026-11-17T20:41:26Z · local SQLite ledger, no payment SDK, no network, no card fields. No payment of any kind runs, including sandbox or test mode.
 
 - MOCKED · 1 pay: event evt_test_1 → order ord_test_1 paid, fee 95 of 1900 minor units, download token issued
 - MOCKED · 1b deliver: download with token allowed=True

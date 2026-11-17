@@ -18,7 +18,7 @@ No completed experiment yet (status: not_started). Real demand is unknown, so no
 | Experiment status | not_started |
 | Visitors | not measured |
 | Real signups | 0 |
-| Simulated signups excluded | 2 |
+| Simulated signups excluded | 3 |
 | Attempt | 1 |
 | Maximum attempts | 2 |
 | Repeat floor | 0.5 |

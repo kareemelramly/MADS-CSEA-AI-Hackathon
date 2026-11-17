@@ -4,17 +4,17 @@
 
 > STOP: the system recommends not continuing on the current evidence.
 
-Founder fit 1.30 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
+Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
 
 ## What was measured
 
 | Measure | Value |
 |---|---|
-| Sources answered | 3 |
-| Items screened | 58 |
-| Relevant items | 4 |
+| Sources answered | 2 |
+| Items screened | 42 |
+| Relevant items | 3 |
 | Relevant sources | 2 |
-| Fit score | 1.3 |
+| Fit score | 1.6 |
 
 ## Thresholds (locked before any data, ASSUMPTION)
 

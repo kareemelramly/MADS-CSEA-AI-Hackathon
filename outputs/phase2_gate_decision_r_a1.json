@@ -1,6 +1,6 @@
 {
   "banner": "UNVALIDATED · FOUNDER OVERRIDE",
-  "run_id": "20261117T201525Z-r",
+  "run_id": "20261117T203304Z-r",
   "gate": {
     "gate": "phase2_gate",
     "outcome": "awaiting_evidence",
@@ -15,7 +15,7 @@
       "experiment_status": "not_started",
       "visitors": null,
       "real_signups": 0,
-      "simulated_signups_excluded": 2,
+      "simulated_signups_excluded": 3,
       "attempt": 1,
       "max_attempts": 2,
       "repeat_floor": 0.5
@@ -31,15 +31,15 @@
     "signups": 0,
     "attempt": 1,
     "min_visitors": 200,
-    "value_proposition": "A localized, high-organization Notion workspace designed specifically for the nuances of the Egyptian wedding market, prioritizing honesty and privacy.",
+    "value_proposition": "A streamlined, privacy-respecting Notion workspace designed to replace chaotic planning methods with a professional checklist and vendor tracker.",
     "validation_status": "AWAITING_EVIDENCE",
     "landing_ref": {
       "path": "outputs/phase2_step3_landing_page_r_a1.html",
-      "sha256": "034caba123a6a850f7e697ca5d3fe86b586b273e1d10d7b46d9fc75093cd9b91"
+      "sha256": "6fc70fbd657e1733ca4573e86bc309a3dabad6af157d0ade2ff9447bf039cff2"
     },
     "plan_ref": {
       "path": "outputs/phase2_step2_locked_plan_r_a1.json",
-      "sha256": "aeac2ff477648c2fac35af94378d860ac4235e9f244e14240d0790f324a3b59d"
+      "sha256": "08c34a4f7c0821b50c7c0ce73cc4d3a951c116976c53417c6f22f72a275b3d87"
     }
   }
 }

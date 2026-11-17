@@ -2,9 +2,9 @@ UNVALIDATED · FOUNDER OVERRIDE
 
 STUBBED · NOT PUBLISHED
 
-# Notion Wedding Planner Pack (Egypt Edition)
+# Notion Wedding Planner Pack
 
-A specialized Notion template set designed to organize wedding logistics within the Egyptian market. This pack includes structured tools for managing checklists and vendor coordination.
+A structured set of Notion templates designed to organize wedding logistics. This pack includes tools for task management and vendor coordination.
 
 **Price:** 19.0 USD one-time · Checkout: MOCKED (no payment of any kind runs)
 
@@ -17,15 +17,15 @@ A specialized Notion template set designed to organize wedding logistics within 
 
 ## Who it is for
 
-Newly engaged individuals and independent wedding planners in Egypt looking for structured organization tools.
+Engaged individuals and independent wedding planners in Egypt looking for organized digital planning tools.
 
 ## FAQ
 
-**What format are the files in?**  
-The product includes a Markdown checklist and a CSV tracker designed for use within Notion.
+**What is the file format?**  
+The pack includes a Markdown checklist and a CSV tracker.
 
 **How is the product delivered?**  
-Digital files are delivered immediately via the platform after purchase.
+Digital files are delivered immediately upon purchase via the platform.
 
 **What is the refund policy?**  
 Refund requests are handled directly by the founder.

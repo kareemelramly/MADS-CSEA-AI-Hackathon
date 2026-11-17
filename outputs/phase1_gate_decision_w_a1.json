@@ -1,18 +1,18 @@
 {
-  "run_id": "20261117T202306Z-w",
+  "run_id": "20261117T203949Z-w",
   "gate": {
     "gate": "phase1_gate",
     "outcome": "stop",
-    "verdict": "Founder fit 1.30 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.",
+    "verdict": "Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.",
     "reasons": [
       "fit_weak"
     ],
     "numbers": {
-      "sources_answered": 3,
-      "items_screened": 58,
-      "relevant_items": 4,
+      "sources_answered": 2,
+      "items_screened": 42,
+      "relevant_items": 3,
       "relevant_sources": 2,
-      "fit_score": 1.3,
+      "fit_score": 1.6,
       "threshold_min_sources_ok": 2,
       "threshold_min_items_screened": 20,
       "threshold_min_relevant": 3,
@@ -28,14 +28,13 @@
   "handoff": {
     "idea": "Gamified Habit Tracker",
     "alternatives": [
-      "Curated Habit Newsletter",
-      "Digital Habit Workbook"
+      "Habit Coaching Newsletter",
+      "Digital Habit Journal Templates"
     ],
     "evidence_ids": [
       "S009",
       "S024",
-      "S047",
-      "S003"
+      "S043"
     ]
   }
 }

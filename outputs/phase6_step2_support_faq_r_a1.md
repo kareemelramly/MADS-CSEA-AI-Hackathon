@@ -6,17 +6,17 @@ Every answer: DRAFT · AI-written for founder review. Sending any reply is STUBB
 
 **Q: What file formats are included in this pack?**
 
-A: The pack includes a Markdown checklist for wedding timeline milestones and a CSV file for your vendor tracker.
+A: The pack includes a structured Markdown checklist and a CSV tracker for managing your wedding logistics.
 
 _cites: product_docs_
 
-**Q: How do I open and use the files?**
+**Q: How do I open and use the tracker file?**
 
-A: You can open the Markdown file to follow wedding phases and use any spreadsheet application to open and edit the CSV vendor tracker.
+A: The tracker is a CSV file which can be opened in any standard spreadsheet software to log vendor contact details and quotes.
 
 _cites: product_docs_
 
-**Q: Will the download link expire?**
+**Q: How long will my download link remain active?**
 
 A: Escalated to the founder. This assistant gives no legal, health, financial or refund decisions or promises.
 

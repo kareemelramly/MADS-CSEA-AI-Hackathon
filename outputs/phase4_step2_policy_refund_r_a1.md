@@ -6,7 +6,7 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice
 
 ## Eligibility
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Refund eligibility is determined on a case-by-case basis due to the digital nature of the product.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Refund eligibility is determined on a case-by-case basis at the founder's discretion.
 
 ## Process
 

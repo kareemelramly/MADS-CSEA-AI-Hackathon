@@ -4,15 +4,15 @@
 
 > STOP: the system recommends not continuing on the current evidence.
 
-3 relevant of 62 screened across 1 source; threshold 3 across 2 sources. This means not enough public evidence of the pain, not proof that no market exists. No ranked alternative passes evidence and fit, so the system recommends stopping. What would change it: founder evidence URLs showing the pain, or real answers from the Mom Test interviews in the interview script.
+4 relevant of 45 screened across 1 source; threshold 3 across 2 sources. This means not enough public evidence of the pain, not proof that no market exists. No ranked alternative passes evidence and fit, so the system recommends stopping. What would change it: founder evidence URLs showing the pain, or real answers from the Mom Test interviews in the interview script.
 
 ## What was measured
 
 | Measure | Value |
 |---|---|
-| Sources answered | 3 |
-| Items screened | 62 |
-| Relevant items | 3 |
+| Sources answered | 2 |
+| Items screened | 45 |
+| Relevant items | 4 |
 | Relevant sources | 1 |
 | Fit score | 4.75 |
 

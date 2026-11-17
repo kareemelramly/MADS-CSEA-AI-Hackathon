@@ -6,11 +6,11 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice
 
 ## Format
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. The product is delivered as digital Markdown checklist files and CSV tracker files.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. The product is delivered as digital files in Markdown (.md) and CSV formats.
 
 ## Timing
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Delivery occurs immediately via a digital download link sent to your provided email.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Delivery occurs immediately via a digital download link sent to your provided email address.
 
 ## Access expiry
 

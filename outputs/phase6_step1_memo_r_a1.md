@@ -3,13 +3,13 @@ UNVALIDATED · FOUNDER OVERRIDE
 ## Override section
 
 This run continued past a gate by founder override. Every result below is UNVALIDATED.
-- Phase 1: original outcome `stop`; reason given: "Founder accepts weak public evidence to see the rest of the pipeline in a demo run" (2026-11-17T20:17:37Z)
-- Phase 2: original outcome `awaiting_evidence`; reason given: "No experiment has run yet; founder overrides to see the remaining phases in a demo run" (2026-11-17T20:19:34Z)
-- Phase 4: original outcome `repeat`; reason given: "Fewer than three competitor prices loaded; founder sets an experimental demo price of 19 USD" (2026-11-17T20:20:28Z)
+- Phase 1: original outcome `stop`; reason given: "Founder accepts weak public evidence to see the rest of the pipeline in a demo run" (2026-11-17T20:34:46Z)
+- Phase 2: original outcome `awaiting_evidence`; reason given: "No experiment has run yet; founder overrides to see the remaining phases in a demo run" (2026-11-17T20:36:42Z)
+- Phase 4: original outcome `repeat`; reason given: "Fewer than three competitor prices loaded; founder sets an experimental demo price of 19 USD" (2026-11-17T20:38:05Z)
 
 # Persevere-or-pivot memo
 
-Run 20261117T201525Z-r · validation status: UNVALIDATED_FOUNDER_OVERRIDE · memo filled by code from a template (no model call).
+Run 20261117T203304Z-r · validation status: UNVALIDATED_FOUNDER_OVERRIDE · memo filled by code from a template (no model call).
 
 ## Recommendation
 

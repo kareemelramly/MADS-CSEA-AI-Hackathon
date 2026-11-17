@@ -1,15 +1,17 @@
 {
-  "run_id": "20261117T202306Z-w",
+  "run_id": "20261117T203949Z-w",
   "coverage": {
-    "sources_ok": 3,
-    "items_screened": 58,
+    "sources_ok": 2,
+    "items_screened": 42,
     "raw_hits": {
       "hn_algolia": 25,
-      "stackexchange": 16,
+      "stackexchange": 0,
       "github_issues": 20,
       "wikipedia": 3
     },
-    "failed": [],
+    "failed": [
+      "stackexchange (HTTP 400)"
+    ],
     "retry_used": false,
     "query": "habit tracker app",
     "duplicates_removed": 3
@@ -20,7 +22,7 @@
       "url": "https://news.ycombinator.com/item?id=38174614",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Patterns – Habit Tracker App",
       "excerpt": "Show HN: Patterns – Habit Tracker App Hi everyone I'm a Notion-addicted person and love to build my own template to cover different aspects of my life, either work or personal stuff. Once, I wanted to build a habit tracker template, and I realized Notion was not the best solution. You can organize it in a much more eff",
       "use": "demand"
@@ -30,7 +32,7 @@
       "url": "https://news.ycombinator.com/item?id=47998670",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly",
       "excerpt": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly",
       "use": "demand"
@@ -40,7 +42,7 @@
       "url": "https://news.ycombinator.com/item?id=47911543",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly",
       "excerpt": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly I made this small app because I wanted a habit tracker that was not only free, open source and privacy-friendly, but at the same time offer a nice \"premium-feeling\" experience on iOS. I used amangeldybaiserkeev/TeymiaHabit for a while, but I wa",
       "use": "demand"
@@ -50,7 +52,7 @@
       "url": "https://news.ycombinator.com/item?id=48149346",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly",
       "excerpt": "Show HN: Kadō – habit tracker app for iOS, open source and privacy-friendly",
       "use": "demand"
@@ -60,7 +62,7 @@
       "url": "https://news.ycombinator.com/item?id=47892056",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kadō, an open source habit tracker app for iOS",
       "excerpt": "Show HN: Kadō, an open source habit tracker app for iOS I made this small app because I wanted a habit tracker that was not only free, open source and privacy-friendly, but at the same time offer a nice \"premium-feeling\" experience on iOS. I used amangeldybaiserkeev/TeymiaHabit for a while, but I was not really satisfi",
       "use": "demand"
@@ -70,7 +72,7 @@
       "url": "https://news.ycombinator.com/item?id=28507254",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Open Source Loop Habit Tracker App",
       "excerpt": "Open Source Loop Habit Tracker App",
       "use": "demand"
@@ -80,7 +82,7 @@
       "url": "https://news.ycombinator.com/item?id=27906622",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: I built a habit tracker app that uses systems to help you do more",
       "excerpt": "Show HN: I built a habit tracker app that uses systems to help you do more",
       "use": "demand"
@@ -90,7 +92,7 @@
       "url": "https://news.ycombinator.com/item?id=28885347",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Please leave some feedback about my writing habit tracker app",
       "excerpt": "Please leave some feedback about my writing habit tracker app",
       "use": "demand"
@@ -100,7 +102,7 @@
       "url": "https://news.ycombinator.com/item?id=47231047",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kabit – Free habit tracker app",
       "excerpt": "Show HN: Kabit – Free habit tracker app Hi folks, coming from a product design background I wanted to build my apps. With the advent of AI, I used Cursor to create my first app - Kabit Why kabit? I have used a lot of habit-tracking apps and most of them are filled with features that are not useful to me, sometimes UI i",
       "use": "demand"
@@ -110,7 +112,7 @@
       "url": "https://news.ycombinator.com/item?id=41765133",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Habit Tool, a habit tracker app using Google Drive as a storage",
       "excerpt": "Show HN: Habit Tool, a habit tracker app using Google Drive as a storage It's a habit tracker app with fairly simple features where user log everyday habit, built with Flutter. Syncing to Google Drive incrementally using timestamp last synced data with offline-first mode. It uses Google Drive application-spesific data ",
       "use": "demand"
@@ -120,7 +122,7 @@
       "url": "https://news.ycombinator.com/item?id=11247657",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Today – Quantified self and habit tracker app",
       "excerpt": "Today – Quantified self and habit tracker app",
       "use": "demand"
@@ -130,7 +132,7 @@
       "url": "https://news.ycombinator.com/item?id=47874985",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Kadō, an open source habit tracker app for iOS",
       "excerpt": "Show HN: Kadō, an open source habit tracker app for iOS I made this small app because I wanted a habit tracker that was not only free, open source and privacy-friendly, but at the same time offer a nice \"premium-feeling\" experience on iOS. I used amangeldybaiserkeev/TeymiaHabit for a while, but I was not really satisfi",
       "use": "demand"
@@ -140,7 +142,7 @@
       "url": "https://news.ycombinator.com/item?id=46364954",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: I've open-sourced my habit tracker app built with React Native",
       "excerpt": "Show HN: I've open-sourced my habit tracker app built with React Native",
       "use": "demand"
@@ -150,7 +152,7 @@
       "url": "https://news.ycombinator.com/item?id=41647328",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: I created a free, open-source, cross platform habit tracker app",
       "excerpt": "Show HN: I created a free, open-source, cross platform habit tracker app OpenHabitTracker is made with .NET 8 and Blazor and is available on Windows, Linux, Android, iOS, macOS, and as a web app. It is privacy focused: all user data is stored locally on device. It is localized to English, German, Spanish, Slovenian. So",
       "use": "demand"
@@ -160,7 +162,7 @@
       "url": "https://news.ycombinator.com/item?id=40327598",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Minimalistic habit tracker CLI app written in Rust and ratatui",
       "excerpt": "Minimalistic habit tracker CLI app written in Rust and ratatui",
       "use": "demand"
@@ -170,7 +172,7 @@
       "url": "https://news.ycombinator.com/item?id=18315561",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "A habit tracker app build without code (no login required)",
       "excerpt": "A habit tracker app build without code (no login required)",
       "use": "demand"
@@ -180,7 +182,7 @@
       "url": "https://news.ycombinator.com/item?id=44010042",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "OnTrack Goals Habits Tracker App",
       "excerpt": "OnTrack Goals Habits Tracker App",
       "use": "demand"
@@ -190,7 +192,7 @@
       "url": "https://news.ycombinator.com/item?id=43619352",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: HabitHook – Social Habit Tracker App for Professionals",
       "excerpt": "Show HN: HabitHook – Social Habit Tracker App for Professionals HabitHook is a social habit tracker app for professionals. • Set daily goals and build better habits • Join public challenges and leaderboards • Stay consistent with social accountability Looking for early users and feedback to improve it!",
       "use": "demand"
@@ -200,7 +202,7 @@
       "url": "https://news.ycombinator.com/item?id=38447566",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Just released a habit tracker app using Google Drive as a Storage, Habit Tool",
       "excerpt": "Just released a habit tracker app using Google Drive as a Storage, Habit Tool",
       "use": "demand"
@@ -210,7 +212,7 @@
       "url": "https://news.ycombinator.com/item?id=47503007",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "My Trackz – Habit Tracker App",
       "excerpt": "My Trackz – Habit Tracker App",
       "use": "demand"
@@ -220,7 +222,7 @@
       "url": "https://news.ycombinator.com/item?id=46699922",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: I created my first mobile app, could use some support",
       "excerpt": "Show HN: I created my first mobile app, could use some support Hi Everyone, I created a mobile app called Accumoo, and I would appreciate it if y'all can have a look, download and give me a favorable review. Lots of blood, sweat, tears and love went into this app, and I hope you LOVE it as much as I do - it's the app I",
       "use": "demand"
@@ -230,7 +232,7 @@
       "url": "https://news.ycombinator.com/item?id=42457673",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Habit Rewards – A Gamified Habit Tracking with Clean Design",
       "excerpt": "Show HN: Habit Rewards – A Gamified Habit Tracking with Clean Design I built Habit Rewards, a habit tracker app designed to make building habits more enjoyable through gamification and a clean, minimalist design. The app allows you to: - Track daily/weekly/monthly habits. - Earn virtual coins for completing habits. - S",
       "use": "demand"
@@ -240,7 +242,7 @@
       "url": "https://news.ycombinator.com/item?id=4440032",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Role Playing Game for Self Improvement (weekend project)",
       "excerpt": "Show HN: Role Playing Game for Self Improvement (weekend project) Hey HN, been working on a project & could use all you lovelies' feedback :) I was inspired by habit-tracker apps like Joe's Goals, but I wanted something more robust and personally motivating. So I built a habit-tracker which plays like an RPG. As you ac",
       "use": "demand"
@@ -250,7 +252,7 @@
       "url": "https://news.ycombinator.com/item?id=40147989",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: Challenges App - MVP",
       "excerpt": "Show HN: Challenges App - MVP Hey there! This is my first post on HN! Let's go!! In my opinion, tracking habits through normal habit tracker apps is not much rewarding, as it does not reward you in short-term period, for example after completing 10 days of reading daily. So I have decided to make an app where you can t",
       "use": "demand"
@@ -260,397 +262,237 @@
       "url": "https://news.ycombinator.com/item?id=47018146",
       "source": "hn_algolia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Show HN: I created my first mobile app, could use some support",
       "excerpt": "Show HN: I created my first mobile app, could use some support Hi Everyone, I created a mobile app called Accumoo and submitted it to the app store, and I would appreciate it if y'all can have a look, download and give me a favorable rating and review. Lots of blood, sweat, tears and love went into this app, and I hope",
       "use": "demand"
     },
     {
       "source_id": "S026",
-      "url": "https://webapps.stackexchange.com/q/158837",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How does Facebook know which websites I've visited and what technology does it use to do so?",
-      "excerpt": "How does Facebook know which websites I've visited and what technology does it use to do so? Even though I have all permissions disabled for the Facebook app , I start seeing ads related to a product I'd searched for in my feed. … I want to know about the technology Facebook implements to track its users across the web",
-      "use": "demand"
-    },
-    {
-      "source_id": "S027",
-      "url": "https://stackoverflow.com/q/76204614",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Updating Habit Tracker App State in Flutter After Saving Changes",
-      "excerpt": "Updating Habit Tracker App State in Flutter After Saving Changes I'm developing a habit tracker app with Flutter, aiming to help users track and manage their habits effectively. … The app allows users to set a habit name and a timer goal, which they can update via a settings dialogue. …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S028",
-      "url": "https://stackoverflow.com/q/78890697",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Habit Tracker Recurrence Implementation",
-      "excerpt": "Habit Tracker Recurrence Implementation I am creating a Habit Tracker app in flutter and there two screens in App Home Screen In this there is a Horizontal list of dates, a tab bar to add different kind of tasks and a floating button that will … I asked ChatGPT and also look some websites and youtube videos but didn't ",
-      "use": "demand"
-    },
-    {
-      "source_id": "S029",
-      "url": "https://stackoverflow.com/q/60578952",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How to resolve Django Error in formatting: AttributeError: 'Habit' object has no attribute 'goal'",
-      "excerpt": "How to resolve Django Error in formatting: AttributeError: 'Habit' object has no attribute 'goal' I runserver to test my Habit Tracker app . Not sure why I get Error in formatting: AttributeError: ' Habit ' object has no attribute 'goal'. Have included my models.py. … class Habit (models.Model): name = models.CharField",
-      "use": "demand"
-    },
-    {
-      "source_id": "S030",
-      "url": "https://stackoverflow.com/q/56727460",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "UILabels disappear after I run Xcode",
-      "excerpt": "UILabels disappear after I run Xcode I uses a TableView Controller to hold UILable in my habit tracker app . However, after I run Xcode, all the UILable disappear. …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S031",
-      "url": "https://stackoverflow.com/q/41257327",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Local notifications not showing when app is closed using recent apps by user.",
-      "excerpt": "Local notifications not showing when app is closed using recent apps by user. Hi i am making a habit tracker app and when a new habit is created by user i call sendNotification() method for calling notifications at time specified by user.I want to show these notifications everyday … Now notifications are showing up whe",
-      "use": "demand"
-    },
-    {
-      "source_id": "S032",
-      "url": "https://stackoverflow.com/q/74796352",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Sqlite db won't connect",
-      "excerpt": "Sqlite db won't connect I am trying to implement a function that adds a habit to a habit tracker app that I am building. I have created a separate database.py file and a main.py file for the interface. … Tracker /main.py\", line 89, in interface() File \"/home/brandon/IU International University/Object-Oriented and Funct",
-      "use": "demand"
-    },
-    {
-      "source_id": "S033",
-      "url": "https://stackoverflow.com/q/51970238",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "MPAndroidChart: Dates on x-axis - sticky month and year",
-      "excerpt": "MPAndroidChart: Dates on x-axis - sticky month and year I would like to achieve a chart similar to the one from the Loop - Habit Tracker app : While scrolling horizontally, the month(and year) sticks to the left of the chart and the first of each month is replaced …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S034",
-      "url": "https://stackoverflow.com/q/75903683",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How do I fetch a value from Firebase?",
-      "excerpt": "How do I fetch a value from Firebase? I'm making habit tracker app with react native. want to import data from firebase and get the value and adjust it. const days = [ 'M', 'T', 'W', 'T', 'F', 'S', 'S' ]; const Calendar = (props …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S035",
-      "url": "https://stackoverflow.com/q/70138075",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How should I update database and RecyclerView in Kotlin after every midnight?",
-      "excerpt": "How should I update database and RecyclerView in Kotlin after every midnight? I would like to make a simple Habit Tracker app in Kotlin. … I already have a main database where the app stores the habits with dates, and a 'Daily View' where the user can see his habits and check/uncheck them. …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S036",
-      "url": "https://stackoverflow.com/q/67919211",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Iterating through two lists and return indices",
-      "excerpt": "Iterating through two lists and return indices I created a habit tracker app and one of the functions is to return the longest uninterrupted streak of done habits. … Therefore I saved the habit IDs in an id_list and the respective streak lengths in the streak_length_list. …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S037",
-      "url": "https://stackoverflow.com/q/59918386",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "how to make button UIButton save when last clicked on",
-      "excerpt": "how to make button UIButton save when last clicked on basically i am trying to make a habit tracker app . i am still trying to figure out how to make cell save when it was last clicked. i am using RealmSwift here is the function i would like to implement … = Habit () @IBOutlet weak var lblTitle: UILabel! …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S038",
-      "url": "https://stackoverflow.com/q/77729723",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How to get the sequence of consecutive habits that are true with Firebase",
-      "excerpt": "How to get the sequence of consecutive habits that are true with Firebase I'm creating a Habit Tracker App with Firebase. I want to make a sequence of the last habits completed in descending sequence. If a habit is false, it stops counting { \"habits\": { \"-nx... … >>>() val habitsLiveData: LiveData<MutableList<Pair< Hab",
-      "use": "demand"
-    },
-    {
-      "source_id": "S039",
-      "url": "https://stackoverflow.com/q/41074620",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Background drawable for Caldroid",
-      "excerpt": "Background drawable for Caldroid Hi i am using Caldroid library for customizing calendar view in my habit tracker app and there are two hash maps successMap and failureMap representing successful and failed days of a habit . …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S040",
-      "url": "https://stackoverflow.com/q/71091175",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "Flutter Local Notifications runs the Callback function on every hot restart",
-      "excerpt": "Flutter Local Notifications runs the Callback function on every hot restart I am currently working on a Habit Tracker app in Flutter. … , or in cases where the device is not connected, it runs every time I close the app and open it again. …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S041",
-      "url": "https://stackoverflow.com/q/78417793",
-      "source": "stackexchange",
-      "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
-      "title": "How to make whenever gem work on my rails app?",
-      "excerpt": "How to make whenever gem work on my rails app? I am currently creating an \" habit tracker \" app and wish to create an instance of my model Day everyday. … * * * * /bin/bash -l -c 'cd /Users/myusername/code/myusername/ habit - tracker && bundle exec rails runner '\\''Day.create!' …",
-      "use": "demand"
-    },
-    {
-      "source_id": "S042",
       "url": "https://github.com/nyas1/Material-You-app-list/issues/719",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "[APP] Pearform: Habit & Goal Tracker",
       "excerpt": "[APP] Pearform: Habit & Goal Tracker ### App name Pearform: Habit & Goal Tracker ### App type Proprietary ### Primary source URL https://play.google.com/store/apps/details?id=com.kristianka.pearform ### Tags (select all that apply) - [x] MD3E - [ ] MDY - [ ] MD - [ ] MY - [ ] FOSS - [ ] FORK - [ ] MOD - [ ] 💰 - [ ] 🪦 #",
       "use": "demand"
     },
     {
-      "source_id": "S043",
+      "source_id": "S027",
       "url": "https://github.com/Lparedes14/sharkbyte_hackathon/issues/2",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit tracker for students",
       "excerpt": "Habit tracker for students A habit tracker for students: add a few daily habits, check them off each day, and see a weekly streak. First version: no accounts, just a clean mobile-friendly page.",
       "use": "demand"
     },
     {
-      "source_id": "S044",
+      "source_id": "S028",
       "url": "https://github.com/Lparedes14/habit-tracker-test/issues/1",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit tracker for students",
       "excerpt": "Habit tracker for students A habit tracker for students: add a few daily habits, check them off each day, and see a weekly streak. First version: no accounts, just a clean mobile-friendly page. Idea, score card and answers: [docs/IDEA.md](https://github.com/Lparedes14/habit-tracker-test/blob/main/docs/IDEA.md). From th",
       "use": "demand"
     },
     {
-      "source_id": "S045",
+      "source_id": "S029",
       "url": "https://github.com/beeminder/integrations/issues/138",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Tapas Habit Tracker",
       "excerpt": "Tapas Habit Tracker https://tapastracker.app/ Habit tracking app for iOS and Android. General but focused on meditation, yoga, fitness. Made by a friend of Beeminder. ## Cognata * #2 * #105 _**Verbata**: habit tracking,_",
       "use": "demand"
     },
     {
-      "source_id": "S046",
+      "source_id": "S030",
       "url": "https://github.com/rushiranpise/morphe-patches/issues/1130",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "bug: patch broken after app update - Pixel Habit Tracker",
       "excerpt": "bug: patch broken after app update - Pixel Habit Tracker ### App name Pixel Habit Tracker (`com.pixel.al.pixelhabittracker`) ### Broken app version 2.5.2 (`versionCode 100091`) ### Last working app version 2.5.0 ### Patch source release Automated tracker run using `rushiranpise/morphe-patches` release asset for `rushir",
       "use": "demand"
     },
     {
-      "source_id": "S047",
+      "source_id": "S031",
       "url": "https://github.com/Tobiashopf/weekforge/issues/9",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit strength",
       "excerpt": "Habit strength Habit strength (inspired by Loop Habit Tracker): a score that rises with consistency and decays slowly, so one missed day doesn't erase months.\\n\\nPart of v0.8 — Ideas from other personal development apps in ROADMAP.md. Estimate: 2h.",
       "use": "demand"
     },
     {
-      "source_id": "S048",
+      "source_id": "S032",
       "url": "https://github.com/rushiranpise/patches-tracker/issues/558",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "tracker: Pixel Habit Tracker needs attention for 2.5.3",
       "excerpt": "tracker: Pixel Habit Tracker needs attention for 2.5.3 The tracker could not finish `Pixel Habit Tracker` (`com.pixel.al.pixelhabittracker`). - Current known working: `2.5.0` - Version checked: `2.5.3` - Problem area: `APK download` - Issue repo: `rushiranpise/patches-tracker` - Workflow: https://github.com/rushiranpis",
       "use": "demand"
     },
     {
-      "source_id": "S049",
+      "source_id": "S033",
       "url": "https://github.com/dhevdotdev/Nines/issues/2",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Export / import habit data",
       "excerpt": "Export / import habit data No way currently to get data out of or into the app. Never scoped. No design decided yet: file format (a raw DB export vs. a portable format like JSON/CSV), what's included (archived habits? entry history? just current state?), whether import is meant for restore-to-same-device or migrating f",
       "use": "demand"
     },
     {
-      "source_id": "S050",
+      "source_id": "S034",
       "url": "https://github.com/nyas1/Material-You-app-list/issues/663",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "[APP] Pixel Habit Tracker",
       "excerpt": "[APP] Pixel Habit Tracker ### App name Pixel Habit Tracker ### App type Proprietary ### Primary source URL https://play.google.com/store/apps/details?id=com.pixel.al.pixelhabittracker ### Tags (select all that apply) - [x] MD3E - [x] MDY - [x] MD - [ ] MY - [ ] FOSS - [ ] FORK - [ ] MOD - [ ] 💰 - [ ] 🪦 ### Suggested se",
       "use": "demand"
     },
     {
-      "source_id": "S051",
+      "source_id": "S035",
       "url": "https://github.com/mdw223/Islamic-Calendar-Sync/issues/90",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "V2 backlog: habit tracker, mobile apps, prayer makeup",
       "excerpt": "V2 backlog: habit tracker, mobile apps, prayer makeup Deferred past \\\"complete\\\" (`docs/planning/PROJECT_TIMELINE.md` section 1). Captured so the notes items are on the board without crowding the critical path. ## Ideas (not scoped, not scheduled) - Fasting tracker (totals, missed count) and Ramadan days fasted - Praye",
       "use": "demand"
     },
     {
-      "source_id": "S052",
+      "source_id": "S036",
       "url": "https://github.com/ghost-in-the-droid/android-agent/issues/57",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "drift: ghost/habit-tracker app 2.3.1 released, fingerprint covers >=2.3.2",
       "excerpt": "drift: ghost/habit-tracker app 2.3.1 released, fingerprint covers >=2.3.2 Play Store package: `org.isoron.uhabits` Released version: `2.3.1` Declared range: `>=2.3.2` Please verify the skill on this app version and update its fingerprint if appropriate.",
       "use": "demand"
     },
     {
-      "source_id": "S053",
+      "source_id": "S037",
       "url": "https://github.com/henfrydls/daylo/issues/223",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Store listings say \"habit\" while the app says \"activity\"",
       "excerpt": "Store listings say \"habit\" while the app says \"activity\" ## What happens Everything a person reads before installing says **habit**: \"Daylo: Habit Tracker\", \"Track your habits\", \"a dot per habit\" (Play listing, Microsoft Store, snap, Flathub metainfo, landing page). Inside the app the word never appears; it says **acti",
       "use": "demand"
     },
     {
-      "source_id": "S054",
+      "source_id": "S038",
       "url": "https://github.com/fariya092/fariya092/issues/1",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "HABIT TRACKER",
       "excerpt": "HABIT TRACKER https://habit-sparkle-699.lovable.app",
       "use": "demand"
     },
     {
-      "source_id": "S055",
+      "source_id": "S039",
       "url": "https://github.com/Vivekpsps3/vivek-monorepo/issues/309",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "PLACE-05: Make confirmed habit actions produce specific, reversible garden feedback — scope tracker",
       "excerpt": "PLACE-05: Make confirmed habit actions produce specific, reversible garden feedback — scope tracker ## Retained scope, split into small leaves — 2026-11-17 `PLACE-05` is now a **scope tracker, not an executable leaf**. No implementation is declared complete. The owner selected direct building/object interaction, a 2.5D",
       "use": "demand"
     },
     {
-      "source_id": "S056",
+      "source_id": "S040",
       "url": "https://github.com/buwaneka-k/Habit-Tracker_001/issues/1",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit Tracker MVP",
       "excerpt": "Habit Tracker MVP ## Summary A small frontend-only habit tracker: a fixed set of daily habits, ticked off day by day, with a month view and a stats screen. Mock data only (no backend, no login, no roles, single user). Core rule: the app shows how many days in a row a habit was done (current streak), and a future day ca",
       "use": "demand"
     },
     {
-      "source_id": "S057",
+      "source_id": "S041",
       "url": "https://github.com/sachin3696/testrepo/issues/1",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit_tracker",
       "excerpt": "Habit_tracker User stories for the habit tracking app project",
       "use": "demand"
     },
     {
-      "source_id": "S058",
+      "source_id": "S042",
       "url": "https://github.com/super-productivity/super-productivity/issues/9662",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "💡 android widget habit tracker",
       "excerpt": "💡 android widget habit tracker ### Problem Statement habbit are thing which should be done quickly not as wait 7-8 sec to open the app then open habit section then mark as done ### Possible Solution instead, in widget header add ''habit icon and today'' toggle to open the all habit which are schedule for today(replacin",
       "use": "demand"
     },
     {
-      "source_id": "S059",
+      "source_id": "S043",
       "url": "https://github.com/gh01wzx/focusflow/issues/108",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "[108] Make AI work simple and build a rewarding daily habit tracker",
       "excerpt": "[108] Make AI work simple and build a rewarding daily habit tracker ## Why this helps As the owner, I want to open FocusFlow with my saved connections ready, ask a suitable AI to plan or finish one ticket, and build habits through repeatable activity logging, points and a personal rewards shop. The current workflow spr",
       "use": "demand"
     },
     {
-      "source_id": "S060",
+      "source_id": "S044",
       "url": "https://github.com/CHNJohnHK/Material-You-App-Repository/issues/18",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "New app suggestion: Pixel Habit Tracker (Full, Multi, Health & Habits)",
       "excerpt": "New app suggestion: Pixel Habit Tracker (Full, Multi, Health & Habits) **App name:** Pixel Habit Tracker **Play Store:** https://play.google.com/store/apps/details?id=com.pixel.al.pixelhabittracker **Category:** Daily Life > Health & Habits **Suggested label:** Full (complete MD3 components + Dynamic Color), built with",
       "use": "demand"
     },
     {
-      "source_id": "S061",
+      "source_id": "S045",
       "url": "https://github.com/crazy-rabbit-software/themia/issues/154",
       "source": "github_issues",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Tracker improvements",
       "excerpt": "Tracker improvements ### Widget name Mood and habits Tracker ### What should the widget show? Mood Tracker: 1) Thought field missing on startup: Sometimes (I guess when you start the PC up), there is no \"Add a thought to the grade\" field. You have to submit an emoji first, and only then can you add a thought. When chec",
       "use": "demand"
     },
     {
-      "source_id": "S062",
+      "source_id": "S046",
       "url": "https://en.wikipedia.org/wiki/Habit",
       "source": "wikipedia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Habit",
       "excerpt": "particularly effective in promoting habit learning. A variety of digital tools, such as online or mobile apps , support habit formation. For example, Habitica",
       "use": "background"
     },
     {
-      "source_id": "S063",
+      "source_id": "S047",
       "url": "https://en.wikipedia.org/wiki/Daylio",
       "source": "wikipedia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Daylio",
       "excerpt": "Daylio is a diary and mood tracking app available on iOS and Android. The iOS app is published by Relaxio, while the Android app on the Google Play Store",
       "use": "background"
     },
     {
-      "source_id": "S064",
+      "source_id": "S048",
       "url": "https://en.wikipedia.org/wiki/Muzzley",
       "source": "wikipedia",
       "http_status": 200,
-      "fetched_at": "2026-11-17T20:23:08Z",
+      "fetched_at": "2026-11-17T20:39:50Z",
       "title": "Muzzley",
       "excerpt": "Bulbs Belkin Wemo Maker Phillips Hue D-Link Cameras Trax GPS Tracker Tractive GPS Tracker Netatmo Weather Station Koubachi Plant Care GreenIQ Smart Garden",
       "use": "background"
@@ -659,27 +501,21 @@
   "relevant": [
     {
       "source_id": "S009",
-      "pain_point": "Existing habit-tracking apps contain many features that are not useful to the user.",
+      "pain_point": "Existing habit tracking apps contain many features that are not useful to the user.",
       "signal": "complaint",
       "source": "hn_algolia"
     },
     {
       "source_id": "S024",
-      "pain_point": "Standard habit trackers lack sufficient short-term rewards for consistency.",
+      "pain_point": "Standard habit trackers do not provide sufficient short-term rewards for consistency.",
       "signal": "complaint",
       "source": "hn_algolia"
     },
     {
-      "source_id": "S047",
-      "pain_point": "Current habit tracking systems may penalize users too harshly for a single missed day.",
-      "signal": "complaint",
+      "source_id": "S043",
+      "pain_point": "Users want to build habits through repeatable activity logging, points, and rewards.",
+      "signal": "request",
       "source": "github_issues"
-    },
-    {
-      "source_id": "S003",
-      "pain_point": "Users want a habit tracker that is free, open source, privacy-friendly, and offers a premium experience.",
-      "signal": "complaint",
-      "source": "hn_algolia"
     }
   ],
   "note": "Source IDs are assigned by code; excerpts are untrusted data."

@@ -8,7 +8,7 @@
   },
   "lock": {
     "sha256": "2d28b0835a8b8a66da2ee9f03b84e0b713e5bb9144fc5c775e8d0ef08ec2327f",
-    "locked_at": "2026-11-17T20:17:51Z",
+    "locked_at": "2026-11-17T20:35:01Z",
     "plan": {
       "days": 14,
       "min_visitors": 200,

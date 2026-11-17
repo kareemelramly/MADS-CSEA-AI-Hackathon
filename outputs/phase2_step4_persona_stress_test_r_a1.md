@@ -2,46 +2,46 @@ UNVALIDATED · FOUNDER OVERRIDE
 
 # Phase 2 · Step 4 · Persona stress test (SIMULATED · model-generated personas, not real people, not evidence, never counted as sign-ups)
 
-SIMULATED would-join count: 2 of 5. This number is excluded from the demand gate.
+SIMULATED would-join count: 3 of 5. This number is excluded from the demand gate.
 
 ## Persona 1 (SIMULATED)
 
-- Who: A high-end independent wedding planner in Cairo
-- Context: Manages multiple luxury weddings per year and relies on bespoke client portals.
-- Likely reaction: Interested in the vendor tracker aspect to streamline her internal database, but wary of the template's aesthetic flexibility.
+- Who: A high-end independent wedding planner based in Cairo
+- Context: Manages multiple luxury weddings simultaneously and relies on high-touch client service.
+- Likely reaction: Interested in the efficiency gains but wary of whether a template can handle the complexity of high-budget Egyptian weddings.
 - Would plausibly join: True
-- Main doubt: Whether the Notion structure is robust enough to handle complex, multi-day wedding itineraries without becoming cluttered.
+- Main doubt: Whether the vendor tracker can accommodate the specific nuances of local Egyptian vendor contracts and payment installments.
 
 ## Persona 2 (SIMULATED)
 
 - Who: A budget-conscious bride-to-be in Alexandria
-- Context: Planning her own wedding with a strict budget and limited time to manage logistics.
-- Likely reaction: Attracted to the idea of replacing fragmented apps, but skeptical about the cost-to-value ratio.
+- Context: Planning her own wedding with a limited budget and trying to avoid professional planner fees.
+- Likely reaction: Sees the value in organization but is skeptical about the cost-to-benefit ratio of a digital tool versus free spreadsheets.
 - Would plausibly join: False
-- Main doubt: Whether a digital template can actually help her save money or if it is just another organizational tool that adds more work.
+- Main doubt: Whether the template provides enough specific local guidance to justify a purchase over free online checklists.
 
 ## Persona 3 (SIMULATED)
 
-- Who: A freelance wedding coordinator starting her own business
-- Context: Needs professional tools to present to clients but has very little capital for software subscriptions.
-- Likely reaction: Sees the pack as a way to look more professional to her first few clients immediately.
+- Who: A freelance wedding coordinator starting their own business
+- Context: Has basic organizational skills but lacks a professional system to present to clients.
+- Likely reaction: Attracted to the professional framework as a way to build credibility quickly.
 - Would plausibly join: True
-- Main doubt: If the 'localized' aspect actually includes specific Egyptian vendor categories or if it is just a generic template with a local label.
+- Main doubt: If the Notion setup is too complex for clients who are not tech-savvy to navigate during the planning process.
 
 ## Persona 4 (SIMULATED)
 
-- Who: A tech-savvy wedding planner who uses multiple specialized apps
-- Context: Already uses Trello, Google Sheets, and WhatsApp for different parts of the planning process.
-- Likely reaction: Skeptical of the claim that Notion can replace her existing fragmented but highly functional workflow.
+- Who: A skeptical tech-savvy wedding professional
+- Context: Already uses advanced project management tools like Trello or Asana for their business.
+- Likely reaction: Views the product as a niche tool and looks for specific features that differentiate it from general productivity templates.
 - Would plausibly join: False
-- Main doubt: The difficulty of migrating existing vendor data and client history into a new Notion ecosystem.
+- Main doubt: Whether the 'Egyptian context' mentioned is a meaningful feature or just a marketing label for a generic template.
 
 ## Persona 5 (SIMULATED)
 
-- Who: A skeptical DIY couple
-- Context: Prefers manual checklists and physical planners to avoid digital distractions and privacy concerns.
-- Likely reaction: Dismissive of the digital-first approach, viewing it as an unnecessary complication to a traditional process.
-- Would plausibly join: False
-- Main doubt: The security of their personal data and wedding details within a third-party Notion workspace.
+- Who: A busy professional couple planning a destination wedding in Egypt
+- Context: Working full-time jobs and feeling overwhelmed by the fragmented communication with vendors.
+- Likely reaction: Resonates with the pain point of scattered social media boards and fragmented planning methods.
+- Would plausibly join: True
+- Main doubt: If the tool will actually save them time or if they will spend more time learning how to use Notion than actually planning.
 
 Use the doubts to improve the page copy. Only real visitors and sign-ups can validate demand.

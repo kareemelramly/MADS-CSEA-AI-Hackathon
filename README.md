@@ -69,9 +69,9 @@ Open **http://localhost:8501**. Pick an example brief (R, W or E) or write your 
 <!-- runs:start -->
 Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):
 
-- `20261117T201525Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
-- `20261117T202306Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
-- `20261117T202438Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T203304Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
+- `20261117T203949Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T204125Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
 
 At least one committed run has recorded artifacts in all six phases.
 <!-- runs:end -->
@@ -101,7 +101,7 @@ No paid service, API key or account is needed. Everything runs on your machine.
 **About $0.00 per run** (local open-weight model; the complete six-phase run used 16 model calls and about 19k tokens).
 
 <!-- cost:start -->
-$0.00 in model/API charges observed for complete six-phase run 20261117T201525Z-r (16 model calls, 19222 tokens; 230.6 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
+$0.00 in model/API charges observed for complete six-phase run 20261117T203304Z-r (16 model calls, 19389 tokens; 249.3 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
 <!-- cost:end -->
 
 | Cost item | Per run | Basis |
