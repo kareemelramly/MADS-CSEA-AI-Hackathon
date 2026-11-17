@@ -11,4 +11,5 @@ def manifest(ctx, roles):
     m = {"run_id": ctx.run_id, "product": ctx.handoffs["H1"]["idea_name"], "archetype": "A1",
          "product_type": "checklist", "delivery_format": {"kind": "download", "file_types": ["md", "csv", "txt"]},
          "license": "MIT", "files": files, "validation_status": ctx.validation_status}
+    ctx.log("packager", "build_release_manifest", files=len(files), product=m["product"])
     return m, json.dumps(m, sort_keys=True, separators=(",", ":"))

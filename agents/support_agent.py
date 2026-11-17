@@ -12,9 +12,11 @@ ESCALATE = re.compile(r"\b(refund|money back|chargeback|legal|lawyer|sue|contrac
 LABEL = "DRAFT · AI-written for founder review"
 
 
-def faq(ctx, docs_excerpt, on_progress=None):
-    user = (f"Product: {ctx.handoffs['H1']['idea_name']}\nProduct docs excerpt:\n{docs_excerpt[:1500]}\n"
-            "Policies exist as DRAFT documents: terms, privacy, refund, delivery.")
+def faq(ctx, docs_excerpt, on_progress=None, policies=None):
+    pol = "\n\n".join(f"[{k}]\n{v[:600]}" for k, v in (policies or {}).items() if v)
+    user = (f"Product: {ctx.handoffs['H1']['idea_name']}\nProduct docs excerpt:\n{docs_excerpt[:1500]}\n\n"
+            + (f"DRAFT policies (answer factual questions such as link expiry and updates from these):\n{pol}"
+               if pol else "Policies exist as DRAFT documents: terms, privacy, refund, delivery."))
     d = llm.run_task(ctx, f"{ctx.run_id}:faq", lambda tid: llm.ask(
         prompt("support_agent"), user, schema("support_faq"), "support_agent", "draft_support_faq", ctx=ctx,
         task_id=tid, on_progress=on_progress, call_no="6.1"))

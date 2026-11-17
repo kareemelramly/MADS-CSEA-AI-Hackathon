@@ -56,7 +56,7 @@ Design choices in one place (full record with rejected alternatives: [docs/desig
 | Models | One local llama.cpp server; no hosted tier | No founder content goes to a model provider; nothing to pay or sign up for; works offline except for search |
 | State | SQLite (WAL) on a Docker volume; write-once text outputs | Crash-safe approvals and idempotent mock sales |
 | UI | Streamlit on `127.0.0.1:8501` | Single-founder local demo; not a multi-user authorization system |
-| Trick prompts | Fixed pattern rules first; then a local-model rule checker (`agents/rule_checker.py`, strict schema) that can only add refusals | Patterns are testable but miss paraphrases (3 of 12 on the held-out set); the model catches wording the patterns never saw, and if it is down the pattern verdict stands and the UI says so |
+| Trick prompts | Fixed pattern rules first; then a local-model rule checker (`agents/rule_checker.py`, strict schema) that can only add refusals | Patterns are testable but miss paraphrases (3 of 12 on the held-out set); with the model added, 12 of 12 were refused (3 of 10 honest requests too), and if it is down the pattern verdict stands and the UI says so |
 
 ## Phases
 
@@ -160,12 +160,12 @@ No Core step. Support users, measure what is real, and write a persevere-or-pivo
 
 | Item | Detail |
 |---|---|
-| Agents | `support_agent` (FAQ and reply drafts); `analyst` and `gates.operate_gate()` are code |
+| Agents | `support_agent` (FAQ drafts from the product docs and the DRAFT policies); `analyst` and `gates.operate_gate()` are code |
 | Tools | Real-metrics form (founder-entered, evidence link required), Phase 6 targets logged before data, Jinja2 memo template, approval executor for replies |
 | Model calls | 1 (FAQ); the memo's numbers, labels and outcome are filled by code |
 | Outputs | `phase6_step1_memo` (metrics table and recommendation), `phase6_step2_support_faq`, `phase6_gate_decision` (with the founder's decision) |
 
-Method: every metric is labelled real, `MOCKED` or `SIMULATED`, and only real values reach the recommendation. Support drafts cite the docs or DRAFT policies, are labelled "DRAFT · AI-written for founder review", never speak as the founder or a named person, and send legal, health, financial and refund questions to the founder without advice or promises. Sending a reply is `STUBBED` behind approval. The founder's persevere, pivot or stop choice is logged with `approved_by: "founder"`; if it differs from the recommendation, the memo keeps both.
+Method: every metric is labelled real, `MOCKED` or `SIMULATED`, and only real values reach the recommendation. Support drafts cite the docs or DRAFT policies, are labelled "DRAFT · AI-written for founder review", never speak as the founder or a named person, and send legal, health, financial and refund questions to the founder without advice or promises. Sending a reply is `STUBBED`: no send path is wired in this release (the executor has a `send_stub` for it, unused); the founder copies an approved draft by hand. The founder's persevere, pivot or stop choice is logged with `approved_by: "founder"`; if it differs from the recommendation, the memo keeps both.
 
 ## Gates
 
@@ -193,7 +193,7 @@ The Discover and Demand gates never default to `go`.
 
 **Founder override.** After `awaiting_evidence`, `repeat`, `pivot_back` or an evidence-based `stop` in Discover (only when an idea was scored), Validate or the Phase 4 price check, the founder may continue with a typed reason of at least 20 characters. The override is logged, the original verdict stays, an amber bar stays on screen, and every later output starts with "UNVALIDATED · FOUNDER OVERRIDE". It can never pass an excluded product, a guardrail refusal, the Phase 3 test gate, an approval, the payment ban or a failing ledger test.
 
-**Approval.** Approval is separate from gates: a phase `go` authorizes nothing. Each external-effect action (publish, send, release, commercial hand-off, support reply) is queued with its action, content hash, destination, amount and run ID. The founder approves or rejects explicitly; there is no default and no approval on timeout. The executor recomputes the binding, requires an unconsumed approval for the same run, consumes it in the same transaction as the STUBBED or MOCKED effect, and refuses any changed field. Payments, account creation and credential storage cannot be queued at all.
+**Approval.** Approval is separate from gates: a phase `go` authorizes nothing. Each external-effect action (publish, post, release, commercial hand-off) is queued with its action, content hash, destination, amount and run ID. The founder approves or rejects explicitly; there is no default and no approval on timeout. The executor recomputes the binding, requires an unconsumed approval for the same run, consumes it in the same transaction as the STUBBED or MOCKED effect, and refuses any changed field. Payments, account creation and credential storage cannot be queued at all.
 
 ```mermaid
 stateDiagram-v2
@@ -288,11 +288,11 @@ Status words follow one rule: a row says **Working** only when its code exists a
 | Pricing (median of ≥ 3 sourced quotes) and DRAFT policies | Working (policies DRAFT, not legal advice) | `tests/test_phase4_commercial.py` |
 | Store page and launch post | Drafts working; publishing and posting **STUBBED** behind separate approvals | `test_brief_r_full_run_with_override` |
 | Payment, delivery, refund, reconciliation, payout | **MOCKED** (local SQLite events only) | `tests/test_phase5_mock.py`, `outputs/payment_test_log.md` |
-| Support FAQ and replies | Drafts working; sending **STUBBED** behind approval | `tests/test_phase6_operate.py` |
+| Support FAQ and replies | Drafts working; sending **STUBBED** (no send path wired; founder copies drafts) | `tests/test_phase6_operate.py` |
 | Metrics and persevere-or-pivot memo | Working on real, founder-entered data; mock data never gives persevere | `test_mock_only_never_persevere` |
 | Founder approval executor and override | Working | `tests/test_backbone.py` |
 | Local model client (llama.cpp) | Working with fake HTTP and a fake local server; real model measured by `scripts/model_check.py` | `tests/test_llm_cascade.py`, `tests/test_local_http.py` |
-| Trick-prompt defence (patterns, then a local-model rule check) | Working. Patterns are perfect only on the set they were written from; on a held-out set they caught 3 of 12, which is why the model layer exists and why every output is checked again before approval. Measured numbers: `docs/guardrail_eval.md` | `tests/test_guardrails_eval.py`, `tests/test_rule_checker.py` |
+| Trick-prompt defence (patterns, then a local-model rule check) | Working. On a held-out set never used for tuning, patterns alone refused 3 of 12 banned requests; with the Gemma 4 rule check added, 12 of 12, at the cost of 3 of 10 honest requests also refused. Every output is checked again before approval. Measured numbers: `docs/guardrail_eval.md` | `tests/test_guardrails_eval.py`, `tests/test_rule_checker.py` |
 | Final run report (Markdown, HTML, PDF) | Working; built only from the log and the run's files | `tests/test_run_report.py` |
 | Streamlit UI (brief, verdict, approval panel, override bar, readiness, readable tables, final report) | Working | `tests/test_ui_smoke.py` |
 | G3/G4/G5 `pivot_back` routes | Working | `tests/test_pivot_routes.py` |
@@ -303,8 +303,8 @@ Not in this system at all: real payments of any kind, real publishing or posting
 
 | When | Item |
 |---|---|
-| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; local llama.cpp model client (Qwen3 4B on CPU, Gemma 4 26B on GPU); final run report; tests and guardrail eval set |
-| Next | A CI workflow running `pytest -q` on every push; persona test with several calls instead of one |
+| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; local llama.cpp model client (Qwen3 4B on CPU, Gemma 4 26B on GPU); final run report; two-layer trick-prompt defence with a held-out eval; offline tests in CI (`.github/workflows/tests.yml`) |
+| Next | Fewer false refusals from the rule checker (3 of 10 honest held-out requests today); persona test with several calls instead of one; Stack Exchange retry with back-off after rate limits |
 | Next | Product shapes A2 (short HTML guide) and A3 (template pack), with script-integrity checks for HTML; more keyless or founder-keyed evidence sources; import of real experiment results from the founder's own form provider, behind approval; measured A/B test of an optional critic for page and store copy |
 | Next | Arabic and English output for MENA founders; richer Phase 6 metrics from founder-uploaded exports |
 | Later | Authenticated multi-user approvals with roles; consented real integrations (hosting, store listing, email) through the same executor, each still requiring founder approval; reviewed legal policy templates per jurisdiction; A4 static tools |

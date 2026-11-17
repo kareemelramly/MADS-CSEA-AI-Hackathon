@@ -28,6 +28,8 @@ def metrics(ctx, ledger_summary, real_entries):
 
 
 def memo(ctx, rows, gate, targets, decision=None):
+    ctx.log("analyst", "write_operate_memo", outcome=gate.outcome,
+            real_metrics=sum(1 for r in rows if r["label"] == "real" and r["value"] is not None))
     return ENV.get_template("memo.md.j2").render(
         run_id=ctx.run_id, overrides=ctx.overrides, rows=rows, gate=gate, targets=targets,
         validation_status=ctx.validation_status, decision=decision,

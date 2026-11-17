@@ -7,6 +7,7 @@ Runs that already wrote their report when they ended keep it; a run without one 
 from an older version) gets outputs/phase<N>_step9_run_report_<label>_a1.md and .html. PDFs are
 always rebuilt into state/reports/<run_id>.pdf (not committed: outputs/ holds text files only).
 """
+import hashlib
 import json
 import os
 import sys
@@ -35,6 +36,7 @@ def main(argv):
                     f.write(body)
                 added.append({"timestamp": logmod.now_iso(), "agent": "orchestrator", "action": "write_output", "sources": [],
                               "model": None, "cost": 0, "approved_by": None, "run_id": rid, "path": rel,
+                              "sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
                               "generated_by": "scripts/run_report.py"})
         pdf = report.to_pdf(s, report.pdf_path(rid))
         print(f"{rid}: phase {s['max_phase']} of 6, outcome {s['outcome']}, report {'kept' if has else 'written'}"

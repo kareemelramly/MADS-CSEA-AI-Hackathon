@@ -177,7 +177,7 @@ def _csv_banner(body):
     rows = list(csv.reader(io.StringIO(body)))
     width = max((len(r) for r in rows), default=1)
     buf = io.StringIO()
-    w = csv.writer(buf)
+    w = csv.writer(buf, lineterminator="\n")
     w.writerow([OVERRIDE_BANNER] + [""] * (width - 1))
     w.writerows(rows)
     return buf.getvalue()

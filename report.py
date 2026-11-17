@@ -137,6 +137,32 @@ def _num(n):
     return f"{n:,}"
 
 
+def bottom_line(s):
+    """Three plain lines for a busy founder, derived by code from the gates and overrides of this run."""
+    gates = s["gates"]
+    first = next((g for g in gates if g["outcome"] != "go"), None)
+    if first is None:
+        verdict = "Every gate this run reached said go." if gates else "No gate was reached."
+    else:
+        why = (first.get("verdict") or "").split(". ")[0].rstrip(".")
+        verdict = (f"The system's first warning came at Phase {first['phase']} ({PHASE_NAMES.get(first['phase'], '')}): "
+                   f"{OUTCOME_WORDS.get(first['outcome'], first['outcome'])}. {why}.")
+    if s["overrides"]:
+        control = (f"The founder overrode {len(s['overrides'])} gate(s) with typed reasons, so everything after Phase "
+                   f"{s['overrides'][0]['phase']} is UNVALIDATED demo output, not evidence.")
+    else:
+        control = "The founder followed every gate; no result in this run rests on an override."
+    outs = {g["phase"]: g["outcome"] for g in gates}
+    if not gates or s["outcome"] == "stop" and outs.get(1) == "stop" and not s["overrides"] and s["max_phase"] <= 1:
+        nxt = "Do not build this idea as briefed. Change the idea or the brief (skills, time, budget, market) and start a new run."
+    elif outs.get(1) in ("stop", "repeat", "pivot_back") or outs.get(2) == "awaiting_evidence" or outs.get(6) == "repeat":
+        nxt = ("Collect real evidence before spending more time: run the Mom Test interviews from Phase 1, then the Phase 2 "
+               "landing-page experiment against its locked target, and enter the real numbers.")
+    else:
+        nxt = "Review the drafts, then decide in Phase 6 with real metrics only."
+    return [("Verdict", verdict), ("Founder control", control), ("Next best action", nxt)]
+
+
 def to_markdown(s):
     out = s["outcome"] or "not finished"
     L = [f"# Run report · {s['label']} · {s['run_id']}", "",
@@ -144,6 +170,7 @@ def to_markdown(s):
          f"**Idea:** {s['idea']}", "",
          f"**Result:** {OUTCOME_WORDS.get(out, out)} (`{out}`). Reason: {s['reason'] or 'run not finished'}.", "",
          f"**Furthest phase reached:** Phase {s['max_phase']} of 6 ({PHASE_NAMES.get(s['max_phase'], '-')}).", "",
+         "## Bottom line", "", *[f"- **{k}:** {v}" for k, v in bottom_line(s)], "",
          "| Measure | Value |", "|---|---|",
          f"| Model calls | {s['calls']} ({', '.join(f'{m} × {n}' for m, n in s['models'].items()) or 'none'}) |",
          f"| Tokens (prompt / completion) | {_num(s['prompt_tokens'])} / {_num(s['completion_tokens'])} |",
@@ -239,6 +266,7 @@ def to_html(s):
 <h1>{e(str(s['idea']))}</h1>
 <div class="res {e(out)}">Result: {e(OUTCOME_WORDS.get(out, out))}</div>
 <p>{e(s['reason'] or 'Run not finished.')}</p>
+<h2>Bottom line</h2><ul>{''.join(f'<li><b>{e(k)}:</b> {e(v)}</li>' for k, v in bottom_line(s))}</ul>
 <div class="phases">{phases}</div>
 <div class="grid"><div><span class="k">Phases reached</span><b>{s['max_phase']} of 6</b></div>
 <div><span class="k">Model calls</span><b>{s['calls']}</b></div>

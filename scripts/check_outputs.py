@@ -56,13 +56,16 @@ def main(argv=None):
     if SECRET.search(raw):
         problems.append("API key string found in decision log")
     # Hashes match the write_output entries (no file edited after the run).
-    written = {os.path.basename(e["path"]): e["sha256"] for e in log if e.get("action") == "write_output" and e.get("path")}
+    written = {os.path.basename(e["path"]): e["sha256"] for e in log if e.get("action") == "write_output" and e.get("path") and e.get("sha256")}
     for lab, fs in labels.items():
         for f in fs:
             body = open(os.path.join(a.outputs, f), "rb").read()
             if SECRET.search(body.decode("utf-8", "replace")):
                 problems.append(f"API key string in {f}")
-            if f in written and hashlib.sha256(body).hexdigest() != written[f]:
+            # A checkout may convert line endings (e.g. Windows CRLF); accept the logged hash of either form.
+            forms = {hashlib.sha256(body).hexdigest(), hashlib.sha256(body.replace(b"\r\n", b"\n")).hexdigest(),
+                     hashlib.sha256(body.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")).hexdigest()}
+            if f in written and written[f] not in forms:
                 problems.append(f"{f} changed after the run (hash differs from the log)")
             if written and f not in written:
                 problems.append(f"{f} has no write_output log entry")

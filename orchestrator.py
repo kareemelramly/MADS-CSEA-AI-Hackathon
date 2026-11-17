@@ -560,9 +560,11 @@ def phase5(ctx, prog):
         return finish(ctx, "repeat", str(e))
     once(ctx, "p5.outs", lambda: (ctx.out("phase5_step1_store_page", "md", page), ctx.out("phase5_step2_launch_post", "md", post)) and True)
     s_ok = approval_step(ctx, "p5.store_appr", "publish_store_page", page, "none: store publishing is STUBBED",
-                         lambda: approval.publish_stub(ctx.run_id, "publish_store_page", "none: store publishing is STUBBED", "store"))
+                         lambda: approval.publish_stub(ctx.run_id, "publish_store_page", "none: store publishing is STUBBED",
+                                                       hashlib.sha256(page.encode("utf-8")).hexdigest()))
     p_ok = approval_step(ctx, "p5.post_appr", "post_launch_message", post, "none: social posting is STUBBED",
-                         lambda: approval.publish_stub(ctx.run_id, "post_launch_message", "none: social posting is STUBBED", "post"))
+                         lambda: approval.publish_stub(ctx.run_id, "post_launch_message", "none: social posting is STUBBED",
+                                                       hashlib.sha256(post.encode("utf-8")).hexdigest()))
     sim = need(ctx, "p5.mock_sale", {"kind": "input", "phase": 5, "form": "mock_sale",
                                      "help": "Simulate one purchase (MOCKED local event: no payment of any kind runs). Optionally simulate a refund."})
     res = once(ctx, "p5.ledger", lambda: _mock_sale(ctx, sim))
@@ -604,14 +606,21 @@ def _mock_sale(ctx, sim):
     man = ctx.handoffs["H3"]["manifest"]
     root = os.path.dirname(config.outputs_dir())
     blobs = [open(os.path.join(root, f["path"]), "rb").read() for f in man["files"]]
-    pkg = delivery.package_hash(blobs)
+    # The package hash comes from the RELEASED manifest (Phase 3 approval), not from today's files, so
+    # a file changed after release fails verification and nothing is delivered.
+    pkg = hashlib.sha256(b"".join(bytes.fromhex(f["sha256"]) for f in man["files"])).hexdigest()
+    if not delivery.verify_product(blobs, pkg):
+        out["ok"] = False
+        out["lines"].append("MOCKED · product files differ from the released manifest: no payment event processed, nothing delivered")
+        out["reconcile"] = {}
+        return out
     amount = int(round(float(ctx.handoffs["H4"]["price"]) * 100))
     ev = {"event_id": f"evt_{ctx.run_id}_1", "order_id": f"ord_{ctx.run_id}_1", "product_id": man["product"], "amount_minor": amount,
           "currency": ctx.handoffs["H4"]["currency"]}
     r1 = payments.handle_mock_payment(con, ev, pkg, run_id=ctx.run_id)
     out["lines"].append(f"MOCKED · payment event {ev['event_id']} → order {r1['order_id']} status {r1['status']}, fee {r1['fee_minor']} minor units")
-    ok_hash = delivery.verify_product(blobs, pkg)
-    out["lines"].append(f"MOCKED · product files re-hashed before grant: {'match' if ok_hash else 'MISMATCH'}")
+    ok_hash = True  # verified against the released manifest above, before the payment event
+    out["lines"].append("MOCKED · product files re-hashed against the released manifest before the grant: match")
     d1 = delivery.download(con, r1["token"], run_id=ctx.run_id)
     out["lines"].append(f"MOCKED · download with token → allowed={d1['allowed']}")
     r2 = payments.handle_mock_payment(con, ev, pkg, run_id=ctx.run_id)
@@ -669,7 +678,15 @@ def phase6(ctx, prog):
     rows = analyst.metrics(ctx, ctx.handoffs.get("H5", {}).get("ledger_summary", {}), mt.get("metrics", []))
     docs_ref = ctx.final("phase3_step4_user_docs", "md")
     docs_txt = open(os.path.join(os.path.dirname(config.outputs_dir()), docs_ref["path"]), encoding="utf-8").read() if docs_ref else ""
-    items = once(ctx, "p6.faq", lambda: support_agent.faq(ctx, docs_txt, prog))
+    pol = {}
+    for k in ("terms", "privacy", "refund", "delivery"):
+        ref = ctx.final(f"phase4_step2_policy_{k}", "md")
+        if ref:
+            try:
+                pol[k] = open(os.path.join(os.path.dirname(config.outputs_dir()), ref["path"]), encoding="utf-8").read()
+            except OSError:
+                pass
+    items = once(ctx, "p6.faq", lambda: support_agent.faq(ctx, docs_txt, prog, policies=pol))
     once(ctx, "p6.faq_out", lambda: ctx.out("phase6_step2_support_faq", "md", support_agent.faq_md(items)) and True)
     h2 = ctx.handoffs.get("H2", {})
     alt_left = len(ctx.handoffs.get("H1", {}).get("alternatives", [])) > ctx.data.get("p1_pivots", 0)

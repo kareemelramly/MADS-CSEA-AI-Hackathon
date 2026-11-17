@@ -85,3 +85,12 @@ def test_payment_test_run_script_all_mocked(env):
     assert r.returncode == 0, r.stderr
     lines = [l for l in open(out, encoding="utf-8").read().splitlines() if l.startswith("- ")]
     assert len(lines) >= 6 and all("MOCKED" in l for l in lines)
+
+
+def test_tampered_product_file_is_not_delivered(env):
+    import hashlib
+    import delivery
+    files = [b"checklist", b"tracker"]
+    released = hashlib.sha256(b"".join(hashlib.sha256(b).digest() for b in files)).hexdigest()
+    assert delivery.verify_product(files, released)
+    assert not delivery.verify_product([b"checklist EDITED", b"tracker"], released)

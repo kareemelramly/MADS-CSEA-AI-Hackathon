@@ -95,7 +95,17 @@ def run(ctx):
             coverage=coverage)
     # Keyword pre-screen in code picks the excerpts the model reads (at most 20).
     terms = set(re.findall(r"[a-z]{4,}", (brief.get("idea", "") + " " + brief.get("search_terms", "")).lower()))
-    ranked = sorted(demand_ids, key=lambda s: -len(terms & set(re.findall(r"[a-z]{4,}", ctx.sources[s]["excerpt"].lower()))))
+    score = lambda s: -len(terms & set(re.findall(r"[a-z]{4,}", ctx.sources[s]["excerpt"].lower())))  # noqa: E731
+    # Round-robin across sources (best-ranked first within each), so one large source cannot fill
+    # every slot the model reads and starve the cross-source evidence rule.
+    by_src = {}
+    for s in sorted(demand_ids, key=score):
+        by_src.setdefault(ctx.sources[s]["source"], []).append(s)
+    ranked = []
+    while any(by_src.values()):
+        for k in list(by_src):
+            if by_src[k]:
+                ranked.append(by_src[k].pop(0))
     return {"coverage": coverage, "demand_ids": demand_ids, "to_screen": ranked[:th["max_excerpts_to_model"]],
             "thresholds": th, "per_source": per_source}
 

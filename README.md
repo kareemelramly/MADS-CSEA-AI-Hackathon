@@ -16,8 +16,8 @@ Most AI business tools promise income, lock founders into a closed platform and 
 
 | Brief | What the system decided | Why |
 |---|---|---|
-| **R**: Notion wedding-planning templates for Egypt | Phase 1 **STOP** on thin public evidence; the founder overrode with a typed reason, so the run completed all six phases and every later file is stamped UNVALIDATED | 3 relevant pain points from 1 source, below the locked threshold of 3 from 2 sources ([gate](outputs/phase1_gate_decision_r_a1.md)); no real experiment yet, so Phase 6 refuses to recommend persevering ([memo](outputs/phase6_step1_memo_r_a1.md)) |
-| **W**: habit-tracking app, founder without matching skills | **STOP** at Phase 1 | Founder fit 1.3 of 5, below the locked threshold of 3; no alternative passes ([gate](outputs/phase1_gate_decision_w_a1.md)) |
+| **R**: Notion wedding-planning templates for Egypt | Phase 1 **STOP** on thin public evidence; the founder overrode with a typed reason, so the run completed all six phases and every later file is stamped UNVALIDATED | 4 relevant pain points but all from 1 source, below the locked threshold of 3 from 2 sources ([gate](outputs/phase1_gate_decision_r_a1.md)); no real experiment yet, so Phase 6 refuses to recommend persevering ([memo](outputs/phase6_step1_memo_r_a1.md)) |
+| **W**: habit-tracking app, founder without matching skills | **STOP** at Phase 1 | Founder fit 1.6 of 5, below the locked threshold of 3; no alternative passes ([gate](outputs/phase1_gate_decision_w_a1.md)) |
 | **E**: crypto trading-signal bot | **STOP** that cannot be overridden | Excluded product category, stopped before any search ([gate](outputs/phase1_gate_decision_e_a1.md)) |
 
 Proof of control and honesty: a single-use approval bound to action, content hash, destination, amount ($0) and run ID for every publish, send or release; a MOCKED payment, delivery, refund and reconciliation run ([payment_test_log.md](outputs/payment_test_log.md)); and trick-prompt results on prompts the rules were never tuned on, weaknesses included ([guardrail_eval.md](docs/guardrail_eval.md)).
@@ -56,14 +56,14 @@ Open **http://localhost:8501**. Pick an example brief (R, W or E) or write your 
 | 4 Commercial | Policies (core step) | **Working** | DRAFT Terms, Privacy, Refund, Delivery; not legal advice | [terms](outputs/phase4_step2_policy_terms_r_a1.md) |
 | 5 Launch | Open the store (core step) | **Working** | Store page and launch post drafts, each with its own approval | [store page](outputs/phase5_step1_store_page_r_a1.md) |
 | 5 Launch | Publishing and posting | **STUBBED** | Nothing is posted anywhere | `test_brief_r_full_run_with_override` |
-| 5 Launch | Payment triggers delivery (core step) | **MOCKED** | Local SQLite payment event issues a download token; no payment of any kind runs | [mock sale](outputs/phase5_step3_mock_sale_r_a1.md) |
+| 5 Launch | Payment triggers delivery (core step) | **MOCKED** | Product files are re-hashed against the released manifest first; then a local SQLite payment event issues a download token. No payment of any kind runs | [mock sale](outputs/phase5_step3_mock_sale_r_a1.md) |
 | 5 Launch | Refund revokes access; replayed event is not delivered twice | **MOCKED** | Idempotent events; second refund refused | `test_refund_revokes_and_second_refund_refused` |
 | 5 Launch | Reconciliation of orders, payments, fees, payout | **MOCKED** | Matches to the cent; a 1-cent mismatch is flagged | [payment test log](outputs/payment_test_log.md) |
 | 6 Operate | Support FAQ drafts | **Working** | Legal, health, financial and refund questions escalated to the founder | [FAQ](outputs/phase6_step2_support_faq_r_a1.md) |
-| 6 Operate | Sending support replies | **STUBBED** | Behind approval | `test_support_refuses_advice_and_promises` |
+| 6 Operate | Sending support replies | **STUBBED** | No send path is wired; the founder copies an approved draft by hand | `test_support_refuses_advice_and_promises` |
 | 6 Operate | Metrics and persevere-or-pivot memo | **Working** | Only real metrics count; MOCKED and SIMULATED values are shown but ignored | `test_mock_only_never_persevere` |
 | All | Founder approval executor | **Working** | Single use; any change to action, content, destination, amount or run ID is refused | `test_approval_refused_after_any_field_change` |
-| All | Trick-prompt defence | **Working** | Pattern rules, then a local-model rule check that can only add refusals | [eval](docs/guardrail_eval.md) |
+| All | Trick-prompt defence | **Working** | Pattern rules, then a local-model rule check that can only add refusals. Held-out set: 12/12 banned requests refused, 3/10 honest ones wrongly refused | [eval](docs/guardrail_eval.md) |
 | All | Decision log and run report | **Working** | One log entry per agent action; report in Markdown, HTML and PDF | `test_full_run_writes_report_in_three_forms` |
 
 <!-- runs:start -->
@@ -77,6 +77,8 @@ At least one committed run has recorded artifacts in all six phases.
 <!-- runs:end -->
 
 Every hard rule is mapped to code and a test in [docs/requirements_traceability.md](docs/requirements_traceability.md).
+
+**Known limits, stated plainly:** offline tests use a fake model, so real-model quality is shown only by the committed runs. Live search results change between runs; in the committed R run Stack Exchange answered HTTP 400 and was recorded as failed, which is part of why its evidence came from one source. The trick-prompt defence still refuses some honest requests (3 of 10 held out). Policies are DRAFT, not legal advice. No real experiment has been run, so no run recommends persevering. The CPU model setup was not timed.
 
 ## Architecture
 
@@ -113,7 +115,7 @@ $0.00 in model/API charges observed for complete six-phase run 20261117T203304Z-
 
 ## Demo video
 
-Not recorded yet. The video (at most 3 minutes) shows run W ending in a STOP recommendation, the approval screen with its five bound fields, the amber override banner, the MOCKED sale and refund, the "Try to make the system break a rule" box refusing a fake-review request, and the final PDF report.
+**Watch (under 3 minutes):** https://drive.google.com/file/d/1SvaCZNoWQElYm35QG2vma8ybXCSM0CCa/view?usp=drivesdk
 
 ## What our system will NOT do
 

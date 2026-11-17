@@ -4,6 +4,7 @@ never invents counts; simulated counts live in a separate field and never reach 
 
 
 def plan_md(ctx, plan, lock):
+    ctx.log("validation_kit", "build_validation_kit", target_sha256=lock["sha256"], signups_target=plan["signups_target"], days=plan["days"])
     return f"""# Validation experiment plan
 
 **Locked target:** {plan['signups_target']} real waitlist sign-ups in {plan['days']} days, with at least {plan['min_visitors']} real visitors.

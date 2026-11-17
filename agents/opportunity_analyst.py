@@ -77,8 +77,13 @@ def score(ctx, relevant, on_progress=None):
             if GENERAL.search(rs) and not rs.upper().startswith("ASSUMPTION"):
                 opt[kk]["reason"] = "ASSUMPTION: " + rs
         opt["cited_relevant"] = cited
-        opt["passes_evidence"] = len(cited) >= ctx.data["p1_thresholds"]["min_relevant"] and \
-            len({src_of[s] for s in cited}) >= 2
+        # An option passes evidence if it cites enough relevant items itself, or if the run's relevant
+        # pool already meets the evidence threshold and the option cites at least one item of that pool
+        # (the alternative serves the same evidenced pain).
+        th = ctx.data["p1_thresholds"]
+        pool_ok = len(relevant) >= th["min_relevant"] and len(set(src_of.values())) >= th.get("min_relevant_sources", 2)
+        opt["passes_evidence"] = (len(cited) >= th["min_relevant"] and len({src_of[s] for s in cited}) >= 2) or \
+            (pool_ok and len(cited) >= 1)
     out["alternatives"].sort(key=lambda o: -o["fit"])
     ctx.log("opportunity_analyst", "compute_fit_scores", fit_idea=out["idea"]["fit"],
             fit_alternatives=[a["fit"] for a in out["alternatives"]], weights=WEIGHTS)
