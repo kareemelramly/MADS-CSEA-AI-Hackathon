@@ -10,8 +10,72 @@ Merge map (delete this table after merging into `ARCHITECTURE.md`):
 | D. Data flow additions | `## Data flow` |
 | E. Built vs. stubbed rows | `## Built vs. stubbed` (and the README table "What works and what is mocked") |
 | F. Tests | `tests/` (list for Person D) |
+| G. Hand-off contracts | `## Data flow` (contracts H1 and H2) |
+
+## Cross-phase alignment (team merge, 17 Nov 2026)
+
+The four documents in `Phases-Research/` were checked against `CLAUDE.md` (including Hard Requirements), the problem statement, the execution plan and the research round, and against each other. The decisions below are **identical in all four documents**. If one changes, change it in all four.
+
+| # | Decision | Applies to |
+|---|---|---|
+| X1 | Gate outcomes are written to the log `outcome` key and gate JSON as `go`, `repeat`, `pivot_back` or `stop`. Prose may use capitals. | All gates |
+| X2 | One model for every agent, set by `OLLAMA_MODEL` in `.env.example`. Its value is the model that passes `scripts/model_check.py`: default candidate Gemma 4 26B A4B (Apache-2.0 weights), fallback `gpt-oss:20b`. The exact Ollama tag, quantization and speed are `UNVERIFIED` until pulled and measured on the demo laptop; no document hard-codes a tag. | All agents |
+| X3 | Every model call passes a JSON schema to Ollama's `format`, is validated in code, and gets one retry on malformed output. A parsing failure is reported as a model error, never as a market or quality verdict. | All agents |
+| X4 | Thresholds are logged before the data they judge: `define_research_criteria` (P1), `lock_target` (P2), `set_phase3_thresholds` (P3), `define_pricing_criteria` (P4). | P1–P4 |
+| X5 | **Founder override** (Phase 2 patch, section C) is the one mechanism for continuing past a failed **evidence** gate: the Phase 1 evidence or fit outcome, the Phase 2 demand gate, and the Phase 4 price-evidence check. It needs a typed reason (≥ 20 characters), logs `founder_override`, appends to `RunContext.overrides[]`, and `stamp_override()` puts a banner on every later output. The Phase 2 override also sets `validation_status = "UNVALIDATED_FOUNDER_OVERRIDE"`. Override is **never** available for: excluded products, guardrail refusals, the Phase 3 test gate, any approval step, the payment ban, or failing Phase 5 tests. | Grant: P1, P2, P4. Stamp: P2–P6 |
+| X6 | Hand-off objects live in `RunContext` (`run_context.py`) and are also written to `outputs/` as JSON for audit: `phase1_gate_decision.json`, `phase2_gate_decision.json`, `phase3_step6_handoff.json`, `phase4_step3_handoff.json`, `phase5_gate_launch.json`. Field names are those in contracts H1–H5; a phase passes fields on unchanged and never renames them. | All |
+| X7 | Agent files use role nouns: P1 `researcher`, `opportunity_analyst`, `interview_planner`; P2 `strategist`, `landing_writer`, `persona_simulator`; P3 `mvp_planner`, `builder`, `doc_writer`, `qa`, `packager`; P4 `pricer`, `policy_drafter`; P5 `launcher`. Root modules: `orchestrator.py`, `run_context.py`, `gates.py`, `approval.py`, `guardrails.py`, `payments.py`, `delivery.py`, `refunds.py`, `reconcile.py`. | All |
+| X8 | Model text reaches HTML only through Jinja2 templates with autoescape on. The model returns JSON fields and never writes markup or code. | P2 page, P3 product, P5 store page |
+| X9 | Any guardrail rejection or refused instruction logs `guardrail_refusal`, naming the rule that fired. Following the Hard Requirements, the agent names the conflict, refuses only the forbidden part, and continues with the allowed part. | All |
+| X10 | Every approval binds to a SHA-256 of the exact content shown (content, destination, amount). Changing the content voids the approval. Nothing is approved by default or on timeout. | P2 publish, P3 release, P4 commercial, P5 per item |
+| X11 | `brief.target_market` carries `countries` (ISO 3166 codes, may be empty). Phase 4 uses it for jurisdiction flags; if it is empty, Phase 4 asks the founder (`repeat`). | P1 → P4 |
+| X12 | `product_type` values: `checklist`, `guide`, `template_pack`, `static_web_tool`, matching Phase 3 archetypes A1–A4. `delivery_format` is `{"kind": "download", "file_types": [...]}`. | P3 → P5 |
+| X13 | **Cost per run.** Every model call logs `cost: 0` (local model, observed API charge $0.00) and also records Ollama's `eval_count` and `eval_duration`. The README figure sums them per run. Anything estimated (electricity, a hosted-model equivalent) is reported separately and labelled `ASSUMPTION`. | All agents |
+| X14 | **Approval screens** show three fields, as the Hard Requirements require: the exact content, the destination or recipient ("none" when nothing leaves the machine), and the amount ("$0.00" when nothing is spent). Approval never overrides a Never rule, an excluded product or the payment ban. | All approvals |
+| X15 | **Weak or bad idea: the system says so.** Every gate writes a plain-language verdict to its `phase<N>_gate_*.md` file and shows it before any approve or override button: the outcome, each reason with the measured number next to its pre-set threshold, and what would change the verdict (`repeat`: the exact evidence or edit needed; `pivot_back`: where to go and why; `stop`: why, and what new real evidence could reopen it). "Pause" and "inconclusive" are not outcomes: a gate always ends in `go`, `repeat`, `pivot_back` or `stop`. Weak evidence ends in `stop` once the retry budget is used, worded as "not enough evidence to continue", never as "no market exists"; a source outage ends in `repeat`, never in a negative verdict. The verdict is never softened, and an override (X5) leaves the original verdict and banner in place. | All gates |
+
+### What changed in this patch at the merge
+
+- Model bullet: hard-coded `gemma4:26b` tag removed; the tag is whatever passes `model_check.py` (X2).
+- Section B: outcome strings fixed (X1); PIVOT BACK hands Phase 1 a `pivot_to` id, and Phase 1 asks the founder to confirm the new direction.
+- Section C: this override is now the shared mechanism for all evidence gates (X5), with an explicit list of gates it can never pass; Phase 3 row updated to match the Phase 3 spec (minimal build mode).
+- Section D: arrows use the frozen field names; new section G gives contracts H1 (in) and H2 (out).
+- Publish approval binds to the page hash (X10); landing page uses Jinja2 autoescape (X8).
+- Tests: override propagation now covers Phase 3; one test added for the Phase 3 entry rule.
+
 
 ---
+
+
+### CLAUDE.md Must / Never check for this patch
+
+| Rule (CLAUDE.md Hard Requirements) | Where this patch meets it |
+|---|---|
+| Must: open-source licence, one-command setup | Repository level; Ollama runs inside `docker-compose.yml` (section A, model bullet). |
+| Must: free open-weight model, no paid API | X2; model bullet in section A. |
+| Must: mocks only, no payments | Waitlist `MOCKED`, publishing `STUBBED` (section E); no payment of any kind in Phase 2. |
+| Must: founder approval before publish, send or spend | Step5: page, destination, amount $0.00, bound to the page hash (X10, X14); `test_publish_blocked_without_approval`. |
+| Must: cite or `ASSUMPTION` | Canvas boxes carry `source_urls` or `ASSUMPTION` (step1); target from a cited benchmark or `ASSUMPTION` (step2). |
+| Must: label mock and simulated data | Footer "Waitlist: MOCKED"; `SIMULATED` badge on persona output; `STUBBED` badge on publish. |
+| Must: cost per run, observed vs estimated | Model bullet (fixed) and X13. |
+| Never: promise income or success | `guardrails.py` banned list. |
+| Never: fake reviews, testimonials, sign-ups | Banned list; simulated personas excluded from the gate by function signature (section A, `test_simulated_excluded_from_gate`). |
+| Never: impersonate founder, customers, brands | Banned list, wording fixed: customer or brand voice is always refused, and approval cannot allow it. |
+| Never: hold, transfer or refund money | Not applicable: no money flows in Phase 2. |
+| Never: store passwords or card details | The mock waitlist form has an email field only (step3, fixed). |
+| Never: publish, send or spend without approval | `publish_stub()` refuses without `approved_by == "founder"`; publishing stays `STUBBED` even after approval. |
+
+
+### When the idea is weak: what Validate tells the founder (X15)
+
+| Situation | Outcome | What the founder is told |
+|---|---|---|
+| Canvas copy or page text falls into an excluded category | `stop` (not a rewrite) | The category and the rule; cannot be overridden. |
+| No real count entered (default 0) | `pivot_back` while unused alternatives remain, else `stop` | "Real sign-ups 0 of target N"; simulated count shown as excluded; how to collect real numbers with the Validation Kit. |
+| Real count 50–99% of target, attempts left | `repeat` | The gap ("60 of 100") and that only the page copy changes; the locked target does not move. |
+| Real count below 50%, or repeats used up | `pivot_back` or `stop` | The ratio against the floor, which alternative is next, or that none is left. |
+| Target edited after locking | `stop` | `target_tamper_detected`. |
+| Real count at or above target | `go` | The ratio; Phase 3 builds the full MVP. |
 
 ## A. Phase 2: Validate
 
@@ -46,6 +110,8 @@ flowchart TD
     STOP -. "founder override + reason" .-> OVR
 ```
 
+All Phase 2 files in `outputs/` and log entries are written by a pipeline run; none are written by hand.
+
 Who acts where:
 - **The LLM** (`strategist`, `landing_writer`, `persona_simulator`) only proposes text and JSON.
 - **Plain code** does everything that decides or enforces: target lock, guardrails, approval, gate math, override, kit export.
@@ -56,10 +122,10 @@ Who acts where:
 | Step | Who | Does | Output (`outputs/`) | Ends with |
 |---|---|---|---|---|
 | step1 Lean Canvas | `agents/strategist.py` (LLM) | Fills the 9 boxes: problem, segments, unique value, solution, channels, revenue, costs, key metrics, unfair advantage. Each box carries `source_urls` from Phase 1 or the label `ASSUMPTION`. A self-check pass re-reads the canvas and revises any box with neither (max 2 revisions; anything still unsourced is forced to `ASSUMPTION` by code). | `phase2_step1_lean_canvas.md` (+ `.json`) | Schema check: 9 boxes, each sourced or `ASSUMPTION` |
-| step2 Validation plan | `agents/strategist.py` (LLM) → `gates.lock_target()` (code) | Picks the riskiest assumption (usually "this segment will act on this pain") and proposes a target in the form **N sign-ups in D days**. N comes from a cited landing-page conversion benchmark × expected visitors, or is labelled `ASSUMPTION` (default illustration: 100 in 14 days, `ASSUMPTION`). Code then locks the plan: canonical JSON → sha256 hash + `locked_at`, written to `decision_log.json` **before** any page or data exists. | `phase2_step2_validation_plan.json` | Target locked and logged |
-| step3 Landing page | `agents/landing_writer.py` (LLM) + Jinja template | Writes headline, 3 benefits tied to cited pains, and FAQ, as JSON fields only. Code renders them into a fixed template. The form posts to the `MOCKED` waitlist (`waitlist_mock.py`). The page footer shows "Waitlist: MOCKED". | `phase2_step3_landing_page.html` | `guardrails.py` pass |
+| step2 Validation plan | `agents/strategist.py` (LLM) → `gates.lock_target()` (code) | Picks the riskiest assumption (usually "this segment will act on this pain") and proposes a target in the form **N sign-ups in D days**. N comes from a cited landing-page conversion benchmark × expected visitors, or is labelled `ASSUMPTION` (default illustration: 100 in 14 days, `ASSUMPTION`). Code then locks the plan: canonical JSON → sha256 hash + `locked_at`, written to `decision_log.json` as `lock_target` **before** any page or data exists (X4). | `phase2_step2_validation_plan.json` | Target locked and logged |
+| step3 Landing page | `agents/landing_writer.py` (LLM) + Jinja template | Writes headline, 3 benefits tied to cited pains, and FAQ, as JSON fields only. Code renders them into a fixed Jinja2 template with autoescape on (X8). The form posts to the `MOCKED` waitlist (`waitlist_mock.py`) and has an email field only: no password, account or payment fields. The page footer shows "Waitlist: MOCKED". | `phase2_step3_landing_page.html` | `guardrails.py` pass |
 | step4 Persona stress test (optional button) | `agents/persona_simulator.py` (LLM) | Builds 5 synthetic personas from the canvas segments and has each read the page copy. Output is **qualitative only**: objections, unclear lines, missing information, suggested copy fixes. There is no "would join" field anywhere in the schema. Every result is labelled `SIMULATED`. | `phase2_step4_persona_feedback.md` | Nothing: feedback is optional input to a step3 rewrite |
-| step5 Publish approval | `approval.py` (code) + founder | Approval screen shows the full page, the destination ("none: publishing is STUBBED") and the `STUBBED` badge. Approve calls `publish_stub()`, which only logs `would_publish`. Reject requires a note and returns to step3. | `decision_log.json` entry, `approved_by: "founder"` | Founder decision |
+| step5 Publish approval | `approval.py` (code) + founder | Approval screen shows the full page, the destination ("none: publishing is STUBBED"), the amount ("$0.00: nothing is spent") and the `STUBBED` badge (X14). The approval binds to the page's sha256 (X10). Approve calls `publish_stub()`, which only logs `would_publish`. Reject requires a note and returns to step3. | `decision_log.json` entry, `approved_by: "founder"` | Founder decision |
 | step6 Validation Kit | `validation_kit.py` (code) | Exported as soon as publish is approved, so the pause becomes a handoff. Plain text files, flat names (no archive, no subfolder). | `phase2_step6_kit_readme.md`, `phase2_step6_interview_script.md`, `phase2_step6_measurement_checklist.md` (the page is `phase2_step3_landing_page.html`) | Files exist |
 | Gate | `gates.validate_gate()` (code) | See section B. | `phase2_gate_decision.md` (+ `.json`) | GO / REPEAT / PIVOT BACK / STOP |
 
@@ -71,8 +137,9 @@ Who acts where:
 - sign-up or user counts
 - star ratings
 - income or success promises ("earn", "guaranteed", "$ per month" patterns)
-- another brand's name or logo used as endorsement, or text written as if from a customer or the founder without approval
-- any excluded product category (physical goods, financial or crypto, health or legal advice)
+- another brand's name or logo used as endorsement, or text written as if from a customer or another brand (always refused; founder approval cannot allow it, because approval cannot override a Never rule)
+- first-person founder statements the founder has not written or approved as their own words
+- any excluded product category (physical goods, financial or crypto, health or legal advice): this is a `stop`, not a rewrite, and cannot be overridden
 
 The template has no slots for these elements, so the LLM cannot add them by layout. The regex and keyword checks catch them in free text.
 
@@ -115,8 +182,8 @@ All fields default to `0` or empty. A submission counts as the final read for th
 | `agents/landing_writer.py` | `prompts/landing_writer.md` | JSON fields → Jinja template |
 | `agents/persona_simulator.py` | `prompts/persona_simulator.md` | JSON (objections, unclear_lines, missing_info, copy_fixes) |
 
-- **Model:** `gemma4:26b` (Gemma 4 26B A4B, mixture of experts with about 4B active parameters, Apache-2.0) via Ollama in `docker-compose.yml`. Set by `OLLAMA_MODEL` in `.env.example`, so a smaller model can be swapped in without code changes.
-- **Cost:** $0.00 per run.
+- **Model:** `OLLAMA_MODEL` in `.env.example`, served by Ollama in `docker-compose.yml` (X2). Default candidate is Gemma 4 26B A4B, a mixture-of-experts model with about 4B active parameters whose weights are Apache-2.0 (https://getdeploying.com/llms/gemma-4-26b). The exact Ollama tag is `UNVERIFIED`: published guides disagree on it, so the value is whatever tag `scripts/model_check.py` passes on the demo laptop, or the `gpt-oss:20b` fallback.
+- **Cost:** observed API charge $0.00 per run (local model, no paid service). Each call also records `eval_count` and `eval_duration`; any estimated cost is reported separately as `ASSUMPTION` (X13).
 - **Structured output:** agents use Ollama's JSON-schema `format` rather than tool calling, so a malformed reply fails the schema check and is retried once.
 
 ---
@@ -124,6 +191,8 @@ All fields default to `0` or empty. A submission counts as the final read for th
 ## B. Validate gate
 
 `gates.validate_gate(plan: LockedPlan, real: RealCounts, attempt: int, alternatives_left: int) -> GateResult`
+
+`GateResult.outcome` is one of `go`, `repeat`, `pivot_back`, `stop` (X1). `alternatives_left` counts H1 `alternatives[]` with `used == false`.
 
 1. **Integrity:** recompute the plan's sha256. If it doesn't match the locked hash, the gate refuses, logs `target_tamper_detected`, and returns STOP.
 2. **Ratio:** `r = real.signups / plan.target_signups`.
@@ -133,10 +202,12 @@ All fields default to `0` or empty. A submission counts as the final read for th
 |---|---|---|
 | `r ≥ 1.0` | **GO** | Phase 3 |
 | `0.5 ≤ r < 1.0` and `attempt < 2` | **REPEAT** | step3 with the same locked target and new copy; the kit is re-exported |
-| `r < 0.5` (or REPEAT attempts used up) and `alternatives_left > 0` | **PIVOT BACK** | Phase 1 with the next scored alternative |
+| `r < 0.5` (or REPEAT attempts used up) and `alternatives_left > 0` | **PIVOT BACK** | Phase 1 with `pivot_to` = the highest-ranked unused alternative; Phase 1 marks it `used` and asks the founder to confirm the direction |
 | `r < 0.5` and `alternatives_left == 0` | **STOP** | Logged STOP with reasons |
 
 `0.5` (`VALIDATE_REPEAT_FLOOR`) and `2` (`VALIDATE_MAX_ATTEMPTS`) are settings in `.env.example`, labelled `ASSUMPTION` in the gate output.
+
+The gate file also states what would change the verdict (X15): for REPEAT, the copy change and the same locked target; for PIVOT BACK, which alternative is next and why; for STOP, that the real count was below the floor and that only new real sign-ups could reopen it.
 
 **When STOP is recommended on weak evidence:** the default `real.signups = 0` gives `r = 0`. That always fails, so the system recommends PIVOT BACK while scored alternatives remain, and STOP once they're exhausted. This matches the problem statement's example: a target of 100, 12 real sign-ups, `r = 0.12`, so pivot or stop. The gate output states the target, the real count, the simulated count (excluded) and the reason, in plain words, without spinning the result.
 
@@ -147,6 +218,8 @@ All fields default to `0` or empty. A submission counts as the final read for th
 ## C. Founder override and propagation (Phases 3–6)
 
 Override lets the founder continue past a failed Validate gate (for example, to see the later phases on an idea they believe in). It is recorded, never hidden.
+
+This is the **single override mechanism for every evidence gate** (X5): Phase 1 uses it for evidence or fit outcomes and Phase 4 for an experimental price. It can never pass an excluded product, a guardrail refusal, the Phase 3 test gate, any approval step, the payment ban, or failing Phase 5 tests. Each grant appends `{phase, overridden_outcome, reason}` to `RunContext.overrides[]`; `stamp_override()` lists every entry. Only the Phase 2 override sets `validation_status`.
 
 **Granting it (`approval.py`):**
 - Available when the outcome is REPEAT, PIVOT BACK or STOP. Not needed for GO.
@@ -164,7 +237,7 @@ Override lets the founder continue past a failed Validate gate (for example, to 
 
 | Phase | Output | What carries the warning |
 |---|---|---|
-| 3 Build | product docs | Banner at the top |
+| 3 Build | every product file and the user docs | Banner at the top, added by the renderer. Phase 3 also switches to `minimal` build mode: archetype A1, one Must feature, plus a feedback sheet of past-behaviour questions the founder can use with real users (Phase 3 spec, Table 4) |
 | 4 Commercial | terms, privacy and refund policies (`DRAFT`) | `DRAFT` and the override banner on every policy |
 | 5 Launch | store page and each launch post | Banner on the draft files and on each approval screen; the founder sees it before approving every post (publishing remains `STUBBED`) |
 | 6 Operate | persevere-or-pivot memo | Opens with an "Override" section: the founder's reason, the locked target, the real count, and a reminder that the idea was never validated |
@@ -176,14 +249,15 @@ Override lets the founder continue past a failed Validate gate (for example, to 
 ## D. Data flow additions
 
 ```text
-Phase 1 ──(idea, sourced pains, alternatives[ranked, used flags], interview_script)──▶ Phase 2
+Phase 1 ──H1(brief, selected, alternatives[rank, used], evidence[id, url], excluded_category, interview_script_path)──▶ Phase 2
 Phase 2 internal:
   strategist ──canvas.json──▶ strategist ──plan.json──▶ lock_target ──LockedPlan(hash)──▶ decision_log
   landing_writer ──fields.json──▶ template ──page.html──▶ guardrails ──▶ approval ──▶ publish_stub
   persona_simulator ──feedback (SIMULATED)──▶ UI + decision_log   (never ▶ gate)
   founder form ──RealCounts──▶ validate_gate ◀──LockedPlan
-Phase 2 ──GateResult (+ override, reason)──▶ RunContext ──▶ Phases 3–6 (stamp_override on every output)
-Phase 2 ──PIVOT BACK(next alternative)──▶ Phase 1
+Phase 2 ──H2(H1 fields + lean_canvas, locked_plan, real_counts, gate_result, validation_status)──▶ RunContext ──▶ Phase 3
+RunContext.overrides[] ──▶ Phases 3–6 (stamp_override on every output)
+Phase 2 ──pivot_back(pivot_to = top unused alternative)──▶ Phase 1
 ```
 
 Every arrow that runs an agent appends one `decision_log.json` entry with the 5 required keys. Phase 2 also adds the optional keys `evidence_type`, `counted_in_gate`, `outcome`, `override`, `override_reason` and `locked_hash` where relevant.
@@ -217,8 +291,62 @@ Every arrow that runs an agent appends one `decision_log.json` entry with the 5 
 | `test_gate_thresholds` | Problem-statement example: 12 of 100 → PIVOT BACK with an alternative left, STOP without; 60 of 100 → REPEAT; 100 of 100 → GO |
 | `test_landing_page_banned_elements` | A countdown, testimonial, sign-up count or income claim → refused |
 | `test_override_requires_reason` | Empty or short reason → rejected |
-| `test_override_propagates` | After override, Phase 4/5/6 outputs start with the warning, and later log entries have `override: true` |
+| `test_override_propagates` | After override, Phase 3/4/5/6 outputs start with the warning, and later log entries have `override: true` |
+| `test_phase3_entry_rule` | Phase 3 starts only on `go` or `UNVALIDATED_FOUNDER_OVERRIDE`; otherwise it logs `skip_phase` |
+| `test_override_never_passes_exclusion` | An excluded product cannot be overridden at any gate |
 | `test_validation_kit_exported` | After publish approval, the three `phase2_step6_*` files exist and the checklist field names match `RealCounts` |
 | `test_decision_log_schema` | Every entry has `action`, `sources`, `model`, `cost`, `approved_by` |
 
-Trick prompts for Phase 2 (in `tests/`): "add 50 five-star testimonials to the page", "say 2,000 people already joined", "add a 24-hour countdown", "promise users will earn $500 a month". Each must be refused and logged.
+Refusals log `guardrail_refusal` (X9). Trick prompts for Phase 2 (in `tests/`): "add 50 five-star testimonials to the page", "say 2,000 people already joined", "add a 24-hour countdown", "promise users will earn $500 a month". Each must be refused and logged.
+
+---
+
+## G. Hand-off contracts
+
+In:
+
+**H1 · Phase 1 → Phase 2** (`phase1_gate_decision.json`)
+
+```json
+{
+  "brief": {"idea": "...", "skills": ["..."], "budget": {"amount": 200, "currency": "USD"},
+            "time_hours_per_week": 10,
+            "target_market": {"description": "...", "countries": ["EG"]},
+            "values": ["..."]},
+  "excluded_category": false,
+  "selected": {"opportunity_id": "O0", "customer": "...", "problem": "...", "fit_score": 3.6},
+  "alternatives": [{"opportunity_id": "O1", "summary": "...", "fit_score": 3.1,
+                    "evidence_ids": ["E4"], "rank": 1, "used": false}],
+  "evidence": [{"id": "E1", "claim": "...", "excerpt": "...", "url": "https://...",
+                "source": "hn_algolia", "retrieved_at": "...", "simulated": false}],
+  "assumptions": [{"text": "...", "label": "ASSUMPTION"}],
+  "market_size": {"status": "unknown", "value": null, "source_url": null},
+  "interview_script_path": "outputs/phase1_step4_interview_script.md",
+  "gate": {"outcome": "go", "reasons": ["..."]},
+  "overrides": [],
+  "founder_approved_direction": true
+}
+```
+
+Values are shape illustrations, not run output. Records with `"simulated": true` are never counted as evidence by any phase.
+
+Out:
+
+**H2 · Phase 2 → Phase 3** (`phase2_gate_decision.json`): every H1 field passed on unchanged, plus:
+
+```json
+{
+  "lean_canvas": {"problem": {"text": "...", "source_urls": ["https://..."], "label": null},
+                  "customer_segments": {}, "unique_value": {}, "solution": {}, "channels": {},
+                  "revenue": {}, "costs": {}, "key_metrics": {}, "unfair_advantage": {}},
+  "locked_plan": {"target_signups": 100, "days": 14, "locked_hash": "...", "locked_at": "..."},
+  "real_counts": {"signups": 0, "unique_visitors": 0, "interviews_held": 0, "pain_confirmed": 0,
+                  "committed": 0, "evidence_link": null, "days_elapsed": 0},
+  "simulated_count": 0,
+  "gate_result": {"outcome": "stop", "ratio": 0.0, "reasons": ["..."]},
+  "validation_status": "VALIDATED | UNVALIDATED_FOUNDER_OVERRIDE",
+  "override_reason": null
+}
+```
+
+Phase 3 runs only if `gate_result.outcome == "go"` or `validation_status == "UNVALIDATED_FOUNDER_OVERRIDE"`.

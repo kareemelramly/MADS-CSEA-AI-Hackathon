@@ -12,6 +12,71 @@
 - No excluded products (physical goods, financial/investment/crypto products, health or legal advice products); no income promises, fake reviews, fake sign-ups or false urgency.
 - `outputs/` and `decision_log.json` must come from a real pipeline invocation, **not from manually authored sample output**. This research document is a design artifact only and must not be mistaken for a run output.
 
+## Cross-phase alignment (team merge, 17 Nov 2026)
+
+The four documents in `Phases-Research/` were checked against `CLAUDE.md` (including Hard Requirements), the problem statement, the execution plan and the research round, and against each other. The decisions below are **identical in all four documents**. If one changes, change it in all four.
+
+| # | Decision | Applies to |
+|---|---|---|
+| X1 | Gate outcomes are written to the log `outcome` key and gate JSON as `go`, `repeat`, `pivot_back` or `stop`. Prose may use capitals. | All gates |
+| X2 | One model for every agent, set by `OLLAMA_MODEL` in `.env.example`. Its value is the model that passes `scripts/model_check.py`: default candidate Gemma 4 26B A4B (Apache-2.0 weights), fallback `gpt-oss:20b`. The exact Ollama tag, quantization and speed are `UNVERIFIED` until pulled and measured on the demo laptop; no document hard-codes a tag. | All agents |
+| X3 | Every model call passes a JSON schema to Ollama's `format`, is validated in code, and gets one retry on malformed output. A parsing failure is reported as a model error, never as a market or quality verdict. | All agents |
+| X4 | Thresholds are logged before the data they judge: `define_research_criteria` (P1), `lock_target` (P2), `set_phase3_thresholds` (P3), `define_pricing_criteria` (P4). | P1–P4 |
+| X5 | **Founder override** (Phase 2 patch, section C) is the one mechanism for continuing past a failed **evidence** gate: the Phase 1 evidence or fit outcome, the Phase 2 demand gate, and the Phase 4 price-evidence check. It needs a typed reason (≥ 20 characters), logs `founder_override`, appends to `RunContext.overrides[]`, and `stamp_override()` puts a banner on every later output. The Phase 2 override also sets `validation_status = "UNVALIDATED_FOUNDER_OVERRIDE"`. Override is **never** available for: excluded products, guardrail refusals, the Phase 3 test gate, any approval step, the payment ban, or failing Phase 5 tests. | Grant: P1, P2, P4. Stamp: P2–P6 |
+| X6 | Hand-off objects live in `RunContext` (`run_context.py`) and are also written to `outputs/` as JSON for audit: `phase1_gate_decision.json`, `phase2_gate_decision.json`, `phase3_step6_handoff.json`, `phase4_step3_handoff.json`, `phase5_gate_launch.json`. Field names are those in contracts H1–H5; a phase passes fields on unchanged and never renames them. | All |
+| X7 | Agent files use role nouns: P1 `researcher`, `opportunity_analyst`, `interview_planner`; P2 `strategist`, `landing_writer`, `persona_simulator`; P3 `mvp_planner`, `builder`, `doc_writer`, `qa`, `packager`; P4 `pricer`, `policy_drafter`; P5 `launcher`. Root modules: `orchestrator.py`, `run_context.py`, `gates.py`, `approval.py`, `guardrails.py`, `payments.py`, `delivery.py`, `refunds.py`, `reconcile.py`. | All |
+| X8 | Model text reaches HTML only through Jinja2 templates with autoescape on. The model returns JSON fields and never writes markup or code. | P2 page, P3 product, P5 store page |
+| X9 | Any guardrail rejection or refused instruction logs `guardrail_refusal`, naming the rule that fired. Following the Hard Requirements, the agent names the conflict, refuses only the forbidden part, and continues with the allowed part. | All |
+| X10 | Every approval binds to a SHA-256 of the exact content shown (content, destination, amount). Changing the content voids the approval. Nothing is approved by default or on timeout. | P2 publish, P3 release, P4 commercial, P5 per item |
+| X11 | `brief.target_market` carries `countries` (ISO 3166 codes, may be empty). Phase 4 uses it for jurisdiction flags; if it is empty, Phase 4 asks the founder (`repeat`). | P1 → P4 |
+| X12 | `product_type` values: `checklist`, `guide`, `template_pack`, `static_web_tool`, matching Phase 3 archetypes A1–A4. `delivery_format` is `{"kind": "download", "file_types": [...]}`. | P3 → P5 |
+| X13 | **Cost per run.** Every model call logs `cost: 0` (local model, observed API charge $0.00) and also records Ollama's `eval_count` and `eval_duration`. The README figure sums them per run. Anything estimated (electricity, a hosted-model equivalent) is reported separately and labelled `ASSUMPTION`. | All agents |
+| X14 | **Approval screens** show three fields, as the Hard Requirements require: the exact content, the destination or recipient ("none" when nothing leaves the machine), and the amount ("$0.00" when nothing is spent). Approval never overrides a Never rule, an excluded product or the payment ban. | All approvals |
+| X15 | **Weak or bad idea: the system says so.** Every gate writes a plain-language verdict to its `phase<N>_gate_*.md` file and shows it before any approve or override button: the outcome, each reason with the measured number next to its pre-set threshold, and what would change the verdict (`repeat`: the exact evidence or edit needed; `pivot_back`: where to go and why; `stop`: why, and what new real evidence could reopen it). "Pause" and "inconclusive" are not outcomes: a gate always ends in `go`, `repeat`, `pivot_back` or `stop`. Weak evidence ends in `stop` once the retry budget is used, worded as "not enough evidence to continue", never as "no market exists"; a source outage ends in `repeat`, never in a negative verdict. The verdict is never softened, and an override (X5) leaves the original verdict and banner in place. | All gates |
+
+### What changed in these cards at the merge
+
+- **Phase 4 input** now reads contract H3 from Phase 3 (the old list had `target_market_country` as one value and `product_assets` without hashes).
+- **Agent names** follow the execution plan (X7): `pricer`, `policy_drafter`, `launcher`.
+- **Experimental price decided:** when fewer than three comparable quotes exist, the founder may approve an `ASSUMPTION`-labelled experimental price through the shared founder override (X5). Without this, Phase 4 would return `repeat` on every unseen demo brief, because no keyless price source was verified, and Phase 5 would never run.
+- **Pricing criteria logged first** as `define_pricing_criteria` (X4).
+- **Terms follow the product licence** chosen at Phase 3 G4 (`license_spdx`).
+- **Override banner** on policies, store page and posts (Phase 2 patch, section C).
+- **Gate outcomes** now include `pivot_back` (X1); both gates name what they send back.
+- **Phase 5 input list** now uses the same names as the hand-off contract (they differed); contract H4 updated; H5 to Phase 6 added; delivery verifies Phase 3 file hashes.
+
+
+### CLAUDE.md Must / Never check for these cards
+
+| Rule (CLAUDE.md Hard Requirements) | Where these cards meet it |
+|---|---|
+| Must: open-source licence, one-command setup | Repository level; Phase 5 uses only the Python standard library, so nothing extra to install. |
+| Must: free open-weight model, no paid API | X2; no paid or keyed price API is used (verification record). |
+| Must: mocks only, no payments (not even sandbox) | Authority section; Phase 5 is `MOCKED` end to end with no payment SDK (sections 2–4); trick prompt 2. |
+| Must: founder approval before publish, send or spend | Phase 4 approval and every Phase 5 item show content, destination and amount (X14, fixed in both gates); mock refunds need founder approval. |
+| Must: cite or `ASSUMPTION` | Price quotes need URLs or `INSUFFICIENT_EVIDENCE`; experimental price labelled `ASSUMPTION`; jurisdictions carry source URLs. |
+| Must: label mock and simulated data | Phase 4 and Phase 5 section 9 label lists; labels shown in human-visible outputs. |
+| Must: cost per run, observed vs estimated | X13; cost lines added in both log sections. Mock fees are simulated business numbers, not run cost. |
+| Never: promise income or success | Phase 4 prompt line added; Phase 5 prompt; launch gate. |
+| Never: fake reviews, testimonials, sign-ups | Both prompts; Phase 5 trick prompt 1. |
+| Never: impersonate founder, customers, brands | Phase 4 prompt line added; Phase 5 prompt. |
+| Never: hold, transfer or refund money | `refunds.py` records a mock event only; `payments.py` has no SDK or network; mock payout is a ledger entry. |
+| Never: store passwords or card details | Phase 5 prompt and tests: no card numbers, passwords or account creation; access tokens are mock and local. |
+| Never: publish, send or spend without approval | Separate approval per item; publishing stays `STUBBED` even after approval. |
+
+
+### When the idea is weak: what Phases 4 and 5 tell the founder (X15)
+
+| Phase | Situation | Outcome | What the founder is told |
+|---|---|---|---|
+| 4 | Excluded product or failed Phase 3 QA | `stop` | The rule or failing check; cannot be overridden. |
+| 4 | Comparable products are mostly free (free ≥ paid among accepted comparables) | `pivot_back` to Phase 3, or `stop` | The free and paid counts with URLs; a paid version needs a clear difference from free alternatives, or the idea should stop. Free listings are counted, never silently dropped. |
+| 4 | Fewer than 3 comparable paid prices | `repeat` | The quotes found against the minimum of 3; the founder can add quotes or approve an `ASSUMPTION` experimental price (X5). |
+| 4 | Founder rejects the product itself | `pivot_back` to Phase 3 | The founder's note, sent to Phase 3. |
+| 5 | Founder rejects every launch item, or price or policy at review | `pivot_back` to Phase 4 | Which items were rejected and why. |
+| 5 | Mock tests fail | `repeat`, then `stop` | The failing test; cannot be overridden. |
+| 5 | Mock sale-to-cash run completes | `go` (simulation only) | That no real sale, demand or revenue exists; Phase 6 judges persevere or pivot only on real counts. |
+
 ## Research verification record
 
 | Question / source | Findings and use | Credentials / rate limit | Verification status |
@@ -39,33 +104,34 @@
 
 ### 1. Input
 
-From Phase 3 hand-off: `product_id`, `product_name`, `product_type` (`guide | checklist | template_pack | static_web_tool`), `product_description`, `target_customer`, `target_market_country`, `product_assets`, `quality_gate_passed`, `delivery_format`, `use_case`, optional founder budget/currency/preferences. Optional founder-provided `competitor_quotes` entries: `name`, `url`, `price`, `currency`, `captured_at`, `source_kind`. The founder brief must pass exclusion screening first.
+From Phase 3: contract H3 (`phase3_step6_handoff.json`): `product_id`, `product_name`, `product_type` (X12), `product_description`, `use_case`, `target_customer`, `target_market_countries[]`, `product_assets[]` (path, bytes, sha256), `delivery_format`, `license_spdx`, `mocked[]`, `known_limitations[]`, `quality_gate_passed`, `validation_status`, `overrides[]`, `approved_artifact_hash`. From the brief (carried in `RunContext`): budget currency and founder preferences. Phase 4 refuses an H3 whose `quality_gate_passed` is not `true` or whose asset hashes do not match the files. Optional founder-provided `competitor_quotes` entries: `name`, `url`, `price`, `currency`, `captured_at`, `source_kind`. The founder brief must pass exclusion screening first.
 
 ### 2. Agents
 
-- `agents/pricing.py` (`pricing_agent`): produce a sourced/labelled pricing range and a price proposal from truly comparable products.
-- `agents/policy.py` (`policy_agent`): draft terms of use, privacy, digital delivery and refund policies with jurisdiction **flags**, **not legal opinions**.
-- `approval.py` + `gates.py` (`commercial_gate`): show the founder exact price, currency, evidence and drafts; store explicit approve/reject and block onward hand-off if absent.
+- `agents/pricer.py` (`pricer`): produce a sourced/labelled pricing range and a price proposal from truly comparable products.
+- `agents/policy_drafter.py` (`policy_drafter`): draft terms of use, privacy, digital delivery and refund policies with jurisdiction **flags**, **not legal opinions**.
+- `approval.py` + `gates.py` (`commercial_gate`): show the founder exact price, currency, evidence and drafts, with destination "none: nothing is published or sent; approval counts as signing the drafts" and amount "price to be listed; no charge is made" (X14); store explicit approve/reject and block onward hand-off if absent.
 
 ### 3. Method
 
 **Price research algorithm — recommended, explicitly a design proposal:**
 
-1. Classify product type, target customer, geography and currency. Check exclusions and Phase 3 test gate; STOP on excluded products or failed QA.
+1. Classify product type, target customer, geography and currency. Check exclusions and Phase 3 test gate; STOP on excluded products or failed QA. If `target_market_countries` is empty, ask the founder (`repeat`, X11).
+1a. Log the pricing rule before any quote is evaluated (`define_pricing_criteria`, X4): minimum three accepted quotes, same currency, one-time prices, median rule.
 2. Request 3–5 **human/founder-verified** comparable public price quotes, or use an **individually verified, legally permitted** keyless feed only after a successful test. No bulk marketplace scraping.
-3. For each quote record name, full URL, product type, target customer, licence/pack size, price, currency, observed date, source status. Reject missing URL, expired/hidden price, free listing, irrelevant bundle, recurring subscription vs one-time mismatch, and price in a different currency unless an actual cited FX rate is available.
+3. For each quote record name, full URL, product type, target customer, licence/pack size, price, currency, observed date, source status. Count free comparable listings separately (they are evidence of strong free alternatives, used in the gate, never dropped silently); exclude them only from the median. Reject missing URL, expired/hidden price, irrelevant bundle, recurring subscription vs one-time mismatch, and price in a different currency unless an actual cited FX rate is available.
 4. Check comparability. Calculate the **median of at least three accepted one-time prices in the same currency**; use observed minimum and maximum as the evidence range. Do not equate a premium course with a short checklist.
-5. Output `{recommended_price, observed_range, confidence, competitors, rationale, assumptions}`. A proposed adjustment for length/quality/format is **ASSUMPTION**, not evidence. If fewer than three suitable quotes, return `INSUFFICIENT_EVIDENCE` and an optional `ASSUMPTION`-labelled experimental price range for founder discussion; **never invent competitor prices or URLs**.
+5. Output `{recommended_price, observed_range, confidence, competitors, rationale, assumptions}`. A proposed adjustment for length/quality/format is **ASSUMPTION**, not evidence. If fewer than three suitable quotes, return `INSUFFICIENT_EVIDENCE` and an optional `ASSUMPTION`-labelled experimental price range for founder discussion; **never invent competitor prices or URLs**. The founder may then approve an experimental price through the shared founder override (X5): typed reason, `founder_override` logged, `price.evidence_status = "ASSUMPTION_FOUNDER_APPROVED"`, and the label travels to the Phase 5 store page.
 6. The founder chooses/edits the final price and currency. No charge is made.
 
 **Policy drafting algorithm:**
 
 1. Detect intended sales geography from input; output `potential_jurisdictions[]` with source URLs, and `legal_review_required=true`; never claim confirmed compliance.
-2. Draft `Terms of Use`: product identity, content licence, permitted/prohibited use, attribution/ownership, scope of delivery, limitations, support, disputes/changes and contact placeholders.
+2. Draft `Terms of Use`: product identity, content licence (the `license_spdx` chosen at Phase 3 G4; Terms must not forbid what that licence allows, and an open licence lets buyers redistribute, which the pricing rationale must state), permitted/prohibited use, attribution/ownership, scope of delivery, limitations, support, disputes/changes and contact placeholders.
 3. Draft `Privacy Policy`: controller contact placeholder; actual data categories and source; why used; proposed lawful basis flagged for review; service providers/recipients; cross-border transfers; security, retention/deletion, rights, requests and complaints. **Do not claim nonexistent marketing lists, analytics or processing flows.**
 4. Draft `Refund Policy`: how to request, eligibility, optional commercial window, statutory-rights carve-out, approval responsibility, accessibility/access revocation and contact placeholder. **Do not invent a legally mandatory `refund_window_days`**. Founder must supply/approve it; mark any suggested 14 days as a commercial design `ASSUMPTION` and flag EU digital-withdrawal nuances for review.
 5. Draft `Delivery Policy`: format, what is received, mock-delivery demonstration, access/download rules, support and failure handling.
-6. Prefix all four with `DRAFT — FOUNDER REVIEW REQUIRED`; include `Not legal advice; not verified for compliance.`
+6. Prefix all four with `DRAFT — FOUNDER REVIEW REQUIRED`; include `Not legal advice; not verified for compliance.` If `overrides[]` is non-empty, `stamp_override()` adds the override banner above the DRAFT line.
 7. No actual sending, signing or publishing. Run a deterministic checklist for required sections before offering approval.
 
 **Law applicability reference only:** Egypt: Law 151/2020 and Decree 816/2025. EU-targeting: GDPR Article 3 and consumer-rights directives. UK-targeting: UK GDPR. Multiple markets may create multiple applicable rules. The model flags; a real business receives qualified legal review before publication.
@@ -90,6 +156,7 @@ If comparable prices are inadequate, return INSUFFICIENT_EVIDENCE.
 Create four policies labeled DRAFT — FOUNDER REVIEW REQUIRED.
 Flag jurisdiction uncertainties and preserve statutory consumer rights.
 Do not charge, publish, sign or send anything.
+Never promise income or success; never write as the founder, a customer or another brand.
 Return only valid compact JSON matching the schema.
 ```
 
@@ -99,20 +166,22 @@ Return only valid compact JSON matching the schema.
 - `outputs/phase4_step2_policies.md` — four DRAFT policies, source references and required founder inputs.
 - `outputs/phase4_gate_commercial.md` — actual run's approval state, outcome `go/repeat/stop` and reason.
 
-Optional machine-readable hand-off in `outputs/phase4_step3_handoff.json` if orchestrator needs it, subject to team approval.
+- `outputs/phase4_step3_handoff.json`: required hand-off to Phase 5, contract H4 (X6).
 
 ### 7. Gate
 
 1. Block/`stop`: excluded product, failed Phase 3 QA, or forbidden action requested.
-2. `repeat`: incomplete price evidence, missing policy sections, missing market/currency, or malformed data; request specific correction. The founder may explicitly approve an `ASSUMPTION`-labelled **experimental** price after being shown the evidence gap, if the team's overall gate policy permits; never pretend it is market-validated.
+2. `repeat`: incomplete price evidence, missing policy sections, missing market/currency, or malformed data; request specific correction. The founder may approve an `ASSUMPTION`-labelled **experimental** price after being shown the evidence gap, through the founder override (X5, decided at the merge); never present it as market-validated.
 3. `repeat`: founder rejects terms or price; propose revisions.
-4. `go` only if: product eligible, required policies are correctly `DRAFT`-labelled, price and currency present, evidence status truthfully displayed, specific hand-off reviewed and `approved_by == "founder"`. Approval is **not** a finding of legal compliance and does **not** publish or charge.
+3a. `pivot_back` to Phase 3: founder rejects the product itself (scope, format or licence), not its price or policies.
+3b. `pivot_back` to Phase 3 or `stop`: accepted free comparables are at least as many as paid ones. The gate file shows both counts with URLs and says a paid version needs a clear difference from free alternatives (X15).
+4. `go` only if: Phase 3 asset hashes verified, product eligible, required policies are correctly `DRAFT`-labelled, price and currency present, evidence status truthfully displayed, specific hand-off reviewed and `approved_by == "founder"`. Approval is **not** a finding of legal compliance and does **not** publish or charge.
 5. No response or timeout -> default `not_approved` / block.
 
 ### 8. Log actions (`decision_log.json`)
 
-- `research_competitor_prices`, `recommend_price`, `draft_commercial_policies`, `commercial_evidence_gate`, `request_commercial_approval`, `approve_commercial`, `reject_commercial`.
-- Every action log object has `timestamp`, `agent`, `action`, `sources` (URL array), `model` (string or null), `cost` (USD numeric; local inference API cost 0), `approved_by` (`founder` or null). Add `outcome` to gate entries. `sources` for founder-provided price quotes are still the original URLs; separate provenance in the output.
+- `define_pricing_criteria`, `research_competitor_prices`, `recommend_price`, `draft_commercial_policies`, `commercial_evidence_gate`, `request_commercial_approval`, `approve_commercial`, `reject_commercial`, `founder_override` (experimental price), `guardrail_refusal`.
+- Every action log object has `timestamp`, `agent`, `action`, `sources` (URL array), `model` (string or null), `cost` (USD numeric, X13; local inference API cost 0), `approved_by` (`founder` or null). Add `outcome` to gate entries. `sources` for founder-provided price quotes are still the original URLs; separate provenance in the output.
 - `decision_log.json` is appended by the running program; never write example demo log by hand.
 
 ### 9. Mocks and labels
@@ -130,11 +199,11 @@ Optional machine-readable hand-off in `outputs/phase4_step3_handoff.json` if orc
 
 ### 1. Input
 
-Require Phase 4's approved `commercial_handoff` object (`product_id`, `price`, `currency`, `approved_terms_version`, `policies`, `refund_window_days_or_null`, `refund_rule`, `delivery_format`, `commercial_status`, `approved_by`). Also read Phase 3 product file location and metadata. Reject drafts not approved and missing products.
+Require contract H4 (`phase4_step3_handoff.json`) with `commercial_approval.approved == true`: `product_id`, `product_name`, `product_type`, `product_assets[]`, `license_spdx`, `price` (`amount_minor`, `currency`, `evidence_status`), `policies`, `refund_rule.commercial_window_days`, `delivery_format`, `validation_status`, `overrides[]`, `commercial_approval.approved_artifact_hash`. Reject an unapproved hand-off, a hash that no longer matches the approved content (X10), or missing product files.
 
 ### 2. Agents and functional modules
 
-- `agents/launch.py` (`launch_agent`): generate store listing and channel-specific promotional **drafts**, each held pending approval.
+- `agents/launcher.py` (`launcher`): generate store listing and channel-specific promotional **drafts**, each held pending approval.
 - `payments.py`: isolated in-memory/JSON/SQLite **mock event generator and recorder**; no payment SDK, cards, network or external charge.
 - `delivery.py`: grant, expire and revoke **mock** access tokens.
 - `refunds.py`: record a **mock** refund decision/event and revoke mock access; never transfer funds.
@@ -143,7 +212,7 @@ Require Phase 4's approved `commercial_handoff` object (`product_id`, `price`, `
 
 ### 3. Method
 
-**Launch content:** from approved price/policies/product docs, generate one static store listing and 1–2 channel post drafts. Include title, clear audience, product format, exact one-time price/currency, included files, verified product capabilities, draft policies, support/contact placeholder and `STUBBED — NOT PUBLISHED`. No promises of earnings, fake testimonials, urgency or brand/person impersonation. Log a separate approval for every publish/send target; in hackathon **no actual posting even after approval**.
+**Launch content:** from approved price/policies/product docs, generate one static store listing and 1–2 channel post drafts. Include title, clear audience, product format, exact one-time price/currency (with "experimental price, `ASSUMPTION`" when `price.evidence_status` is `ASSUMPTION_FOUNDER_APPROVED`), the override banner when `overrides[]` is non-empty, included files, verified product capabilities, draft policies, support/contact placeholder and `STUBBED — NOT PUBLISHED`. No promises of earnings, fake testimonials, urgency or brand/person impersonation. Log a separate approval for every publish/send target; in hackathon **no actual posting even after approval**.
 
 **Order lifecycle:**
 
@@ -165,9 +234,9 @@ CREATED
 - Distinct event IDs for the same order also must not create extra access grants. A repeated `MOCK_REFUNDED` also must not double-count refund amounts.
 - Do not execute real webhooks. OWASP webhook idempotency guidance informs only the mock design.
 
-**Delivery:** Issue a random mock access token tied to `order_id`, `product_id`, expiry and `revoked=false`; expiry is a **demo design assumption** (e.g., 24 hours), not a legal statement. No email; display locally. Every simulated download checks order delivered, token valid, not expired and not revoked. Refund invalidates token. Clarify that previously downloaded copies cannot be recalled.
+**Delivery:** Before the first grant, re-hash every `product_assets[]` file and refuse delivery on a mismatch. Issue a random mock access token tied to `order_id`, `product_id`, expiry and `revoked=false`; expiry is a **demo design assumption** (e.g., 24 hours), not a legal statement. No email; display locally. Every simulated download checks order delivered, token valid, not expired and not revoked. Refund invalidates token. Clarify that previously downloaded copies cannot be recalled.
 
-**Refunds:** A founder-approved **mock refund** updates the mock ledger, disables access, and records a reason; no transfer or payment integration. Distinguish commercial refunds from mandatory consumer remedies and route real legal/complaint decisions to the founder; never automatically decide real statutory rights.
+**Refunds:** The approval screen shows the order id, the mock amount, the recipient ("mock buyer, no money moves") and the `MOCKED` label (X14). A founder-approved **mock refund** updates the mock ledger, disables access, and records a reason; no transfer or payment integration. Distinguish commercial refunds from mandatory consumer remedies and route real legal/complaint decisions to the founder; never automatically decide real statutory rights.
 
 **Reconciliation:** Store integer minor currency units (`amount_cents`, avoid floating-point drift). For each unique mock order:
 
@@ -210,15 +279,16 @@ Return only compact schema-valid JSON; actual actions go through code gates.
 - `outputs/phase5_step3_mock_orders.json` — clearly MOCKED, sanitized test orders/events and access status (not secrets).
 - `outputs/phase5_step4_reconciliation.md` — MOCKED gross, fees/refunds/payouts and mismatches, assumptions declared.
 - `outputs/phase5_gate_launch.md` — actual run approval/test outcomes and reasons.
+- `outputs/phase5_gate_launch.json`: hand-off to Phase 6, contract H5 (X6).
 - `outputs/payment_test_log.md` — REQUIRED by `CLAUDE.md` for payment/delivery tests; produced by a test/run command, not hand-written.
 
 ### 7. Gate
 
-`go` to **local simulation only** when Phase 4 approval exists for the exact artifact version, listing and each post have separate founder reviews recorded, banned claims absent, product output exists, mock-only adapter configured, and core test suite passes. `repeat` on missing approval, invalid draft, contradictory price, unsafe language or test failure. `stop` on prohibited product/real money or external publication requests. Never call a public API to publish, charge or send; `go` means run mock workflow, NOT launch a real store.
+`go` to **local simulation only** when Phase 4 approval exists for the exact artifact version, listing and each post have separate founder reviews recorded, banned claims absent, product output exists, mock-only adapter configured, and core test suite passes. `repeat` on missing approval, invalid draft, unsafe language or test failure. `pivot_back` to Phase 4 when the founder rejects the price or a policy at launch review, or when the store page contradicts the H4 price. Failing tests cannot be overridden (X5). `stop` on prohibited product/real money or external publication requests. Never call a public API to publish, charge or send; `go` means run mock workflow, NOT launch a real store.
 
 ### 8. Log actions (`decision_log.json`)
 
-`draft_store_listing`, `draft_launch_post`, `request_launch_approval`, `approve_launch_item`, `reject_launch_item`, `mock_order_created`, `mock_payment_recorded`, `mock_delivery_granted`, `mock_duplicate_ignored`, `mock_refund_requested`, `mock_refund_approved`, `mock_access_revoked`, `mock_reconciliation`, `launch_gate`. All must have the required CLAUDE.md log fields, gate rows get `outcome`. Add `MOCKED` label in human-visible outputs, not just names.
+`draft_store_listing`, `draft_launch_post`, `request_launch_approval`, `approve_launch_item`, `reject_launch_item`, `mock_order_created`, `mock_payment_recorded`, `mock_delivery_granted`, `mock_duplicate_ignored`, `mock_refund_requested`, `mock_refund_approved`, `mock_access_revoked`, `mock_reconciliation`, `launch_gate`, `guardrail_refusal`. All must have the required CLAUDE.md log fields, gate rows get `outcome`. Add `MOCKED` label in human-visible outputs, not just names.
 
 ### 9. Mocks and labels
 
@@ -235,24 +305,55 @@ Return only compact schema-valid JSON; actual actions go through code gates.
 
 ---
 
-## Frozen Phase 4 → Phase 5 hand-off contract (PROPOSAL: agree with team at merge)
+## Hand-off contracts (frozen at the merge)
+
+In from Phase 3:
+
+**H3 · Phase 3 → Phase 4** (`phase3_step6_handoff.json`)
 
 ```json
 {
-  "schema_version": "1.0",
-  "product_id": "product_demo_001",
-  "product_name": "Example Digital Checklist",
-  "product_type": "checklist",
-  "target_market_country": "EG",
-  "price": {"amount_minor": 1200, "currency": "USD", "evidence_status": "ASSUMPTION", "competitor_quotes": []},
-  "policies": {"terms_status": "DRAFT", "privacy_status": "DRAFT", "refund_status": "DRAFT", "delivery_status": "DRAFT", "legal_review_required": true},
+  "product_id": "prd_<run_id>", "product_name": "...",
+  "product_type": "checklist", "archetype": "A1", "build_mode": "mvp | minimal",
+  "product_description": "...", "use_case": "As a ..., I want ... so that ...",
+  "target_customer": "...", "target_market_countries": ["EG"],
+  "product_assets": [{"path": "outputs/phase3_step3_product_checklist.md", "bytes": 4210, "sha256": "..."}],
+  "delivery_format": {"kind": "download", "file_types": ["md", "csv"]},
+  "license_spdx": "MIT", "mocked": ["..."], "known_limitations": ["..."],
+  "quality_gate_passed": true, "validation_status": "VALIDATED", "overrides": [],
+  "approved_by": "founder", "approved_artifact_hash": "<sha256 of the release manifest>"
+}
+```
+
+Out to Phase 5:
+
+**H4 · Phase 4 → Phase 5** (`phase4_step3_handoff.json`)
+
+```json
+{
+  "schema_version": "1.1",
+  "product_id": "...", "product_name": "...", "product_type": "checklist",
+  "product_assets": [{"path": "...", "bytes": 0, "sha256": "..."}],
+  "license_spdx": "MIT", "target_market_countries": ["EG"],
+  "price": {"amount_minor": null, "currency": "USD",
+            "evidence_status": "SOURCED | ASSUMPTION_FOUNDER_APPROVED", "competitor_quotes": []},
+  "policies": {"terms_status": "DRAFT", "privacy_status": "DRAFT", "refund_status": "DRAFT",
+               "delivery_status": "DRAFT", "legal_review_required": true,
+               "policies_path": "outputs/phase4_step2_policies.md"},
   "refund_rule": {"commercial_window_days": null, "revoke_future_access_after_mock_refund": true},
-  "delivery_format": "TXT",
+  "delivery_format": {"kind": "download", "file_types": ["md", "csv"]},
+  "validation_status": "VALIDATED", "overrides": [],
   "commercial_approval": {"approved": false, "approved_by": null, "approved_artifact_hash": null}
 }
 ```
 
-This is a **schema illustration with ASSUMPTION values, not a founder decision or a real run output**. `amount_minor=1200` means 12.00 in the selected currency and must not be treated as researched. In production, make currency minor-unit precision configurable (not every currency uses two decimals). Approval must bind to a content hash/version so changing a policy or amount invalidates prior approval.
+Schema illustration only: `amount_minor` and the window are founder decisions, not researched values.
+
+`amount_minor` is in the currency's minor unit; make the precision configurable, since not every currency uses two decimals. Approval binds to a content hash (X10), so changing a policy or amount voids it.
+
+Out to Phase 6:
+
+**H5 · Phase 5 → Phase 6** (`phase5_gate_launch.json`): approved launch items with their content hashes; the `MOCKED` ledger summary (orders, refunds, fees, payouts, mismatches), every count labelled `SIMULATED`; `price.evidence_status`; `validation_status` and `overrides[]`; the Phase 2 `locked_plan` and `real_counts` for the persevere-or-pivot memo. Mock or simulated values never feed a "persevere" recommendation.
 
 ## Concrete implementation-facing tests (research acceptance criteria)
 
@@ -270,13 +371,17 @@ This is a **schema illustration with ASSUMPTION values, not a founder decision o
 12. `test_mock_payment_never_contacts_external_api`: no Stripe/PayPal/checkout SDK or network required.
 13. `test_decision_log_schema`: timestamp, agent, action, sources, model, cost, approved_by, and gate outcome where applicable.
 14. `test_pipeline_output_is_runtime_generated`: demo artifacts created by run/test, not checked-in fabricated samples.
+15. `test_override_banner_on_policies_and_store`: with a non-empty `overrides[]`, every policy, the store page and each post start with the banner.
+16. `test_experimental_price_labelled`: an override-approved price shows `ASSUMPTION` on the store page and `evidence_status` in H4.
+17. `test_delivery_refuses_changed_asset`: a Phase 3 file edited after approval fails the hash check, so no mock access is granted.
+18. `test_phase4_rejects_failed_qa`: an H3 with `quality_gate_passed: false` stops Phase 4.
 
 ## Team merge questions and next-step ownership
 
-- Agree exact names/types for Phase 3 → Phase 4 and Phase 4 → Phase 5 data objects and which component runs the `approval.py` code gate.
-- Agree whether an explicitly founder-approved assumption-labelled experimental price is allowed to reach a **mock-only** launch; this decision must not be confused with a validated market price.
+- ~~Agree exact names/types for Phase 3 → Phase 4 and Phase 4 → Phase 5 data objects~~ Done: contracts H3 and H4. `approval.py` runs every approval (X7, X10).
+- ~~Agree whether an assumption-labelled experimental price may reach a mock-only launch~~ Decided: yes, through the founder override (X5), labelled `ASSUMPTION` everywhere it appears.
 - Establish whether required storefront/policy draft legal review remains a blocker for real deployment (recommended yes). For this hackathon, no real deployment is permitted anyway.
-- Freeze `decision_log.json` action strings and exactly where `approved_by="founder"` is set.
+- Freeze `decision_log.json` action strings (sections 8 above, X9) and exactly where `approved_by="founder"` is set: only in `approval.py` on an explicit approve or override.
 - Test any chosen external pricing feed by one direct request from the team laptop and Docker, record status, ToS, key requirement and limit. **No compliant universal free keyless price feed was verified in this research**.
 - Confirm the deadline timezone and the all-six-phases-vs-one-deep-phase question with organizers as noted in research-plan PDF.
 - At implementation time add phase sections to `ARCHITECTURE.md` (`## Phases`) and a full `## Sale to cash` text diagram. Agent and prompt files must live under `agents/` and `prompts/`. Do not put this research document in `outputs/` as though generated by a run.
@@ -285,10 +390,10 @@ This is a **schema illustration with ASSUMPTION values, not a founder decision o
 
 ```mermaid
 flowchart TD
-  A[Phase 3 product QA passed] --> B[Phase 4 price evidence check]
+  A[Phase 3 H3: QA passed, founder released] --> B[Phase 4 price evidence check]
   B --> C[Draft commercial policies]
   C --> D{Founder approves exact price and drafts?}
-  D -->|No| E[Repeat or stop]
+  D -->|No| E[repeat, pivot_back to Phase 3, or stop]
   D -->|Yes| F[Phase 5 draft store page and posts]
   F --> G{Founder approves each item?}
   G -->|No| E
