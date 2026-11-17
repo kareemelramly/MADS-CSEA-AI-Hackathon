@@ -4,24 +4,24 @@ UNVALIDATED · FOUNDER OVERRIDE
 
 **Mode:** minimal
 
-**User story:** As an independent wedding planner in Egypt, I want a structured checklist and vendor tracker so that I can organize wedding categories without relying on low-quality lead generation sites.
+**User story:** As an independent wedding planner in Egypt, I want a structured checklist and vendor tracker so that I can manage wedding details without relying on low-quality lead generation sites.
 
 ## Must features
 
-- Categorized Wedding Planning Pack: A Markdown checklist for task management and a CSV tracker for vendor details, organized by wedding categories like dresses, rings, and locations. (evidence: S002, S005, S016)
+- Localized Planning & Vendor Management Pack: A Markdown checklist for wedding milestones and a CSV tracker for vendor details, designed to replace manual Pinterest organization and low-quality search sites. (evidence: S002, S005, S016)
 
 ## Acceptance criteria
 
-1. Given The user has downloaded the product pack, when they open the Markdown file, then they see a structured checklist of wedding tasks.
-2. Given The user needs to manage vendor contact details, when they import the CSV tracker into their preferred tool, then all vendor columns are correctly mapped and readable.
-3. Given The user is organizing specific wedding elements, when they navigate the checklist, then they find dedicated sections for dresses, rings, and locations.
+1. Given The user has downloaded the product pack, when they open the Markdown file, then they see a complete list of wedding planning milestones.
+2. Given The user is managing multiple vendors, when they import the CSV tracker into their preferred tool, then they can see organized columns for vendor contact and service details.
+3. Given The user is looking for a way to organize ideas, when they use the checklist, then they can track progress through specific wedding phases.
 
 ## Journey
 
-J1. Review the master wedding checklist to identify missing tasks
-J2. Categorize tasks into specific wedding elements like venue or attire
-J3. Populate the vendor tracker with contact information from local suppliers
-J4. Track progress by marking completed items in the Markdown checklist
+J1. Review the wedding timeline milestones in the Markdown checklist
+J2. Identify and list required vendors based on the checklist needs
+J3. Populate the CSV tracker with vendor contact information and pricing
+J4. Track completion of tasks through the checklist phases
 
 ## Mocked integrations
 
@@ -31,4 +31,4 @@ J4. Track progress by marking completed items in the Markdown checklist
 
 | Feature | Evidence | Criteria | Checks |
 |---|---|---|---|
-| Categorized Wedding Planning Pack | S002, S005, S016 | [1, 2, 3] | QA-04, QA-05, QA-14 |
+| Localized Planning & Vendor Management Pack | S002, S005, S016 | [1, 2, 3] | QA-04, QA-05, QA-14 |

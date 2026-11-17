@@ -2,24 +2,33 @@
 
 **Outcome:** `stop`
 
+> STOP: the system recommends not continuing on the current evidence.
+
 Excluded product category (financial_or_crypto). This rule cannot be overridden; start a new run with a different idea.
+
+## What was measured
 
 | Measure | Value |
 |---|---|
-| sources_answered | 0 |
-| items_screened | 0 |
-| relevant_items | 0 |
-| relevant_sources | 0 |
-| fit_score | 0 |
-| threshold_min_sources_ok | 2 |
-| threshold_min_items_screened | 20 |
-| threshold_min_relevant | 3 |
-| threshold_min_relevant_sources | 2 |
-| threshold_min_fit | 3.0 |
-| threshold_fit_weights | skills 35, budget 25, time 25, values 15 |
-| threshold_max_excerpts_to_model | 20 |
-| threshold_broadened_retries | 1 |
+| Sources answered | 0 |
+| Items screened | 0 |
+| Relevant items | 0 |
+| Relevant sources | 0 |
+| Fit score | 0 |
+
+## Thresholds (locked before any data, ASSUMPTION)
+
+| Threshold | Value |
+|---|---|
+| Minimum sources ok | 2 |
+| Minimum items screened | 20 |
+| Minimum relevant | 3 |
+| Minimum relevant sources | 2 |
+| Minimum fit | 3 |
+| Fit weights | skills 35, budget 25, time 25, values 15 |
+| Maximum excerpts to model | 20 |
+| Broadened retries | 1 |
 
 Founder override allowed: no
 
-Thresholds are planning values (ASSUMPTION) fixed before the run and logged as criteria before any data.
+Code decided this gate; no model voted. Thresholds are planning values (ASSUMPTION) fixed before the run and logged as criteria before any data.

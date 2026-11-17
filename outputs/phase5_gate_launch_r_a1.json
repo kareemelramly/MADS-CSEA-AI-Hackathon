@@ -1,6 +1,6 @@
 {
   "banner": "UNVALIDATED · FOUNDER OVERRIDE",
-  "run_id": "20261117T194739Z-r",
+  "run_id": "20261117T201525Z-r",
   "gate": {
     "gate": "phase5_gate",
     "outcome": "go",
@@ -20,11 +20,11 @@
     "launch": "mock run only",
     "store_page_ref": {
       "path": "outputs/phase5_step1_store_page_r_a1.md",
-      "sha256": "585e5135754e138358d6dda7f0ba7a2669618310cd9cd4956d7bf034f00431dc"
+      "sha256": "cab5e6f2a2424978376d6e46c1bec7cb4d4bd969265cbdff14825f5b715c84d8"
     },
     "post_ref": {
       "path": "outputs/phase5_step2_launch_post_r_a1.md",
-      "sha256": "318a5663d0355ea96a7dbfc7232b479c409c0c142dcec18bb3ef87571363d0f0"
+      "sha256": "b866839a760feb95ddace0d6ca8836b3dd5fd0ad5e5061d1b91599aef766fab1"
     },
     "ledger_summary": {
       "orders": 1,

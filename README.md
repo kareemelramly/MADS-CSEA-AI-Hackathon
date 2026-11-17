@@ -58,9 +58,9 @@ Status rule: **Working** means the code exists and the named offline test passes
 <!-- runs:start -->
 Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):
 
-- `20261117T194739Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
-- `20261117T195109Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `pivot_back`; gates: phase1_gate: `pivot_back`.
-- `20261117T195149Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T201525Z-r` (Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack): artifacts in phases 1, 2, 3, 4, 5, 6/6; final outcome `stop`; gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`.
+- `20261117T202306Z-w` (A mobile app that gamifies daily habit tracking with streaks and badges): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T202438Z-e` (A crypto trading signal bot that posts buy and sell alerts): artifacts in phases 1/6; final outcome `stop`; gates: phase1_gate: `stop`.
 
 At least one committed run has recorded artifacts in all six phases.
 <!-- runs:end -->
@@ -86,7 +86,7 @@ No paid service, API key or account is needed. Everything runs on your machine.
 ## Cost per run
 
 <!-- cost:start -->
-$0.00 in model/API charges observed for complete six-phase run 20261117T194739Z-r (15 model calls, 18411 tokens; 77.1 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
+$0.00 in model/API charges observed for complete six-phase run 20261117T201525Z-r (16 model calls, 19222 tokens; 230.6 s system time). Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).
 <!-- cost:end -->
 
 ## Demo video

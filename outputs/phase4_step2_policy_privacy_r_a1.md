@@ -6,17 +6,17 @@ DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice
 
 ## Data collected
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We collect only your email address to facilitate the delivery of your digital download.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We only collect your email address to facilitate the delivery of your digital download.
 
 ## Purpose
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your email is used solely for order confirmation and sending the download link.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your email is used solely for order confirmation and sending your download link. We do not store passwords or credit card information.
 
 ## Retention
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. We retain your email address only as long as necessary to fulfill your order and provide support.
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. Your email is kept only as long as necessary to fulfill your order and provide support.
 
 ## Contact
 
-DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. For privacy inquiries, please contact the founder's support email (to be added).
+DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice. For privacy concerns, please contact the founder's support email (to be added).
 

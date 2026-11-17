@@ -1,0 +1,29 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "run_id": "20261117T201525Z-r",
+  "gate": {
+    "gate": "phase6_gate",
+    "outcome": "repeat",
+    "verdict": "No real demand data yet (Phase 2 never completed an experiment and no real post-launch metrics were entered). No persevere recommendation is possible. Run the Phase 2 experiment first.",
+    "reasons": [
+      "no_real_data"
+    ],
+    "numbers": {
+      "targets": {
+        "waitlist_signups": 100.0,
+        "paying_customers": 5.0
+      },
+      "real_metrics": {},
+      "phase2_completed": false,
+      "ignored_mock_or_simulated": [
+        "mock_orders",
+        "mock_gross_minor",
+        "mock_refunds",
+        "mock_net_minor"
+      ]
+    },
+    "overridable": true,
+    "nothing_decided": true
+  },
+  "founder_decision": "stop"
+}

@@ -3,7 +3,7 @@ UNVALIDATED · FOUNDER OVERRIDE
 # Validation experiment plan
 
 **Locked target:** 100 real waitlist sign-ups in 14 days, with at least 200 real visitors.
-Locked at 2026-11-17T19:49:18Z with SHA-256 `2d28b0835a8b8a66da2ee9f03b84e0b713e5bb9144fc5c775e8d0ef08ec2327f`. Changing it after this point makes the gate return `stop`.
+Locked at 2026-11-17T20:17:51Z with SHA-256 `2d28b0835a8b8a66da2ee9f03b84e0b713e5bb9144fc5c775e8d0ef08ec2327f`. Changing it after this point makes the gate return `stop`.
 
 Basis: ASSUMPTION: planning values set before any data (problem statement example: 100 sign-ups in 14 days)
 

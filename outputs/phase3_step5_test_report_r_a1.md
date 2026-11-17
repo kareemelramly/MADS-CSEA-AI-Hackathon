@@ -7,7 +7,7 @@ Attempt 1. Archetype A1: 14 applicable checks; QA-07 not applicable.
 | Check | Name | Result | Evidence |
 |---|---|---|---|
 | QA-01 | Manifest complete | pass | 4 files |
-| QA-02 | Size | pass | total 7394 bytes; too big: [] |
+| QA-02 | Size | pass | total 7042 bytes; too big: [] |
 | QA-03 | Format validity | pass | CSV column counts [5]; checklist headings present: True |
 | QA-04 | Journey trace | pass | 4 steps traced |
 | QA-05 | Internal links | pass | all resolve |
@@ -24,9 +24,9 @@ Attempt 1. Archetype A1: 14 applicable checks; QA-07 not applicable.
 
 ## Acceptance criteria
 
-1. Given The user has downloaded the product pack, when they open the Markdown file, then they see a structured checklist of wedding tasks. (automated via QA-04, QA-05)
-2. Given The user needs to manage vendor contact details, when they import the CSV tracker into their preferred tool, then all vendor columns are correctly mapped and readable. (automated via QA-04, QA-05)
-3. Given The user is organizing specific wedding elements, when they navigate the checklist, then they find dedicated sections for dresses, rings, and locations. (automated via QA-04, QA-05)
+1. Given The user has downloaded the product pack, when they open the Markdown file, then they see a complete list of wedding planning milestones. (automated via QA-04, QA-05)
+2. Given The user is managing multiple vendors, when they import the CSV tracker into their preferred tool, then they can see organized columns for vendor contact and service details. (automated via QA-04, QA-05)
+3. Given The user is looking for a way to organize ideas, when they use the checklist, then they can track progress through specific wedding phases. (automated via QA-04, QA-05)
 
 ## MANUAL (not checked, never reported as passed)
 
