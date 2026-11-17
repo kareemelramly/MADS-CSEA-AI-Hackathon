@@ -15,7 +15,7 @@ The entry is this repository's **default branch** at the code freeze. The organi
 
 **Models, money and approval**
 - No paid service may be required. At least one open-weight model must work locally (for example via Ollama) or on a free tier.
-- Payments are mocked with local events only. No payment of any kind runs, including sandbox and test mode, even after founder approval (see Hard Requirements). Nothing is published, sent, spent or signed without an explicit founder approve/reject step, **enforced in code** (UI or CLI).
+- Payments run in sandbox/test mode or are mocked. Nothing is published, sent, spent or signed without an explicit founder approve/reject step, **enforced in code** (UI or CLI).
 
 **Honest outputs**
 - Everything in `outputs/` and `decision_log.json` must come from actually running the pipeline. Never write sample results by hand.

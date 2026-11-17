@@ -1,14 +1,14 @@
 # Phase 1 gate: Discover (coverage, evidence, fit)
 
-**Outcome:** `stop`
+**Outcome:** `pivot_back`
 
-Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
+Founder fit 1.60 of 5 is below the threshold 3.0. Alternative 'Habit-Building Digital Guide' passes evidence and fit. What would change it: more time, budget or matching skills in the brief.
 
 | Measure | Value |
 |---|---|
 | sources_answered | 3 |
-| items_screened | 61 |
-| relevant_items | 13 |
+| items_screened | 58 |
+| relevant_items | 4 |
 | relevant_sources | 2 |
 | fit_score | 1.6 |
 | threshold_min_sources_ok | 2 |

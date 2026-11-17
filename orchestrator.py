@@ -12,11 +12,13 @@ CLI (headless stage tests and the committed demo runs):
 import argparse
 import hashlib
 import json
+import re
 import os
 import sys
 import time
 
 import approval
+import report
 import config
 import gates
 import guardrails
@@ -99,6 +101,7 @@ def finish(ctx, outcome, why):
     ctx.final_outcome = outcome
     ctx.stage = "done"
     ctx.log("orchestrator", "end_run", outcome=outcome, reason=why, system_time_s=round(ctx.system_time_s, 1))
+    report.write_for(ctx)
 
 
 def approval_step(ctx, pid, action, content, destination, effect):
@@ -190,6 +193,15 @@ def _h1(ctx, scored, g):
             "gate_outcome": g.outcome, "gate_ref": ctx.ref("phase1_gate_decision", "json")}
 
 
+def _region_label(text, places, local):
+    """A segment or market sentence naming the target region is labelled ASSUMPTION unless a cited
+    demand excerpt mentions that region (the model may not invent geography)."""
+    named = [p for p in places if p.lower() in text.lower()]
+    if named and not local and "no cited source mentions it" not in text:
+        return f"{text} ({', '.join(named)}: ASSUMPTION, no cited source mentions it)"
+    return text
+
+
 def _p1_outputs(ctx, r, relevant, scored, questions, g):
     from agents import render_claim
     cov = r["coverage"]
@@ -204,10 +216,15 @@ def _p1_outputs(ctx, r, relevant, scored, questions, g):
     ctx.out("phase1_step1_opportunities", "md", "\n".join(lines) + "\n")
     ctx.out("phase1_step2_evidence", "json", {"run_id": ctx.run_id, "coverage": cov, "registry": list(ctx.sources.values()),
                                                "relevant": relevant, "note": "Source IDs are assigned by code; excerpts are untrusted data."})
+    places = [p.strip() for p in re.split(r"[,;/]| and ", ctx.brief.get("countries") or "") if p.strip()]
+    local = [x["source_id"] for x in relevant
+             if any(p.lower() in (ctx.sources[x["source_id"]]["excerpt"] + " " + ctx.sources[x["source_id"]].get("title", "")).lower() for p in places)]
     if scored:
         rows = ["# Phase 1 · Step 3 · Idea vs alternatives", "",
-                f"**Segment:** {render_claim(ctx, scored['segment'])}", "",
-                f"**Market:** {render_claim(ctx, scored['market_note'])} Market size is unknown unless a source above states it.", "",
+                f"**Segment:** {_region_label(render_claim(ctx, scored['segment']), places, local)}", "",
+                f"**Market:** {_region_label(render_claim(ctx, scored['market_note']), places, local)} Market size is unknown unless a source above states it.", "",
+                f"**Target region ({', '.join(places) or 'not given'}):** {len(local)} of {len(relevant)} demand excerpts mention it"
+                + (f" ({', '.join(local)})." if local else ". Demand in the target region is an ASSUMPTION until local interviews or a local experiment confirm it."), "",
                 "Fit is weighted in code: skills 35 %, budget 25 %, time 25 %, values 15 % (weights are an ASSUMPTION).", "",
                 "| Option | Skills | Budget | Time | Values | Weighted fit (1-5) | Cites relevant evidence |", "|---|---|---|---|---|---|---|"]
         for o in [scored["idea"]] + scored["alternatives"]:
@@ -441,7 +458,7 @@ def phase4(ctx, prog):
             return
         if ans.get("choice") != "override":
             return finish(ctx, "repeat", "no price evidence; founder stopped")
-        approval.override(ctx, 4, "repeat", ans.get("reason", ""))
+        once(ctx, f"p4.{att}.override", lambda: approval.override(ctx, 4, "repeat", ans.get("reason", "")) or True)
         price, currency, basis = float(ans.get("experimental_price") or 0), ans.get("currency", "USD"), "ASSUMPTION: experimental price set by founder override"
         if price <= 0:
             return finish(ctx, "repeat", "experimental price missing")
@@ -606,8 +623,6 @@ def phase6(ctx, prog):
     finish(ctx, {"persevere": "go", "pivot": "pivot_back", "stop": "stop"}.get(dec["choice"], "stop"), "Phase 6 decision recorded")
 
 
-_state_probe = {"enabled": True}
-
 PHASES = {"p1": phase1, "p2": phase2, "p3": phase3, "p4": phase4, "p5": phase5, "p6": phase6}
 
 
@@ -616,10 +631,6 @@ def run_until_gate(ctx, on_progress=None, clock=time.monotonic):
     if ctx.finished:
         return {"id": "done", "kind": "done", "outcome": ctx.final_outcome}
     ctx.start_segment(clock)
-    if _state_probe["enabled"]:
-        res = llm.probe_remote()
-        if res and any(v != "ok" for v in res.values()):
-            ctx.log("llm", "remote_tier_unavailable", detail=res, fallback="local")
     try:
         while not ctx.finished:
             stage = ctx.stage
@@ -694,12 +705,31 @@ def _ask(prompt, allowed=None, default=None):
         print(f"{R}Please type one of: {', '.join(allowed)}{X}")
 
 
-def _hint(prefill, pause):
+def _hint_value(prefill, pause):
+    """The answer the demo brief recommends. For gates it follows the verdict, so a typo in the brief
+    cannot stop the full demo run: continue on go, override when evidence is missing, stop at Phase 6."""
     h = prefill.get("demo_hints") or {}
+    if not h:
+        return None
     kind = pause["kind"]
-    v = h.get(f"{kind}:{pause.get('phase')}") or h.get(kind)
+    if kind == "gate":
+        opts = pause.get("options") or []
+        outcome = (pause.get("gate") or {}).get("outcome")
+        fixed = h.get(f"gate:{pause.get('phase')}")
+        if fixed in opts and fixed in ("stop", "persevere", "pivot"):
+            return fixed
+        for want in (["continue"] if outcome == "go" else []) + ["override", "continue", "retry"]:
+            if want in opts:
+                return want
+        return fixed
+    return h.get(f"{kind}:{pause.get('phase')}") or h.get(kind)
+
+
+def _hint(prefill, pause):
+    v = _hint_value(prefill, pause)
     if v:
         print(f"{G}{B}→ For this demo run, type: {v}{X}")
+    return v
 
 
 def _cli_answer(ctx, pause, prefill):
@@ -715,19 +745,26 @@ def _cli_answer(ctx, pause, prefill):
         print("What you can type:")
         for o in opts:
             print(f"  {C}{o:<14}{X} {OPTION_HELP.get(o, '')}")
-        _hint(prefill, pause)
+        hint = _hint(prefill, pause)
         c = _ask("Your choice:", opts)
+        if hint and c != hint and c == "stop":
+            if _ask(f"The demo answer here is '{hint}'. Stopping ends the run now. Really stop? Type y or n:", ["y", "n"]) != "y":
+                c = _ask("Your choice:", opts)
         ans = {"choice": c}
         if c == "override":
             default_reason = (prefill.get("override_reasons") or {}).get(str(phase), "")
             if default_reason:
                 print(f"Prepared reason: \"{default_reason}\"")
+            else:
+                print("No prepared reason for this checkpoint: type one sentence saying why you continue.")
             r = ""
             while len(r) < 20:
                 r = _ask("Type your reason (at least 20 characters), or press Enter to use the prepared one:", default=default_reason)
             ans["reason"] = r
             if phase == 4:
-                ans["experimental_price"] = _ask("Experimental price in USD (labelled ASSUMPTION), e.g. 19:")
+                dp = str(prefill.get("experimental_price") or "")
+                ans["experimental_price"] = _ask("Experimental price in USD (labelled ASSUMPTION)"
+                                                 + (f", press Enter for {dp}:" if dp else ", e.g. 19:"), default=dp or None)
                 ans["currency"] = "USD"
         return ans
     if kind == "approval":

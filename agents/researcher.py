@@ -6,7 +6,8 @@ Routine:
 2. Log `define_research_criteria` with every threshold BEFORE the first search (DIS-2).
 3. Search HN Algolia, Stack Exchange and GitHub issues in parallel; Wikipedia for background only.
 4. If coverage is thin, one automatic retry with broadened terms (DIS-6).
-5. Drop items without a URL, dedupe, register every item with a source ID.
+5. Drop items without a URL, register every item with a source ID, and count identical or
+   near-identical excerpts (Jaccard >= 0.85) once, so duplicates cannot inflate the evidence count.
 6. Fetch and register founder evidence URLs; a URL that does not load is not registered.
 """
 import re
@@ -62,7 +63,7 @@ def run(ctx):
                 else:
                     res[k]["items"] += v["items"]
         q = q + " | " + q2
-    demand_ids, per_source = [], {}
+    demand_ids, per_source, seen, dupes = [], {}, [], []
     for name, r in res.items():
         use = "background" if r.get("background_only") else "demand"
         for it in r["items"]:
@@ -71,6 +72,12 @@ def run(ctx):
             sid = sources.register(ctx, url=it["url"], source=name, status=r["status"], title=it.get("title", ""),
                                    excerpt=it.get("excerpt", ""), use=use)
             if use == "demand" and sid not in demand_ids:
+                words = _words(it.get("title", "") + " " + it.get("excerpt", ""))
+                twin = next((s for s, w in seen if _same(words, w)), None)
+                if twin:                      # duplicate text is one piece of evidence, not two
+                    dupes.append({"dropped": sid, "duplicate_of": twin})
+                    continue
+                seen.append((sid, words))
                 demand_ids.append(sid)
                 per_source[name] = per_source.get(name, 0) + 1
     for ev in brief.get("founder_evidence") or []:
@@ -81,7 +88,9 @@ def run(ctx):
     coverage = {"sources_ok": sum(1 for k, r in res.items() if r["status"] == 200 and not r.get("background_only")),
                 "items_screened": len(demand_ids), "raw_hits": {k: len(r["items"]) for k, r in res.items()},
                 "failed": [f"{k} ({r['error']})" for k, r in res.items() if r["status"] != 200],
-                "retry_used": retry_used, "query": q}
+                "retry_used": retry_used, "query": q, "duplicates_removed": len(dupes)}
+    if dupes:
+        ctx.log("researcher", "remove_duplicate_evidence", duplicates=dupes)
     ctx.log("researcher", "search_sources", sources=[ctx.sources[s]["url"] for s in demand_ids[:25]],
             coverage=coverage)
     # Keyword pre-screen in code picks the excerpts the model reads (at most 20).
@@ -89,6 +98,17 @@ def run(ctx):
     ranked = sorted(demand_ids, key=lambda s: -len(terms & set(re.findall(r"[a-z]{4,}", ctx.sources[s]["excerpt"].lower()))))
     return {"coverage": coverage, "demand_ids": demand_ids, "to_screen": ranked[:th["max_excerpts_to_model"]],
             "thresholds": th, "per_source": per_source}
+
+
+def _words(text):
+    return set(re.findall(r"[a-z]{2,}|\d+", re.sub(r"<[^>]+>", " ", (text or "").lower())))
+
+
+def _same(a, b):
+    """Identical or near-identical excerpts (Jaccard >= 0.85 on word sets) count once."""
+    if not a or not b:
+        return False
+    return a == b or (min(len(a), len(b)) >= 6 and len(a & b) / len(a | b) >= 0.85)
 
 
 def _coverage(res):

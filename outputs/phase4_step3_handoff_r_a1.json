@@ -1,0 +1,26 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "price": 19.0,
+  "currency": "USD",
+  "price_basis": "ASSUMPTION: experimental price set by founder override",
+  "policies": {
+    "terms": {
+      "path": "outputs/phase4_step2_policy_terms_r_a1.md",
+      "sha256": "bee927e042e4f0e0061b145ed77c9f501c666d20e8a590d2bfb4a2c51b02d588"
+    },
+    "privacy": {
+      "path": "outputs/phase4_step2_policy_privacy_r_a1.md",
+      "sha256": "92d58edd65fe0572d6fa4eb2796d59f8fc1d60ebf8890923b6cb2c8dc12a8e67"
+    },
+    "refund": {
+      "path": "outputs/phase4_step2_policy_refund_r_a1.md",
+      "sha256": "bd8b8eda8ed6027cd8a1620749ce95e52843a767ccd2126833432b66a31653d4"
+    },
+    "delivery": {
+      "path": "outputs/phase4_step2_policy_delivery_r_a1.md",
+      "sha256": "f6f062104678b7e9fe085a6bd386bf57d588c2b56cba26afb12356c0c16a072d"
+    }
+  },
+  "policy_status": "DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice",
+  "payments": "none: MOCKED ledger only"
+}

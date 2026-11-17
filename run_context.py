@@ -11,7 +11,7 @@ import json
 import os
 import re
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import fields, dataclass, field, asdict
 from datetime import datetime, timezone
 
 import config
@@ -115,7 +115,7 @@ class RunContext:
         elif ext == "csv" and isinstance(content, list):
             body = content
         else:
-            body = content if ext in ("json", "csv") else self.stamp(content)
+            body = content if ext in ("json", "csv") or (ext == "html" and OVERRIDE_BANNER in content) else self.stamp(content)
             if ext == "csv" and self.overridden:
                 body = _csv_banner(body)
         odir = config.outputs_dir()
@@ -161,7 +161,8 @@ class RunContext:
     @classmethod
     def from_json(cls, s):
         d = json.loads(s)
-        return cls(**d)
+        known = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in d.items() if k in known})
 
     def save(self):
         d = os.path.join(config.state_dir(), "runs")

@@ -1,16 +1,14 @@
 """One model client for every agent (SRS 4.2, runbook section 2a).
 
-Tiers, in LLM_ORDER (default nvidia,local):
-  1 nvidia  NVIDIA Build free tier, OpenAI-compatible, NVIDIA_MODEL (google/gemma-4-31b-it)
-  2 local   llama.cpp `llama-server` (OpenAI-compatible) serving Gemma 4 26B A4B Q4_K_M
+Provider: a llama.cpp `llama-server` on this machine (OpenAI-compatible HTTP on loopback or the
+compose network). Model: whatever open-weight GGUF that server loads; the default Docker setup uses
+Qwen3 4B Instruct 2507 (Q4_K_M, CPU-friendly) and the GPU setup uses Gemma 4 26B A4B (Q4_K_M).
+No hosted or paid API is called, so no prompt, brief or excerpt leaves the machine through the model.
 
-Switching rules (MOD-4): a tier without a key is skipped silently; the remote tier out of quota
-(rate-limit headers or HTTP 429), lagging (no answer within LLM_REMOTE_TIMEOUT_S), returning 5xx
-or 401/403 -> local tier at once; invalid output -> one retry on
-the same tier, then next tier; at most LLM_MAX_ATTEMPTS_PER_CALL attempts; no attempt starts with
-less than LLM_MIN_ATTEMPT_S left in the segment or run budget. All calls of one task stay on one
-tier (MOD-5); a mid-task switch raises TierSwitched and `run_task` restarts the task.
-No key or auth header ever reaches a log, progress event or exception (LOG-4).
+Call rules: invalid output -> one retry with the validation error appended; at most
+LLM_MAX_ATTEMPTS_PER_CALL attempts; no attempt starts with less than LLM_MIN_ATTEMPT_S left in the
+segment or run budget; a timeout or HTTP error raises ModelError, which the orchestrator turns into
+`repeat` (never `stop`). `run_task` keeps the multi-call task API used by the agents.
 """
 import json
 import os
@@ -20,6 +18,7 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+from urllib.parse import urlsplit
 
 import config
 import validate as V
@@ -42,24 +41,19 @@ class TierSwitched(Exception):
 
 # ------------------------------------------------------------------ tiers
 def tiers():
-    out = []
-    for name in config.llm_order():
-        if name == "nvidia":
-            out.append(dict(name="nvidia", n=1, provider="nvidia", local=False,
-                            base=config.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
-                            model=config.get("NVIDIA_MODEL", "google/gemma-4-31b-it"),
-                            key=config.get("NVIDIA_API_KEY", ""),
-                            extra=_json_env("NVIDIA_EXTRA_BODY", '{"chat_template_kwargs": {"enable_thinking": false}}')))
-        elif name in ("local", "ollama", "llamacpp"):
-            out.append(dict(name="local", n=2, provider="llamacpp", local=True,
-                            base=config.get("LOCAL_BASE_URL", "http://127.0.0.1:8080/v1"),
-                            model=config.get("LOCAL_MODEL", "gemma-4-26b-a4b-it-q4_k_m"),
-                            key="local",
-                            extra=_json_env("LOCAL_EXTRA_BODY", '{"chat_template_kwargs": {"enable_thinking": false}}')))
-    for t in out:
-        if GPT_RE.search(t["model"]):
-            raise RuntimeError(f"GPT-family models are not allowed on any tier (MOD-3): {t['name']}")
-    return out
+    """The single local tier. LLM_ORDER is kept for compatibility; any non-local name is ignored."""
+    local_base = config.get("LOCAL_BASE_URL", "http://127.0.0.1:8080/v1")
+    parsed = urlsplit(local_base)
+    if (parsed.scheme not in ("http", "https") or parsed.hostname not in
+            ("localhost", "127.0.0.1", "::1", "llm", "host.docker.internal") or
+            parsed.path.rstrip("/") != "/v1" or parsed.username or parsed.password):
+        raise RuntimeError("LOCAL_BASE_URL must point to a loopback host or the local llama service")
+    t = dict(name="local", n=1, provider="llamacpp", local=True, base=local_base,
+             model=config.get("LOCAL_MODEL", "qwen3-4b-instruct-2507-q4_k_m"), key="local",
+             extra=_json_env("LOCAL_EXTRA_BODY", '{"chat_template_kwargs": {"enable_thinking": false}}'))
+    if GPT_RE.search(t["model"]):
+        raise RuntimeError("GPT-family models are not allowed (MOD-3)")
+    return [t]
 
 
 def _json_env(name, default):
@@ -69,8 +63,30 @@ def _json_env(name, default):
         return {}
 
 
+_served = {}
+
+
+def served_model(t, timeout=2):
+    """The model id llama-server reports at /v1/models (its GGUF file name), cached per base URL,
+    so the decision log names the model that really answered, not a configured guess."""
+    if t["base"] in _served:
+        return _served[t["base"]]
+    name = None
+    try:
+        with urllib.request.urlopen(t["base"].rstrip("/") + "/models", timeout=timeout) as r:
+            data = json.loads(r.read().decode("utf-8", "replace"))
+        ids = [m.get("id") for m in data.get("data", []) if m.get("id")]
+        if ids:
+            name = os.path.basename(ids[0]).removesuffix(".gguf").lower()
+    except Exception:  # noqa: BLE001 - fall back to LOCAL_MODEL
+        name = None
+    if name:
+        _served[t["base"]] = name
+    return name or t["model"]
+
+
 def model_label(t):
-    return f"tier{t['n']}/{t['provider']}/{t['model']}"
+    return f"local/{t['provider']}/{served_model(t) if _transport is _http_post else t['model']}"
 
 
 # ------------------------------------------------------------------ process state
@@ -80,6 +96,7 @@ _clock = time.monotonic
 
 def reset_state():
     _state.update(cooldown={}, disabled=set(), headers={}, pins={})
+    _served.clear()
 
 
 def set_fake(fn):
@@ -130,37 +147,10 @@ def status():
     return out
 
 
-def probe_remote(timeout=4):
-    """Once per segment: a cheap GET /models on each remote tier. A tier that does not answer is
-    cooled down (or disabled on 401/403) before any agent call, so a failing provider costs seconds,
-    not one timeout per call."""
-    out = {}
-    for t in tiers():
-        if t["local"] or not available(t):
-            continue
-        req = urllib.request.Request(t["base"].rstrip("/") + "/models", headers={"Authorization": "Bearer " + t["key"]})
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                out[t["name"]] = "ok" if r.status == 200 else f"HTTP {r.status}"
-        except urllib.error.HTTPError as e:
-            out[t["name"]] = f"HTTP {e.code}"
-            if e.code in (401, 403):
-                _state["disabled"].add(t["name"])
-            else:
-                _cool(t["name"], config.cooldown_default())
-        except Exception as e:  # noqa: BLE001
-            out[t["name"]] = type(e).__name__
-            _cool(t["name"], config.cooldown_default())
-    return out
-
-
-def has_remote_key():
-    return any(t["key"] and not t["local"] for t in tiers())
-
-
 def local_ready(timeout=2):
     """('ready' | 'loading' | 'unreachable', detail) from llama-server's /health."""
-    base = config.get("LOCAL_BASE_URL", "http://127.0.0.1:8080/v1")
+    base = tiers()
+    base = next((t["base"] for t in base if t["local"]), "http://127.0.0.1:8080/v1")
     url = re.sub(r"/v1/?$", "", base) + "/health"
     try:
         with urllib.request.urlopen(url, timeout=timeout) as r:
@@ -389,7 +379,7 @@ def ask(system, user, schema, agent, action, *, ctx, sources=(), task_id=None,
             _state["pins"].pop(pin_key, None)
             raise TierSwitched("; ".join(reasons))
     if not reasons:
-        reasons.append("no model tier available (no key, disabled or cooling down)")
+        reasons.append("local model not available (cooling down after an error)")
     _fail_log(ctx, agent, action, reasons, attempts)
     raise ModelError(reasons)
 

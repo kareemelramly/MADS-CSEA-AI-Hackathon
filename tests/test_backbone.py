@@ -6,6 +6,7 @@ import pytest
 
 import approval
 import log
+import orchestrator
 from run_context import RunContext
 
 
@@ -29,6 +30,12 @@ def test_log_never_contains_keys(env):
     raw = open(env / "decision_log.json").read()
     assert "abcdefghijklmnop" not in raw and "nvapi-123" not in raw
 
+
+def test_old_saved_run_with_unknown_keys_still_loads(env):
+    ctx = orchestrator.new_run({"idea": "public demo idea"}, "t")
+    d = json.loads(ctx.to_json())
+    d["remote_model_consent"] = True          # field from an older version
+    assert RunContext.from_json(json.dumps(d)).run_id == ctx.run_id
 
 def test_write_once_and_attempts(env):
     c = ctx()

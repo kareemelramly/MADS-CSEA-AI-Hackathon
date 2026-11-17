@@ -10,6 +10,10 @@ Rules for every task:
 TASK screen:
 1. For each excerpt, decide if it shows a real person describing a problem, need or workaround that the founder's idea would address.
 2. Set "relevant": true only for that; generic news, ads, tutorials and off-topic items are false.
+   Set "signal": "request" (someone asks for a solution), "complaint" (someone describes the problem),
+   "workaround" (someone describes a manual fix), "launch_or_ad" (someone announces or sells a product:
+   that is supply, not demand) or "other". Feature tickets in a developer's own hobby or hackathon repository
+   are "other". Only request, complaint and workaround count as demand.
 3. Write "pain_point" as one short neutral sentence describing the problem in the excerpt (empty string if not relevant).
 4. Use the excerpt's source_id exactly. One item per excerpt.
 
@@ -20,6 +24,9 @@ TASK score:
    - time: whether the stated hours per week are enough;
    - values: how well it fits the founder's stated values (1 means it conflicts with them).
 2. Alternatives should reuse the same evidence where it applies; cite the relevant source IDs in "source_ids".
-3. "segment": who has the pain, in one sentence, citing source IDs or marked assumption.
-4. "market_note": one sentence about the market. Do not estimate market size unless an excerpt states it; otherwise mark it assumption.
+   Reasons must come from the brief (skills, budget, hours, values). Do not state general facts about costs or
+   markets in a reason; if you must, start the reason with "ASSUMPTION:".
+3. "segment": who has the pain, in one sentence, citing source IDs or marked assumption. Name a country or
+   region only if a cited excerpt mentions it.
+4. "market_note": one sentence about the market. Do not estimate market size unless an excerpt states it; otherwise mark it assumption. State the geography represented by the cited evidence. If the excerpts do not establish demand in the founder's target country or region, say so and mark local demand as unknown; global or English-language discussion is not local market validation.
 5. You do not compute the weighted score and you do not recommend go or stop: code does that.

@@ -1,0 +1,20 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "run_id": "20261117T194739Z-r",
+  "gate": {
+    "gate": "phase3_gate",
+    "outcome": "go",
+    "verdict": "All 14 applicable checks pass (QA-07 not applicable to A1). Release needs founder approval.",
+    "reasons": [
+      "qa_pass"
+    ],
+    "numbers": {
+      "checks_applicable": 14,
+      "checks_failed": 0,
+      "attempt": 1,
+      "max_attempts": 3
+    },
+    "overridable": false,
+    "nothing_decided": false
+  }
+}

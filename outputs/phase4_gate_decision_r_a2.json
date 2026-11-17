@@ -1,0 +1,19 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "run_id": "20261117T194739Z-r",
+  "gate": {
+    "gate": "phase4_gate",
+    "outcome": "go",
+    "verdict": "Price 19.0 set from ASSUMPTION (founder override, experimental). Policies are DRAFT. Commercial approval authorizes the internal hand-off only; nothing is signed.",
+    "reasons": [
+      "ok"
+    ],
+    "numbers": {
+      "paid_quotes": 2,
+      "required_quotes": 3,
+      "price": 19.0
+    },
+    "overridable": true,
+    "nothing_decided": false
+  }
+}

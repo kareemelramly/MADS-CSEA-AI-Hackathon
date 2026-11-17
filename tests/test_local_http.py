@@ -24,6 +24,10 @@ class H(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b'{"status":"ok"}')
+        elif self.path == "/v1/models":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'{"data":[{"id":"/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"}]}')
         else:
             self.send_response(404)
             self.end_headers()
@@ -35,7 +39,7 @@ class H(BaseHTTPRequestHandler):
         user = body["messages"][-1]["content"]
         ids = re.findall(r"\[(S\d{3})\]", user)
         if "screen" in body["messages"][0]["content"].split("TASK:")[-1][:20]:
-            out = {"items": [{"source_id": i, "relevant": True, "pain_point": "Planner loses track of vendor deadlines"} for i in ids[:5]]}
+            out = {"items": [{"source_id": i, "relevant": True, "pain_point": "Planner loses track of vendor deadlines", "signal": "request"} for i in ids[:5]]}
         else:
             out = gen(schema, ids)
         resp = {"choices": [{"message": {"role": "assistant", "content": json.dumps(out)}}],
@@ -69,6 +73,8 @@ def test_full_run_over_local_http(env, server, fake_sources):
     assert SEEN and all(s["response_format"]["type"] == "json_schema" for s in SEEN)
     assert all("Authorization" not in json.dumps(s) for s in SEEN)
     log = json.load(open(env / "decision_log.json"))
-    calls = [e for e in log if (e.get("model") or "").startswith("tier2/llamacpp/")]
+    calls = [e for e in log if (e.get("model") or "").startswith("local/llamacpp/")]
     assert len(calls) == len(SEEN) <= 16
     assert all(e["cost"] == 0 and e["prompt_tokens"] > 0 for e in calls)
+    # The log names the model the server really loaded, read from /v1/models.
+    assert all(e["model"] == "local/llamacpp/qwen3-4b-instruct-2507-q4_k_m" for e in calls)

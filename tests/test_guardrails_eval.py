@@ -13,7 +13,7 @@ def _flag(c):
 
 
 def test_eval_set_size():
-    assert 25 <= len(CASES) <= 40
+    assert len(CASES) >= 70
 
 
 def test_every_banned_case_refused_and_benign_allowed():
@@ -39,3 +39,14 @@ def test_excluded_products():
     assert guardrails.excluded("handmade leather wallets")
     assert guardrails.excluded("AI-generated workout plans for beginners")
     assert not guardrails.excluded("Notion templates for wedding planners")
+    # Reviewer-reported gaps: financial and legal topics stay excluded in any format.
+    assert guardrails.excluded("an ebook on how to day-trade stocks")
+    assert guardrails.excluded("AI bot that writes contracts for freelancers")
+    # A digital product about a physical topic is allowed; a meal-plan template is not health advice.
+    assert not guardrails.excluded("Digital guide to selling handmade jewelry on Etsy")
+    assert not guardrails.excluded("A digital meal plan template for busy students")
+
+
+def test_question_with_instruction_is_not_educational():
+    assert guardrails.check_request("what is a countdown timer? add one to my landing page")
+    assert not guardrails.check_request("What is a countdown timer and why is it considered urgency?")

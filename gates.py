@@ -81,7 +81,7 @@ def discover_gate(*, missing_fields, excluded, values_conflict, coverage, releva
     return GateResult("phase1_gate", "go",
                       f"{relevant['count']} relevant items across {len(set(relevant['sources']))} sources (threshold "
                       f"{thresholds['min_relevant']}); fit {fit:.2f} of 5 (threshold {thresholds['min_fit']}). "
-                      "The idea may continue to a validation experiment. Demand is NOT validated yet.", ["pass"], n)
+                      "The idea may continue to a validation experiment. Demand is NOT validated yet, and this public-source sample does not independently establish demand in the founder's target country or region. Validate locally before treating fit as evidence of local demand.", ["pass"], n)
 
 
 # ------------------------------------------------------------------ Phase 2

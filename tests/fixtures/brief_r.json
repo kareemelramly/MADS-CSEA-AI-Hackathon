@@ -18,7 +18,10 @@
     },
     "override_reasons": {
       "1": "Founder accepts weak public evidence to see the rest of the pipeline in a demo run",
-      "2": "No experiment has run yet; founder overrides to see the remaining phases in a demo run"
+      "2": "No experiment has run yet; founder overrides to see the remaining phases in a demo run",
+      "3": "Founder accepts the build result to see the remaining phases in a demo run",
+      "4": "Fewer than three competitor prices loaded; founder sets an experimental demo price of 19 USD",
+      "5": "Founder continues the demo run to see the Operate phase with mock data only"
     },
     "p4_quotes": [
       {
@@ -72,15 +75,16 @@
     },
     "p6_metrics": [],
     "demo_hints": {
-      "gate:1": "continue (or override if it says STOP/PIVOT)",
+      "gate:1": "continue",
       "gate:2": "override",
       "gate:3": "continue",
-      "gate:4": "retry",
-      "gate:5": "retry",
+      "gate:4": "continue",
+      "gate:5": "continue",
       "gate:6": "stop",
       "approval": "approve",
       "input": "y",
       "error": "try_again"
-    }
+    },
+    "experimental_price": 19
   }
 }

@@ -1,0 +1,19 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "run_id": "20261117T194739Z-r",
+  "gate": {
+    "gate": "phase4_gate",
+    "outcome": "repeat",
+    "verdict": "Only 2 verified paid one-time competitor prices (need 3). No price is set; add quotes or override with an experimental price labelled ASSUMPTION.",
+    "reasons": [
+      "price_evidence_thin"
+    ],
+    "numbers": {
+      "paid_quotes": 2,
+      "required_quotes": 3,
+      "price": null
+    },
+    "overridable": true,
+    "nothing_decided": true
+  }
+}

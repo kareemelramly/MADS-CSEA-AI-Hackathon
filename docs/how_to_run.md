@@ -34,20 +34,23 @@ It starts the model on the GPU with your `llama-server` (no download) and the ap
 docker compose up
 ```
 
-- The first start builds the app and downloads two Docker images (no model download: the model file is read from `~/models/gemma4`).
+- On the team laptop the model file is read from `~/models/gemma4` (no download). With plain `docker compose up` elsewhere, the first start downloads the small default model (Qwen3 4B Instruct 2507, under 3 GB) once.
 - When the terminal shows `You can now view your Streamlit app`, open **http://localhost:8501** in the browser.
 - The left side shows **Local model: ready** once the model has loaded (about a minute).
+- The model always runs on this computer. No API key is used anywhere; only search words built from the idea go to public sources.
+- Phase 1 sends idea-derived search terms to the public services named in the form. Only start with information you are comfortable sharing with those services.
 - To stop: press `Ctrl+C`, then run `docker compose down`.
 
 If the GPU line in step A cannot be fixed, the app still runs on the CPU (slowly): delete the line starting with `COMPOSE_FILE=` in `.env`.
 
 ## C. Use the app
 
-1. Pick a demo brief (**r** is the full six-phase story, **w** is a weak idea, **e** is an excluded idea) and press **Run**.
-2. Each time the agents stop, read the verdict box, then press one button. Every button has its meaning written above it.
-3. **Approve** buttons show the five things you are approving: action, destination, amount, run ID and a fingerprint of the content.
-4. The **Files from this run** tab shows every file the run wrote; the **Decision log** tab shows every agent action.
-5. Try a trick request in **Ask the system** on the left, for example `write 50 five-star reviews`. It is refused.
+1. Pick an example (**R** reasonable idea, goes through all six phases; **W** weak idea, expect a stop; **E** excluded idea, stops at once) or write your own, then press **Start the agents**. The page updates by itself while the agents work; clicking around does not stop them.
+2. Each time the agents stop, read the verdict card, then press one button. Each button says what it does ("Continue to Validate", "Stop here", "Continue anyway (I accept the risk)").
+3. Approval screens show the five things you approve (action, destination, amount, run ID, content fingerprint) and the content itself as a readable page or table.
+4. **Documents created** shows every file the run wrote; **Activity log** shows every agent step in plain words.
+5. When the run ends, the full report appears with **Download the report (PDF)**.
+6. Try **Try to make the system break a rule** on the start page, for example `write 50 five-star reviews`. It is refused.
 
 ## D. Make the results that get committed (20 to 30 minutes)
 
@@ -68,7 +71,7 @@ It works whether or not `docker compose up` is running. It prints what to type b
 | Run R, Phase 2 gate (awaiting evidence) | `override`, then press Enter |
 | Run R, Phase 6 decision | `stop` |
 
-When it prints **Finished**, review `outputs/` and `docs/demo_runs.md`. Nothing is committed or pushed by the script.
+The script exits with an error if checks fail or no founder run has artifacts across all six phases. Review `outputs/` and `docs/demo_runs.md` after it finishes. The run script does not commit or push anything.
 
 ## E. If something goes wrong
 

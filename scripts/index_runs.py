@@ -24,6 +24,10 @@ def main():
             m = re.search(r"phase([1-6])_", os.path.basename(e["path"]))
             if m:
                 r.setdefault("phases", set()).add(int(m.group(1)))
+        if rid.startswith("payment-test-"):
+            payment_log = "outputs/payment_test_log.md"
+            if os.path.isfile(os.path.join(ROOT, payment_log)) and payment_log not in r["files"]:
+                r["files"].append(payment_log)
         if e.get("model"):
             r["tiers"].add(e["model"])
         if e["action"] == "end_run":
@@ -41,11 +45,17 @@ def main():
         if not r["brief"]:
             continue
         ph = max(r.get("phases") or {0})
-        summary.append(f"- `{rid}` ({r['brief'][:60]}): reached Phase {ph} of 6; final outcome `{r['outcome']}`; gates: {'; '.join(r['gates']) or 'none'}.")
-    full = any(max(r.get("phases") or {0}) == 6 for r in runs.values())
+        brief = str(r["brief"]).replace("`", "\\`").replace("\n", " ").replace("|", "\\|")
+        if len(brief) > 100:
+            brief = brief[:97].rstrip() + "…"
+        phases = sorted(r.get("phases") or set())
+        phase_text = ", ".join(str(p) for p in phases) or "none"
+        summary.append(f"- `{rid}` ({brief}): artifacts in phases {phase_text}/6; final outcome `{r['outcome']}`; gates: {'; '.join(r['gates']) or 'none'}.")
+    required_phases = set(range(1, 7))
+    full = any(required_phases.issubset(r.get("phases", set())) for r in runs.values())
     text = ("Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):\n\n" + "\n".join(summary) +
-            ("\n\nAt least one committed run went through all six phases." if full else
-             "\n\nNo committed run has reached Phase 6 yet, so the committed evidence does not demonstrate a complete six-phase run."))
+            ("\n\nAt least one committed run has recorded artifacts in all six phases." if full else
+             "\n\nNo committed run has artifacts across all six phases, so the committed evidence does not demonstrate a complete six-phase run."))
     rp = os.path.join(ROOT, "README.md")
     txt = open(rp, encoding="utf-8").read()
     txt = re.sub(r"(<!-- runs:start -->\n).*?(\n<!-- runs:end -->)", lambda m: m.group(1) + text + m.group(2), txt, flags=re.S)

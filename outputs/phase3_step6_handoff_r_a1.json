@@ -1,0 +1,50 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "manifest": {
+    "run_id": "20261117T194739Z-r",
+    "product": "Notion Wedding Planner Pack",
+    "archetype": "A1",
+    "product_type": "checklist",
+    "delivery_format": {
+      "kind": "download",
+      "file_types": [
+        "md",
+        "csv",
+        "txt"
+      ]
+    },
+    "license": "MIT",
+    "files": [
+      {
+        "role": "checklist",
+        "path": "outputs/phase3_step3_product_checklist_r_a1.md",
+        "sha256": "ca1c4522a650e4bc3b26bd086cbbba27c8f51efff47948094396c1c065ed362b"
+      },
+      {
+        "role": "tracker",
+        "path": "outputs/phase3_step3_product_tracker_r_a1.csv",
+        "sha256": "99bdf1d53ef4902971ad5348d471e4fb22a7fd39582c99281e3db318d5169086"
+      },
+      {
+        "role": "license",
+        "path": "outputs/phase3_step3_product_license_r_a1.txt",
+        "sha256": "fb18e9ce27988398b59d4df2e82feb69e450fd662433e73e1d06412fb728e5bd"
+      },
+      {
+        "role": "docs",
+        "path": "outputs/phase3_step4_user_docs_r_a1.md",
+        "sha256": "f1b31116aa8327e263b24bd87e415a321cd3dc38d9426fbc4ed35546e59a7fae"
+      }
+    ],
+    "validation_status": "UNVALIDATED_FOUNDER_OVERRIDE"
+  },
+  "manifest_sha256": "03710d0802721d739ca0db8a555ce4c9146ded9d93afcac4a5980e3ad7de1809",
+  "build_mode": "minimal",
+  "validation_status": "UNVALIDATED_FOUNDER_OVERRIDE",
+  "product_type": "checklist",
+  "archetype": "A1",
+  "test_report_ref": {
+    "path": "outputs/phase3_step5_test_report_r_a1.md",
+    "sha256": "31f47f62d3ce3a5b345a0159c26dc4e5737b38f12485aae0de57a81b609e8787"
+  }
+}

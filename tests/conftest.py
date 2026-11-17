@@ -96,7 +96,7 @@ class FakeLLM:
         if action == "screen_evidence":
             rel = self.relevant
             return {"items": [{"source_id": i, "relevant": (rel(i) if callable(rel) else rel),
-                               "pain_point": f"Person describes difficulty tracking tasks ({i})"} for i in ids[:5]]}
+                               "pain_point": f"Person describes difficulty tracking tasks ({i})", "signal": "complaint"} for i in ids[:5]]}
         return gen(schema, ids)
 
 
@@ -121,11 +121,11 @@ class FakeSources:
         n = self.per if self.scenario == "rich" else 3
         if "hn.algolia.com" in url:
             return 200, json.dumps({"hits": [{"objectID": f"{1000 + i}", "title": f"Ask HN: planning tool pain {i}",
-                                              "comment_text": f"I keep losing track of vendors and deadlines {i}"} for i in range(n)]})
+                                              "comment_text": f"I keep losing track of vendors and deadlines (case {i}, {i * 7} vendors, {i * 13 + 5} tasks)"} for i in range(n)]})
         if "api.stackexchange.com" in url:
             if self.scenario == "thin":
                 return 200, json.dumps({"items": [{"question_id": 50 + i, "title": f"Tracking planner tasks {i}", "excerpt": "spreadsheet tracking"} for i in range(1)]})
-            return 200, json.dumps({"items": [{"question_id": 500 + i + (100 if "stackoverflow" in url else 0), "title": f"Template for planning tasks {i}", "excerpt": "how do I track tasks"} for i in range(n // 2)]})
+            return 200, json.dumps({"items": [{"question_id": 500 + i + (100 if "stackoverflow" in url else 0), "title": f"Template for planning tasks {i}", "excerpt": f"how do I track tasks ({'stackoverflow' if 'stackoverflow' in url else 'superuser'} {i})"} for i in range(n // 2)]})
         if "api.github.com" in url:
             if self.scenario == "thin":
                 return 403, ""

@@ -1,34 +1,36 @@
 # Phase 1 · Step 3 · Idea vs alternatives
 
-**Segment:** Independent wedding planners and newly engaged couples in Egypt seeking structured planning tools. [S001](https://news.ycombinator.com/item?id=9042959) [S002](https://news.ycombinator.com/item?id=16506549)
+**Segment:** Newly engaged individuals and independent wedding planners in Egypt seeking organization tools [S002]. [S002](https://news.ycombinator.com/item?id=16506549) (Egypt: ASSUMPTION, no cited source mentions it)
 
-**Market:** There is a demand for high-quality, non-SEO-driven wedding planning tools and streamlined management services. [S005](https://news.ycombinator.com/item?id=4853598) Market size is unknown unless a source above states it.
+**Market:** The market shows demand for planning assistance [S002] and current manual workarounds via Pinterest [S016], though local demand in Egypt is not explicitly validated by the English-language excerpts. [S002](https://news.ycombinator.com/item?id=16506549) [S016](https://news.ycombinator.com/item?id=9489126) (Egypt: ASSUMPTION, no cited source mentions it) Market size is unknown unless a source above states it.
+
+**Target region (Egypt):** 0 of 3 demand excerpts mention it. Demand in the target region is an ASSUMPTION until local interviews or a local experiment confirm it.
 
 Fit is weighted in code: skills 35 %, budget 25 %, time 25 %, values 15 % (weights are an ASSUMPTION).
 
 | Option | Skills | Budget | Time | Values | Weighted fit (1-5) | Cites relevant evidence |
 |---|---|---|---|---|---|---|
-| Notion Wedding Planner Pack | 5 | 5 | 4 | 5 | 4.75 | 3 |
-| Visual Wedding Moodboard Service | 4 | 5 | 3 | 4 | 4.0 | 1 |
-| Wedding Vendor Directory & Review Platform | 2 | 2 | 2 | 5 | 2.45 | 1 |
+| Notion Wedding Planner Pack | 5 | 5 | 4 | 5 | 4.75 | 2 |
+| Wedding Visual Moodboard Kit | 5 | 5 | 4 | 5 | 4.75 | 1 |
+| Wedding Vendor Directory Guide | 3 | 4 | 3 | 5 | 3.55 | 1 |
 
 ## Reasons
 
-**Notion Wedding Planner Pack**: A collection of Notion templates including a planning checklist and vendor tracker specifically for the Egyptian market.
+**Notion Wedding Planner Pack**: A set of Notion templates including a planning checklist and vendor tracker specifically for wedding planners and couples.
 - skills: The founder is a Notion power user and has practical experience organizing weddings.
-- budget: Creating digital templates requires minimal upfront capital, fitting well within a 200 USD budget.
-- time: 10 hours per week is sufficient for template design and iterative testing.
-- values: The product is a utility tool that avoids hype and respects user privacy by being a self-managed workspace.
+- budget: A 200 USD budget is sufficient for creating and distributing digital Notion templates.
+- time: 10 hours per week allows for template design and content creation.
+- values: ASSUMPTION: Digital templates are low-hype and do not require collecting sensitive user data beyond Notion's own infrastructure.
 
-**Visual Wedding Moodboard Service**: A digital service providing curated, high-quality visual boards and aesthetic guides for wedding elements.
-- skills: Leverages the founder's graphic design skills and understanding of visual organization.
-- budget: Low overhead costs for digital asset creation.
-- time: Curating high-quality visual content can be time-intensive for a part-time schedule.
-- values: Aligns with providing quality over SEO-driven noise, though requires careful curation to maintain honesty.
+**Wedding Visual Moodboard Kit**: A collection of professionally designed graphic design assets and templates for Pinterest-style organization.
+- skills: Matches the founder's graphic design skills and addresses the current workaround of using Pinterest [S016].
+- budget: ASSUMPTION: Low overhead cost fits within the 200 USD budget.
+- time: 10 hours per week is adequate for asset creation.
+- values: Aligns with the founder's values of honesty and no hype.
 
-**Wedding Vendor Directory & Review Platform**: A curated digital directory of Egyptian wedding vendors with verified reviews to avoid low-quality SEO leads.
-- skills: Requires more technical development and database management than the founder's current skill set suggests.
-- budget: Building and marketing a directory platform may exceed the 200 USD budget.
-- time: Managing vendor relationships and verifying reviews is highly time-consuming.
-- values: Directly addresses the pain point of low-quality, SEO-driven industry tools by focusing on honesty.
+**Wedding Vendor Directory Guide**: A curated, high-quality digital guide of vetted wedding vendors to bypass low-quality SEO sites.
+- skills: ASSUMPTION: Requires more research and curation skills than the founder's stated technical skills.
+- budget: ASSUMPTION: Researching vendors may require small costs for verification, but fits within 200 USD.
+- time: Vetting vendors may be time-intensive for 10 hours per week.
+- values: Directly addresses the problem of low-quality, SEO-optimized lead generation sites [S005].
 

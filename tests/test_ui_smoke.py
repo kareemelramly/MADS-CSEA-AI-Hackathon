@@ -19,6 +19,14 @@ def test_home_shows_status_readiness_and_brief_form(env):
     assert any(t.label.startswith("Run name") for t in at.text_input)
 
 
+def test_no_hosted_model_option_even_with_a_key_set(env, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-testkeytestkey")
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    assert not at.exception
+    assert not list(at.checkbox)
+    assert "running on this computer" in " ".join(m.value for m in at.info)
+
+
 def _at_with_pause(env, fake_llm, fake_sources, until):
     b, pre = load_brief("r")
     ctx = orchestrator.new_run(b, "u")
@@ -81,3 +89,19 @@ def test_real_counts_form_submits_and_gate_waits(env, fake_llm, fake_sources):
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
     assert "nothing is decided" in md
+
+
+def test_finished_run_shows_final_report_and_no_raw_json(env, fake_llm, fake_sources):
+    from conftest import TestFounder, drive
+    b, pre = load_brief("r")
+    ctx = orchestrator.new_run(b, "f")
+    drive(ctx, TestFounder(pre))
+    assert ctx.finished and any("_run_report_" in a["path"] for a in ctx.artifacts)
+    at = AppTest.from_file(APP, default_timeout=30)
+    at.session_state["ctx_json"] = ctx.to_json()
+    at.session_state["pause"] = {"kind": "done"}
+    at.run()
+    assert not at.exception
+    assert "Run finished" in " ".join(m.value for m in at.markdown)
+    assert len(at.get("download_button")) >= 2
+    assert not at.get("json")          # structured data is shown as tables and text, never raw JSON

@@ -1,9 +1,13 @@
-# Optional NVIDIA GPU override (CPU stays the default). Flags are the team's measured 16 GB VRAM setup.
+# NVIDIA GPU override: the larger Gemma 4 26B A4B (Q4_K_M, about 17 GB) on CUDA. CPU + Qwen3 4B stays the default.
 # docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+# Flags are the team's measured 16 GB VRAM setup (MoE expert layers partly on CPU).
 services:
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     environment:
+      - LOCAL_MODEL_FILE=gemma-4-26B-A4B-it-UD-Q4_K_M.gguf
+      - LOCAL_MODEL_HF=unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M
+      - LOCAL_MODEL_ALIAS=gemma-4-26b-a4b-it-q4_k_m
       - LLAMA_ARGS_EXTRA=-ngl 99 --n-cpu-moe 6 -fa on --cache-type-k q8_0 --cache-type-v q8_0
     deploy:
       resources:
@@ -12,3 +16,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+  app:
+    environment:
+      - LOCAL_MODEL=gemma-4-26b-a4b-it-q4_k_m

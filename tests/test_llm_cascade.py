@@ -1,4 +1,5 @@
-"""Model cascade with fake HTTP and a fake clock: no network, no keys (SRS MOD-1 to MOD-9, PERF-2, PERF-7)."""
+"""Local model client with fake HTTP and a fake clock: no network (SRS MOD-1 to MOD-9, PERF-2, PERF-7).
+Only one provider exists: the llama.cpp server on this machine. No hosted API is called."""
 import json
 import socket
 
@@ -22,32 +23,25 @@ class Clock:
 
 
 class Net:
-    """Scripted responses per tier: list of 'ok', 'bad', '429', '401', '500', 'hang', 'lowtok'."""
+    """Scripted responses: list of 'ok', 'bad', '400', '500', 'hang'."""
 
     def __init__(self, clock, script):
-        self.clock, self.script, self.calls = clock, {k: list(v) for k, v in script.items()}, []
+        self.clock, self.script, self.calls, self.bodies = clock, list(script), [], []
 
     def __call__(self, url, headers, body, timeout):
-        tier = "nvidia" if "nvidia" in url else "local"
-        self.calls.append((tier, round(timeout, 1)))
-        assert "Authorization" not in headers or headers["Authorization"].startswith("Bearer ")
-        steps = self.script.get(tier) or ["ok"]
-        step = steps.pop(0) if len(steps) > 1 else steps[0]
+        self.calls.append((url, round(timeout, 1)))
+        self.bodies.append(body)
+        assert "Authorization" not in headers
+        step = self.script.pop(0) if len(self.script) > 1 else (self.script[0] if self.script else "ok")
         self.clock.t += 1
         if step == "ok":
             return 200, {}, GOOD
-        if step == "lowtok":
-            return 200, {"x-ratelimit-remaining-tokens": "10", "x-ratelimit-reset-tokens": "7.5s"}, GOOD
         if step == "bad":
             return 200, {}, BAD
-        if step == "429":
-            return 429, {"retry-after": "41"}, ""
-        if step == "401":
-            return 401, {}, ""
-        if step == "500":
-            return 500, {}, ""
         if step == "400":
             return 400, {}, ""
+        if step == "500":
+            return 500, {}, ""
         if step == "hang":
             self.clock.t += timeout
             raise socket.timeout("timed out")
@@ -71,11 +65,6 @@ def mkctx(clock, budget=1800):
     return c
 
 
-def keys(mp, nvidia=True):
-    if nvidia:
-        mp.setenv("NVIDIA_API_KEY", "nvapi-testkeytestkey")
-
-
 def ask(ctx, **kw):
     return llm.ask("sys", "user", SCHEMA, "tester", "act", ctx=ctx, **kw)
 
@@ -84,107 +73,70 @@ def models(env):
     return [e["model"] for e in json.load(open(env / "decision_log.json")) if e["action"] == "act"]
 
 
-def test_no_keys_uses_local_only(env, setup):
+def test_only_the_local_tier_exists_even_with_hosted_settings(env, monkeypatch):
+    monkeypatch.setenv("LLM_ORDER", "nvidia,groq,local")
+    monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-testkeytestkey")
+    ts = llm.tiers()
+    assert [t["name"] for t in ts] == ["local"] and ts[0]["local"]
+
+
+def test_local_answer_is_logged_with_model_and_zero_cost(env, setup):
     clock, mp = setup
-    net = Net(clock, {})
+    net = Net(clock, ["ok"])
     llm.set_transport(net)
     assert ask(mkctx(clock)) == {"answer": "ok"}
-    assert [c[0] for c in net.calls] == ["local"]
-    assert models(env)[0].startswith("tier2/llamacpp/")
+    assert len(net.calls) == 1 and net.calls[0][0].endswith("/v1/chat/completions")
+    entry = [e for e in json.load(open(env / "decision_log.json")) if e["action"] == "act"][0]
+    assert entry["model"].startswith("local/llamacpp/") and entry["cost"] == 0
+    assert net.bodies[0]["response_format"]["type"] == "json_schema"
 
 
-def test_remote_429_goes_to_local_at_once(env, setup):
+def test_bad_json_retries_once_with_the_error(env, setup):
     clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["429"]})
+    net = Net(clock, ["bad", "ok"])
     llm.set_transport(net)
-    ask(mkctx(clock))
-    assert [c[0] for c in net.calls] == ["nvidia", "local"]
-    e = json.load(open(env / "decision_log.json"))[-1]
-    assert e["fallback_from"] == "nvidia" and e["fallback_reason"] == "429"
+    assert ask(mkctx(clock)) == {"answer": "ok"}
+    assert len(net.calls) == 2
+    assert "previous answer was rejected" in net.bodies[1]["messages"][1]["content"]
 
 
-def test_tokens_low_skips_remote_next_call(env, setup):
+def test_bad_json_twice_is_model_error(env, setup):
     clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["lowtok"]})
+    net = Net(clock, ["bad", "bad", "ok"])
     llm.set_transport(net)
-    c = mkctx(clock)
-    ask(c)
-    net.calls.clear()
-    ask(c)
-    assert [x[0] for x in net.calls] == ["local"]
+    with pytest.raises(llm.ModelError):
+        ask(mkctx(clock))
+    assert len(net.calls) == 2
 
 
-def test_remote_lag_moves_to_local(env, setup):
+def test_server_error_is_model_error(env, setup):
     clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["hang"]})
-    llm.set_transport(net)
-    ask(mkctx(clock))
-    assert [c[0] for c in net.calls] == ["nvidia", "local"]
-    assert net.calls[0][1] <= 20
-
-
-def test_401_disables_tier(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["401"]})
-    llm.set_transport(net)
-    c = mkctx(clock)
-    ask(c)
-    net.calls.clear()
-    ask(c)
-    assert "nvidia" not in [x[0] for x in net.calls]
-    assert any(s["name"] == "nvidia" and s["disabled"] for s in llm.status())
-
-
-def test_cooldown_expiry_returns_to_remote(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["429", "ok"]})
-    llm.set_transport(net)
-    c = mkctx(clock)
-    ask(c)
-    clock.t += 60
-    net.calls.clear()
-    ask(c)
-    assert net.calls[0][0] == "nvidia"
-
-
-def test_bad_json_twice_moves_tier(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["bad", "bad", "ok"]})
-    llm.set_transport(net)
-    ask(mkctx(clock))
-    assert [c[0] for c in net.calls] == ["nvidia", "nvidia", "local"]
-
-
-def test_all_fail_is_model_error_and_repeat(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["500"], "local": ["500"]})
-    llm.set_transport(net)
+    llm.set_transport(Net(clock, ["500"]))
     with pytest.raises(llm.ModelError):
         ask(mkctx(clock))
 
 
+def test_400_retries_without_extras_then_plain_json(env, setup):
+    clock, mp = setup
+    net = Net(clock, ["400", "400", "ok"])
+    llm.set_transport(net)
+    assert ask(mkctx(clock)) == {"answer": "ok"}
+    assert "chat_template_kwargs" in net.bodies[0] and "chat_template_kwargs" not in net.bodies[1]
+    assert "response_format" not in net.bodies[2]
+
+
 def test_max_attempts_per_call(env, setup):
     clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["bad"], "local": ["bad"]})
+    net = Net(clock, ["bad"])
     llm.set_transport(net)
     with pytest.raises(llm.ModelError):
         ask(mkctx(clock))
     assert len(net.calls) <= 4
 
 
-def test_budget_bounds_hanging_tiers(env, setup):
+def test_budget_bounds_a_hanging_server(env, setup):
     clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["hang"], "local": ["hang"]})
-    llm.set_transport(net)
+    llm.set_transport(Net(clock, ["hang"]))
     c = mkctx(clock, budget=30)
     start = clock.t
     with pytest.raises(llm.ModelError):
@@ -192,45 +144,32 @@ def test_budget_bounds_hanging_tiers(env, setup):
     assert clock.t - start <= 30 + 1
 
 
-def test_no_key_in_logs_events_or_errors(env, setup):
+def test_no_attempt_starts_without_budget(env, setup):
     clock, mp = setup
-    keys(mp)
-    events = []
-    net = Net(clock, {"nvidia": ["401"], "local": ["500"]})
+    net = Net(clock, ["ok"])
     llm.set_transport(net)
+    c = mkctx(clock, budget=3)
+    with pytest.raises(llm.ModelError) as ei:
+        ask(c)
+    assert ei.value.kind == "budget" and net.calls == []
+
+
+def test_failure_is_logged_without_secrets(env, setup):
+    clock, mp = setup
+    mp.setenv("NVIDIA_API_KEY", "nvapi-testkeytestkey")
+    events = []
+    llm.set_transport(Net(clock, ["500"]))
     with pytest.raises(llm.ModelError) as ei:
         ask(mkctx(clock), on_progress=events.append)
     blob = open(env / "decision_log.json").read() + json.dumps(events) + str(ei.value) + json.dumps(llm.status())
     assert "nvapi-" not in blob
-    assert [e["status"] for e in events][0] == "trying"
-
-
-def test_sticky_tier_restarts_task(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["ok", "429"], "local": ["ok"]})
-    llm.set_transport(net)
-    c = mkctx(clock)
-    seen = []
-
-    def task(tid):
-        a = ask(c, task_id=tid)
-        b = ask(c, task_id=tid)
-        seen.append((a, b))
-        return a
-
-    llm.run_task(c, "T1", task)
-    tiers = [x[0] for x in net.calls]
-    assert tiers == ["nvidia", "nvidia", "local", "local"]          # restarted from its first call on the local tier
-    logd = json.load(open(env / "decision_log.json"))
-    assert any(e["action"] == "task_restart" for e in logd)
+    assert events[0]["status"] == "trying"
+    assert any(e["action"] == "model_error" for e in json.load(open(env / "decision_log.json")))
 
 
 def test_budget_error_becomes_repeat_in_orchestrator(env, setup, fake_sources):
     clock, mp = setup
-    net = Net(clock, {"local": ["hang"]})
-    llm.set_transport(net)
-    import json as _j
+    llm.set_transport(Net(clock, ["hang"]))
     from conftest import load_brief
     b, _ = load_brief("r")
     mp.setenv("WORKFLOW_TIME_BUDGET_S", "10")
@@ -238,23 +177,16 @@ def test_budget_error_becomes_repeat_in_orchestrator(env, setup, fake_sources):
     p = orchestrator.run_until_gate(ctx, clock=clock)
     assert p["kind"] == "error" and p["outcome"] == "repeat"
     assert "nothing decided" in p["verdict"]
-    assert not any(e.get("outcome") == "stop" for e in _j.load(open(env / "decision_log.json")))
+    assert not any(e.get("outcome") == "stop" for e in json.load(open(env / "decision_log.json")))
 
 
 def test_no_gpt_model_allowed(env, monkeypatch):
-    monkeypatch.setenv("NVIDIA_MODEL", "openai/gpt-oss-20b")
+    monkeypatch.setenv("LOCAL_MODEL", "gpt-oss-20b")
     with pytest.raises(RuntimeError):
         llm.tiers()
 
 
-def test_remote_rejecting_request_shape_is_disabled_and_local_answers(env, setup):
-    clock, mp = setup
-    keys(mp)
-    net = Net(clock, {"nvidia": ["400"]})
-    llm.set_transport(net)
-    c = mkctx(clock)
-    assert ask(c) == {"answer": "ok"}
-    assert [x[0] for x in net.calls][-1] == "local"
-    net.calls.clear()
-    ask(c)
-    assert [x[0] for x in net.calls] == ["local"]          # never asked again in this session
+def test_untrusted_model_endpoint_is_rejected(env, monkeypatch):
+    monkeypatch.setenv("LOCAL_BASE_URL", "https://api.example.com/v1")
+    with pytest.raises(RuntimeError, match="LOCAL_BASE_URL"):
+        llm.tiers()

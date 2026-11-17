@@ -15,12 +15,23 @@
      },
      "pain_point": {
       "type": "string"
+     },
+     "signal": {
+      "type": "string",
+      "enum": [
+       "request",
+       "complaint",
+       "workaround",
+       "launch_or_ad",
+       "other"
+      ]
      }
     },
     "required": [
      "source_id",
      "relevant",
-     "pain_point"
+     "pain_point",
+     "signal"
     ]
    },
    "minItems": 1,

@@ -2,9 +2,9 @@
 
 ## Overview
 
-The system is an open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, target market, values) through six gated phases: Discover, Validate, Build, Commercial setup, Launch, and Operate and learn. It aims at a validated, sellable **digital** product, and it says "stop" when the evidence is weak. A fixed Python state machine (`orchestrator.py`) runs the phases in order. Each agent is a role function (`agents/<role>.py`) with its own prompt (`prompts/<role>.md`), JSON schema and log entry. The agents only propose text and JSON; plain code decides every gate, checks every rule, keeps the MOCKED ledger, and runs an approval executor that is the only path to any external effect. Nothing is published, sent, spent or released without the founder approving that exact action. No payment of any kind runs, including sandbox and test mode.
+The system is an open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, target market, values) through six gated phases: Discover, Validate, Build, Commercial setup, Launch, and Operate and learn. It aims at a validated, sellable **digital** product, and it says "stop" when the evidence is weak. A fixed Python state machine (`orchestrator.py`) runs the phases in order. Each agent is a role function (`agents/<role>.py`) with its own prompt (`prompts/<role>.md`), JSON schema and log entry. The agents only propose text and JSON; plain code decides every gate, checks every rule, and keeps the MOCKED ledger. Publishing and business communications go through the single-use approval executor. The only model is open-weight and runs on the founder's machine, so no brief, excerpt or draft is sent to a model provider. No payment of any kind runs, including sandbox and test mode.
 
-Models: every agent uses one model chain (`llm.py`). Tier 1 is NVIDIA Build serving Google `gemma-4-31b-it` (open weights, Apache 2.0, free developer tier, optional key). Tier 2 is local **Gemma 4 26B A4B, Q4_K_M** served by llama.cpp's `llama-server` (OpenAI-compatible API), used as the backup and as the only tier when no API key is set, so `docker compose up` on a fresh clone works without keys. All calls of one agent task stay on one tier. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
+Models: every agent uses one client (`llm.py`) talking to a local llama.cpp `llama-server` (OpenAI-compatible API, JSON-schema constrained output). The default Docker model is **Qwen3 4B Instruct 2507, Q4_K_M** (CPU-friendly); the GPU setup and the committed demo runs use **Gemma 4 26B A4B, Q4_K_M**. Both are Apache 2.0 open weights. There is no hosted tier and no API key; the decision log records the model id the server reports at `/v1/models`. A run ends with a report (Markdown and HTML in `outputs/`, PDF in the app) built by `report.py` from the log. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
 
 ```mermaid
 flowchart TD
@@ -40,7 +40,7 @@ flowchart TD
     P6 --> G6{"Operate gate + founder decision"}
     G6 -->|persevere / pivot / stop| E["Memo and decision"]
     X["Approval executor<br/>action, content, destination, amount, run ID"] -.-> P2 & P3 & P4 & P5 & P6
-    L["llm.py: NVIDIA Build → local Gemma (llama.cpp)"] -.-> P1 & P2 & P3 & P4 & P5 & P6
+    L["llm.py: local llama.cpp (Qwen3 4B or Gemma 4 26B)"] -.-> P1 & P2 & P3 & P4 & P5 & P6
     D[("SQLite: runs, sources, artifacts, gates, approvals, ledger, action_log")] -.-> J[("decision_log.json")]
 ```
 
@@ -53,7 +53,7 @@ Design choices in one place (full record with rejected alternatives: [docs/desig
 | Decisions | Code owns exclusions, thresholds, gate outcomes, QA, price math, ledger | Safety and money must not depend on model wording |
 | Evidence | Fetched-source registry; the model cites source IDs, code renders URLs | No invented links; unsourced claims become `ASSUMPTION` |
 | Approval | One executor checks a single-use binding of action, content hash, destination, amount and run ID | A changed payload or a direct code call cannot pass |
-| Models | NVIDIA Build → local Gemma, sticky per task | A fast free remote tier for the demo; a no-key local path that always works |
+| Models | One local llama.cpp server; no hosted tier | No founder content goes to a model provider; nothing to pay or sign up for; works offline except for search |
 | State | SQLite (WAL) on a Docker volume; write-once text outputs | Crash-safe approvals and idempotent mock sales |
 | UI | Streamlit on `127.0.0.1:8501` | Single-founder local demo; not a multi-user authorization system |
 
@@ -252,19 +252,20 @@ flowchart LR
 
 - **Hand-offs.** Each phase receives a compact typed hand-off (H1 to H5), not the conversation history. Fields are passed on unchanged. Hand-offs and approvals point to the **final** artifact of a step by path and SHA-256; retries write new attempt files and mark older ones superseded.
 - **Evidence.** The source registry holds every fetched item (ID, URL, source, status, fetch time, excerpt). Models see IDs and excerpts; the renderer turns IDs into URLs; a claim without a valid ID is printed as `ASSUMPTION`. Mocked and simulated records never count as evidence.
-- **Model calls.** `llm.py` sends each call to the first tier with a key, quota and no cooldown, and keeps all calls of one task on that tier.
+- **Model calls.** `llm.py` sends every call to the local llama.cpp server with the agent's JSON schema as `response_format`, so the server constrains the output. The base URL must be a loopback host or the compose `llm` service; anything else is refused. An earlier design had a hosted NVIDIA tier; it was removed because its requests timed out repeatedly and it would send founder content off the machine.
+- **Research requests.** Phase 1 derives a short query from the idea or founder search terms and sends it to HN Algolia, Stack Exchange, GitHub Search and Wikipedia (background only). A founder-supplied URL is fetched directly. The UI discloses these destinations before the founder starts a run.
+- **Evidence hygiene.** Identical or near-identical excerpts (Jaccard ≥ 0.85 on word sets) count once. The analyst labels each excerpt `request`, `complaint`, `workaround`, `launch_or_ad` or `other`; only the first three count toward the evidence threshold, because a product launch is supply, not demand. Code also drops feature tickets from developers' own practice, test or hackathon repositories and counts a repeated pain point once. The store page's file list is written by code from the released manifest, so it cannot advertise a file that was never built. If the brief names a country and no counted excerpt mentions it, the segment and market lines say so and label local demand ASSUMPTION.
 
 | Signal | Action |
 |---|---|
-| No key for a tier | Skip it (a clone without `.env` uses the local tier only) |
-| Remote quota exhausted (rate-limit headers or HTTP 429) | Move to the local tier at once; the remote tier returns after its reset |
-| Remote tier lags (no answer within 20 s), 5xx, 401/403 | Move to the local tier; the task restarts from its first call |
-| Output fails the schema or a source ID is unknown | One repair on the same tier, then the next tier; at most 4 attempts per call |
-| All tiers fail or the run budget is used | `repeat` with "nothing decided"; no quality attempt is used |
+| Output fails the schema or cites an unknown source ID | One repair attempt with the error appended; at most 4 attempts per call |
+| Server rejects an optional parameter or `response_format` (HTTP 400) | Retry once without it, then once with the schema in the prompt only |
+| Timeout, HTTP error or the segment budget is used | `repeat` with "nothing decided"; never `stop` |
+| GPT-family model id or a non-local base URL | Refused at start-up (team rule) |
 
-- **Time.** In the demo configuration a full run is limited to 180 s of system time (time spent waiting for the founder excluded). The local-only path must finish but is not held to 180 s; its measured time is published in the README.
-- **State and logs.** SQLite (WAL mode) on the `app_state` volume holds runs, steps, sources, claims, artifacts, gates, approvals, the mock ledger and `action_log`. `decision_log.json` is exported atomically from `action_log` for the committed demo runs, with the five required keys plus `run_id`, tier, tokens and wall time. Cost is $0.00 on every tier; it is reported as observed only from a logged run.
-- **Runtime.** `docker compose up` starts `llm` (llama.cpp `llama-server`; it loads the GGUF from `LOCAL_MODEL_DIR` when present, otherwise downloads `unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M` once into a volume) and `app`. The UI opens at once and shows local-model readiness from `/health` while the model loads. Ports bind to `127.0.0.1`. `docker-compose.gpu.yml` switches to the CUDA image with the team's 16 GB VRAM flags (`-ngl 99 --n-cpu-moe 6 -fa on`, q8_0 KV cache: MoE expert layers that do not fit stay on the CPU). `docker-compose.host-llm.yml` uses a `llama-server` already running on the host (`scripts/start_local_llm.sh`). UI runs write to the `app_state` volume; only the demo runs write the committed `outputs/` and `decision_log.json`.
+- **Time.** Each segment between founder decisions has a time budget (`WORKFLOW_TIME_BUDGET_S`, 1800 s, ASSUMPTION); time spent waiting for the founder is excluded. Measured agent time per run is in the run report.
+- **State and logs.** SQLite (WAL mode) on the `app_state` volume holds runs, steps, sources, claims, artifacts, gates, approvals, the mock ledger and `action_log`. `decision_log.json` is exported atomically from `action_log` for the committed demo runs, with the five required keys plus `run_id`, tokens and wall time. Cost is $0.00 because the model is local; it is reported as observed only from a logged run.
+- **Runtime.** `docker compose up` starts `llm` (llama.cpp `llama-server`; it loads the GGUF from `LOCAL_MODEL_DIR` when present, otherwise downloads `unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M` once into a volume) and `app`. The UI opens at once and shows local-model readiness from `/health` while the model loads. Ports bind to `127.0.0.1`. `docker-compose.gpu.yml` switches to the CUDA image and Gemma 4 26B A4B with the team's 16 GB VRAM flags (`-ngl 99 --n-cpu-moe 6 -fa on`, q8_0 KV cache: MoE expert layers that do not fit stay on the CPU). `docker-compose.host-llm.yml` uses a `llama-server` already running on the host (`scripts/start_local_llm.sh`). UI runs write to the `app_state` volume; only the demo runs write the committed `outputs/` and `decision_log.json`.
 
 ## Built vs. stubbed
 
@@ -289,11 +290,11 @@ Status words follow one rule: a row says **Working** only when its code exists a
 | Support FAQ and replies | Drafts working; sending **STUBBED** behind approval | `tests/test_phase6_operate.py` |
 | Metrics and persevere-or-pivot memo | Working on real, founder-entered data; mock data never gives persevere | `test_mock_only_never_persevere` |
 | Founder approval executor and override | Working | `tests/test_backbone.py` |
-| Model chain (NVIDIA Build → local llama.cpp) | Working with fake HTTP; local tier measured by `scripts/model_check.py`; remote tiers optional and unmeasured until keys are added | `tests/test_llm_cascade.py` |
-| Guardrails against trick prompts | Working on the team's 35-case eval set (in-sample; paraphrases outside it can be missed) | `tests/test_guardrails_eval.py` |
-| Streamlit UI (brief, verdict, approval panel, override bar, readiness) | Working | `tests/test_ui_smoke.py` |
+| Local model client (llama.cpp) | Working with fake HTTP and a fake local server; real model measured by `scripts/model_check.py` | `tests/test_llm_cascade.py`, `tests/test_local_http.py` |
+| Guardrails against trick prompts | Working on the team's 75-case eval set, including 18 paraphrases an outside review found (in-sample; new paraphrases can still be missed, which is why every output is also checked before approval) | `tests/test_guardrails_eval.py` |
+| Final run report (Markdown, HTML, PDF) | Working; built only from the log and the run's files | `tests/test_run_report.py` |
+| Streamlit UI (brief, verdict, approval panel, override bar, readiness, readable tables, final report) | Working | `tests/test_ui_smoke.py` |
 | G3/G4/G5 `pivot_back` routes | Working | `tests/test_pivot_routes.py` |
-| Provider check notebook | Working on the host with keys (`notebooks/llm_cascade_check.ipynb`, outputs cleared) | `scripts/check_keys.py`, notebook |
 
 Not in this system at all: real payments of any kind, real publishing or posting, real email, account creation, stored passwords or card details, and any claim of legal compliance.
 
@@ -301,7 +302,7 @@ Not in this system at all: real payments of any kind, real publishing or posting
 
 | When | Item |
 |---|---|
-| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; NVIDIA Build → local Gemma (llama.cpp) chain; tests and guardrail eval set |
+| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; local llama.cpp model client (Qwen3 4B on CPU, Gemma 4 26B on GPU); final run report; tests and guardrail eval set |
 | Next | A CI workflow running `pytest -q` on every push; persona test with several calls instead of one |
 | Next | Product shapes A2 (short HTML guide) and A3 (template pack), with script-integrity checks for HTML; more keyless or founder-keyed evidence sources; import of real experiment results from the founder's own form provider, behind approval; measured A/B test of an optional critic for page and store copy |
 | Next | Arabic and English output for MENA founders; richer Phase 6 metrics from founder-uploaded exports |

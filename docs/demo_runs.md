@@ -2,22 +2,78 @@
 
 Each run ID links to the files it wrote. A file marked by a higher `_a<k>` number supersedes the earlier attempt.
 
-## Run `20261117T180747Z-w`
+## Run `20261117T194739Z-r`
+
+- Brief idea: Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack
+- Final outcome: `stop`
+- Gates: phase1_gate: `stop`; phase2_gate: `awaiting_evidence`; phase3_gate: `go`; phase4_gate: `repeat`; phase4_gate: `go`; phase5_gate: `go`; phase6_gate: `repeat`
+- Model tiers used: local/llamacpp/gemma-4-26b-a4b-it-q4_k_m
+
+Files:
+
+- [outputs/phase1_step1_opportunities_r_a1.md](../outputs/phase1_step1_opportunities_r_a1.md)
+- [outputs/phase1_step2_evidence_r_a1.json](../outputs/phase1_step2_evidence_r_a1.json)
+- [outputs/phase1_step3_comparison_r_a1.md](../outputs/phase1_step3_comparison_r_a1.md)
+- [outputs/phase1_gate_decision_r_a1.md](../outputs/phase1_gate_decision_r_a1.md)
+- [outputs/phase1_gate_decision_r_a1.json](../outputs/phase1_gate_decision_r_a1.json)
+- [outputs/phase2_step1_lean_canvas_r_a1.md](../outputs/phase2_step1_lean_canvas_r_a1.md)
+- [outputs/phase2_step2_locked_plan_r_a1.json](../outputs/phase2_step2_locked_plan_r_a1.json)
+- [outputs/phase2_step3_landing_page_r_a1.html](../outputs/phase2_step3_landing_page_r_a1.html)
+- [outputs/phase2_step4_persona_stress_test_r_a1.md](../outputs/phase2_step4_persona_stress_test_r_a1.md)
+- [outputs/phase2_step6_experiment_plan_r_a1.md](../outputs/phase2_step6_experiment_plan_r_a1.md)
+- [outputs/phase2_step6_tracking_r_a1.csv](../outputs/phase2_step6_tracking_r_a1.csv)
+- [outputs/phase2_step6_results_form_r_a1.json](../outputs/phase2_step6_results_form_r_a1.json)
+- [outputs/phase2_gate_decision_r_a1.md](../outputs/phase2_gate_decision_r_a1.md)
+- [outputs/phase2_gate_decision_r_a1.json](../outputs/phase2_gate_decision_r_a1.json)
+- [outputs/phase3_step1_mvp_definition_r_a1.md](../outputs/phase3_step1_mvp_definition_r_a1.md)
+- [outputs/phase3_step3_product_checklist_r_a1.md](../outputs/phase3_step3_product_checklist_r_a1.md)
+- [outputs/phase3_step3_product_tracker_r_a1.csv](../outputs/phase3_step3_product_tracker_r_a1.csv)
+- [outputs/phase3_step3_product_license_r_a1.txt](../outputs/phase3_step3_product_license_r_a1.txt)
+- [outputs/phase3_step4_user_docs_r_a1.md](../outputs/phase3_step4_user_docs_r_a1.md)
+- [outputs/phase3_step5_test_report_r_a1.md](../outputs/phase3_step5_test_report_r_a1.md)
+- [outputs/phase3_gate_decision_r_a1.md](../outputs/phase3_gate_decision_r_a1.md)
+- [outputs/phase3_gate_decision_r_a1.json](../outputs/phase3_gate_decision_r_a1.json)
+- [outputs/phase3_step6_handoff_r_a1.json](../outputs/phase3_step6_handoff_r_a1.json)
+- [outputs/phase4_gate_decision_r_a1.md](../outputs/phase4_gate_decision_r_a1.md)
+- [outputs/phase4_gate_decision_r_a1.json](../outputs/phase4_gate_decision_r_a1.json)
+- [outputs/phase4_step1_pricing_r_a1.md](../outputs/phase4_step1_pricing_r_a1.md)
+- [outputs/phase4_step2_policy_terms_r_a1.md](../outputs/phase4_step2_policy_terms_r_a1.md)
+- [outputs/phase4_step2_policy_privacy_r_a1.md](../outputs/phase4_step2_policy_privacy_r_a1.md)
+- [outputs/phase4_step2_policy_refund_r_a1.md](../outputs/phase4_step2_policy_refund_r_a1.md)
+- [outputs/phase4_step2_policy_delivery_r_a1.md](../outputs/phase4_step2_policy_delivery_r_a1.md)
+- [outputs/phase4_gate_decision_r_a2.md](../outputs/phase4_gate_decision_r_a2.md)
+- [outputs/phase4_gate_decision_r_a2.json](../outputs/phase4_gate_decision_r_a2.json)
+- [outputs/phase4_step3_handoff_r_a1.json](../outputs/phase4_step3_handoff_r_a1.json)
+- [outputs/phase5_step1_store_page_r_a1.md](../outputs/phase5_step1_store_page_r_a1.md)
+- [outputs/phase5_step2_launch_post_r_a1.md](../outputs/phase5_step2_launch_post_r_a1.md)
+- [outputs/phase5_step3_mock_sale_r_a1.md](../outputs/phase5_step3_mock_sale_r_a1.md)
+- [outputs/phase5_gate_launch_r_a1.md](../outputs/phase5_gate_launch_r_a1.md)
+- [outputs/phase5_gate_launch_r_a1.json](../outputs/phase5_gate_launch_r_a1.json)
+- [outputs/phase6_step2_support_faq_r_a1.md](../outputs/phase6_step2_support_faq_r_a1.md)
+- [outputs/phase6_step1_memo_r_a1.md](../outputs/phase6_step1_memo_r_a1.md)
+- [outputs/phase6_gate_decision_r_a1.md](../outputs/phase6_gate_decision_r_a1.md)
+- [outputs/phase6_step9_run_report_r_a1.md](../outputs/phase6_step9_run_report_r_a1.md)
+- [outputs/phase6_step9_run_report_r_a1.html](../outputs/phase6_step9_run_report_r_a1.html)
+
+## Run `20261117T195109Z-w`
 
 - Brief idea: A mobile app that gamifies daily habit tracking with streaks and badges
-- Final outcome: `stop`
-- Gates: phase1_gate: `stop`
-- Model tiers used: tier2/llamacpp/gemma-4-26b-a4b-it-q4_k_m
+- Final outcome: `pivot_back`
+- Gates: phase1_gate: `pivot_back`
+- Model tiers used: local/llamacpp/gemma-4-26b-a4b-it-q4_k_m
 
 Files:
 
 - [outputs/phase1_step1_opportunities_w_a1.md](../outputs/phase1_step1_opportunities_w_a1.md)
 - [outputs/phase1_step2_evidence_w_a1.json](../outputs/phase1_step2_evidence_w_a1.json)
 - [outputs/phase1_step3_comparison_w_a1.md](../outputs/phase1_step3_comparison_w_a1.md)
+- [outputs/phase1_step4_interview_script_w_a1.md](../outputs/phase1_step4_interview_script_w_a1.md)
 - [outputs/phase1_gate_decision_w_a1.md](../outputs/phase1_gate_decision_w_a1.md)
 - [outputs/phase1_gate_decision_w_a1.json](../outputs/phase1_gate_decision_w_a1.json)
+- [outputs/phase1_step9_run_report_w_a1.md](../outputs/phase1_step9_run_report_w_a1.md)
+- [outputs/phase1_step9_run_report_w_a1.html](../outputs/phase1_step9_run_report_w_a1.html)
 
-## Run `20261117T180902Z-e`
+## Run `20261117T195149Z-e`
 
 - Brief idea: A crypto trading signal bot that posts buy and sell alerts
 - Final outcome: `stop`
@@ -28,24 +84,10 @@ Files:
 
 - [outputs/phase1_gate_decision_e_a1.md](../outputs/phase1_gate_decision_e_a1.md)
 - [outputs/phase1_gate_decision_e_a1.json](../outputs/phase1_gate_decision_e_a1.json)
+- [outputs/phase1_step9_run_report_e_a1.md](../outputs/phase1_step9_run_report_e_a1.md)
+- [outputs/phase1_step9_run_report_e_a1.html](../outputs/phase1_step9_run_report_e_a1.html)
 
-## Run `20261117T180903Z-r`
-
-- Brief idea: Notion templates for wedding planners in Egypt: a planning checklist and vendor tracker pack
-- Final outcome: `stop`
-- Gates: phase1_gate: `go`
-- Model tiers used: tier2/llamacpp/gemma-4-26b-a4b-it-q4_k_m
-
-Files:
-
-- [outputs/phase1_step1_opportunities_r_a1.md](../outputs/phase1_step1_opportunities_r_a1.md)
-- [outputs/phase1_step2_evidence_r_a1.json](../outputs/phase1_step2_evidence_r_a1.json)
-- [outputs/phase1_step3_comparison_r_a1.md](../outputs/phase1_step3_comparison_r_a1.md)
-- [outputs/phase1_step4_interview_script_r_a1.md](../outputs/phase1_step4_interview_script_r_a1.md)
-- [outputs/phase1_gate_decision_r_a1.md](../outputs/phase1_gate_decision_r_a1.md)
-- [outputs/phase1_gate_decision_r_a1.json](../outputs/phase1_gate_decision_r_a1.json)
-
-## Run `payment-test-20261117T181003Z`
+## Run `payment-test-20261117T195150Z`
 
 - Brief idea: None
 - Final outcome: `None`
@@ -54,3 +96,4 @@ Files:
 
 Files:
 
+- [outputs/payment_test_log.md](../outputs/payment_test_log.md)

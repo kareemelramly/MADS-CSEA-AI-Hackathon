@@ -56,6 +56,7 @@ def test_low_fit_stops_or_pivots():
 def test_go_does_not_declare_demand_validated():
     g = _gate()
     assert g.outcome == "go" and "NOT validated" in g.verdict
+    assert "does not independently establish demand" in g.verdict
 
 
 def test_thresholds_logged_before_first_search(env, fake_llm, fake_sources):
@@ -82,7 +83,7 @@ def test_items_without_url_dropped_and_ids_assigned(env, fake_llm):
 
 def test_unknown_source_id_from_model_is_rejected(env, fake_sources):
     def bad(system, user, schema, ids):
-        return {"items": [{"source_id": "S999", "relevant": True, "pain_point": "x"}]}
+        return {"items": [{"source_id": "S999", "relevant": True, "pain_point": "x", "signal": "complaint"}]}
     llm.set_fake(FakeLLM({"screen_evidence": bad}))
     b, _ = load_brief("r")
     ctx = orchestrator.new_run(b, "t")
@@ -136,3 +137,61 @@ def test_interview_drops_hypothetical_questions(env, fake_sources):
     orchestrator.run_until_gate(ctx)
     kept, dropped = ctx.data["p1.1.interview"]
     assert dropped == 1 and all("Would" not in q["question"] for q in kept)
+
+
+def test_launches_and_duplicates_do_not_count_as_demand(env, fake_sources):
+    """Reviewer-reported evidence bugs: product launches are supply, duplicates count once,
+    and a target country no source mentions is labelled ASSUMPTION."""
+    from conftest import FakeLLM
+    import llm
+
+    def screen(system, user, schema, ids):
+        return {"items": [{"source_id": i, "relevant": True, "pain_point": "p",
+                           "signal": "launch_or_ad" if n % 2 else "complaint"} for n, i in enumerate(ids[:5])]}
+    f = FakeLLM({"screen_evidence": screen})
+    llm.set_fake(f)
+    b, _ = load_brief("r")
+    ctx = orchestrator.new_run(b, "d")
+    orchestrator.run_until_gate(ctx)
+    rel = ctx.data["p1.1.relevant"]
+    assert rel and all(x["signal"] == "complaint" for x in rel)
+    log = json.load(open(env / "decision_log.json"))
+    summ = [e for e in log if e["action"] == "screen_summary"][0]
+    assert summ["excluded_not_demand"]
+    comp = open(env / "outputs" / "phase1_step3_comparison_d_a1.md").read()
+    assert "Target region (Egypt)" in comp and "ASSUMPTION" in comp
+
+
+def test_identical_excerpts_count_once():
+    from agents.researcher import _same, _words
+    a = _words("Need a vendor tracker for weddings, spreadsheets are a mess every single time")
+    assert _same(a, _words("Need a vendor tracker for weddings, spreadsheets are a mess every single time!"))
+    assert not _same(a, _words("How do I export a Notion database to CSV for my accountant"))
+
+
+def test_hobby_repos_and_repeated_pain_points_do_not_count(env, fake_sources):
+    from agents import opportunity_analyst as oa
+    assert oa.HOBBY_REPO.search("https://github.com/x/sharkbyte_hackathon/issues/2")
+    assert oa.HOBBY_REPO.search("https://github.com/x/habit-tracker-test/issues/1")
+    assert not oa.HOBBY_REPO.search("https://github.com/monliu99/wedding-planner/issues/8")
+    from conftest import FakeLLM
+
+    def screen(system, user, schema, ids):
+        return {"items": [{"source_id": i, "relevant": True, "pain_point": "Students need weekly streaks.",
+                           "signal": "request"} for i in ids[:5]]}
+    llm.set_fake(FakeLLM({"screen_evidence": screen}))
+    b, _ = load_brief("r")
+    ctx = orchestrator.new_run(b, "p")
+    orchestrator.run_until_gate(ctx)
+    assert len(ctx.data["p1.1.relevant"]) == 1           # the same pain point counts once
+
+
+def test_place_without_a_cited_mention_is_labelled_everywhere():
+    from agents import render_claim
+    from run_context import RunContext
+    ctx = RunContext(brief={"countries": "Egypt"}, label="z")
+    ctx.sources["S001"] = {"url": "https://example.org/a", "excerpt": "I need a wedding checklist", "title": ""}
+    out = render_claim(ctx, {"text": "Couples in Egypt need checklists", "source_ids": ["S001"]})
+    assert "Egypt: ASSUMPTION" in out
+    ctx.sources["S002"] = {"url": "https://example.org/b", "excerpt": "Weddings in Egypt are hard to plan", "title": ""}
+    assert "ASSUMPTION" not in render_claim(ctx, {"text": "Couples in Egypt need checklists", "source_ids": ["S002"]})

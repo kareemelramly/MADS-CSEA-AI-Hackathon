@@ -1,13 +1,16 @@
 # One-command setup: docker compose up  ->  open http://localhost:8501
-# Services: llm (llama.cpp server with Gemma 4 26B A4B Q4_K_M, the local tier) and app (Streamlit UI,
-# orchestrator, agents, gates, approval, MOCKED ledger). The NVIDIA Build tier is optional (key in .env).
+# Services: llm (llama.cpp server; default model Qwen3 4B Instruct 2507 Q4_K_M, about 2.5 GB, runs on a
+# laptop CPU) and app (Streamlit UI, orchestrator, agents, gates, approval, MOCKED ledger).
+# Bigger model on an NVIDIA GPU (Gemma 4 26B A4B): docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+# No hosted or paid model API is used anywhere.
 services:
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server            # CPU build; docker-compose.gpu.yml switches to CUDA
     ports: ["127.0.0.1:8081:8080"]            # 8081 on the host, so a host llama-server on 8080 does not clash
     environment:
-      - LOCAL_MODEL_FILE=${LOCAL_MODEL_FILE:-gemma-4-26B-A4B-it-UD-Q4_K_M.gguf}
-      - LOCAL_MODEL_HF=${LOCAL_MODEL_HF:-unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M}
+      - LOCAL_MODEL_FILE=${LOCAL_MODEL_FILE:-Qwen3-4B-Instruct-2507-Q4_K_M.gguf}
+      - LOCAL_MODEL_HF=${LOCAL_MODEL_HF:-unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M}
+      - LOCAL_MODEL_ALIAS=${LOCAL_MODEL:-qwen3-4b-instruct-2507-q4_k_m}
       - LLAMA_ARGS_EXTRA=${LLAMA_ARGS_EXTRA:-}
       - LLAMA_CACHE=/cache
     volumes:
@@ -16,10 +19,10 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - >
-        F="/models/$$LOCAL_MODEL_FILE"; [ -f "$$F" ] || F=$$(ls /models/*Q4_K_M*.gguf 2>/dev/null | head -1);
+        F="/models/$$LOCAL_MODEL_FILE"; [ -f "$$F" ] || F=$$(ls /models/*$${LOCAL_MODEL_FILE%%-*}*.gguf 2>/dev/null | head -1);
         if [ -n "$$F" ] && [ -f "$$F" ]; then echo "Loading local model $$F (no download)"; SRC="-m $$F";
         else echo "No local GGUF at /models/$$LOCAL_MODEL_FILE: downloading $$LOCAL_MODEL_HF once"; SRC="-hf $$LOCAL_MODEL_HF"; fi;
-        exec /app/llama-server $$SRC --alias gemma-4-26b-a4b-it-q4_k_m -c ${LOCAL_CTX:-8192} -np 1 --jinja
+        exec /app/llama-server $$SRC --alias $$LOCAL_MODEL_ALIAS -c ${LOCAL_CTX:-8192} -np 1 --jinja
         --host 0.0.0.0 --port 8080 $$LLAMA_ARGS_EXTRA
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -33,14 +36,9 @@ services:
     build: .
     ports: ["127.0.0.1:8501:8501"]
     environment:
-      - LLM_ORDER=${LLM_ORDER:-nvidia,local}
       - LOCAL_BASE_URL=${LOCAL_BASE_URL:-http://llm:8080/v1}
-      - LOCAL_MODEL=${LOCAL_MODEL:-gemma-4-26b-a4b-it-q4_k_m}
-      - NVIDIA_BASE_URL=${NVIDIA_BASE_URL:-https://integrate.api.nvidia.com/v1}
-      - NVIDIA_MODEL=${NVIDIA_MODEL:-google/gemma-4-31b-it}
-      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+      - LOCAL_MODEL=${LOCAL_MODEL:-qwen3-4b-instruct-2507-q4_k_m}
       - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-2000}
-      - LLM_REMOTE_TIMEOUT_S=${LLM_REMOTE_TIMEOUT_S:-20}
       - LLM_LOCAL_TIMEOUT_S=${LLM_LOCAL_TIMEOUT_S:-300}
       - LLM_MAX_ATTEMPTS_PER_CALL=${LLM_MAX_ATTEMPTS_PER_CALL:-4}
       - LLM_MIN_ATTEMPT_S=${LLM_MIN_ATTEMPT_S:-5}

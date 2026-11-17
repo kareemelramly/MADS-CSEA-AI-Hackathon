@@ -2,14 +2,29 @@
 after another) and 1 scoring call. The model rates; code computes the weighted fit
 (skills 35, budget 25, time 25, values 15) and decides nothing.
 """
+import re
+
 import llm
 from agents import prompt, schema, brief_text, excerpts_text
 
+GENERAL = re.compile(r"\b(typically|usually|generally|often|most|requires?|costs?|market|industry|average)\b", re.I)
 WEIGHTS = {"skills": 0.35, "budget": 0.25, "time": 0.25, "values": 0.15}
 
 
+DEMAND_SIGNALS = ("request", "complaint", "workaround")
+# Feature tickets in a developer's own practice, test or hackathon repository describe a coding
+# exercise, not a customer's demand (an outside review found two such tickets counted as demand).
+HOBBY_REPO = re.compile(r"github\.com/[^/]+/[^/]*(hackathon|test|demo|tutorial|assignment|homework|course|practice|sample|example|learn|bootcamp|exercise|clone|starter|playground)[^/]*/", re.I)
+
+
+def _norm(t):
+    return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
+
+
 def screen(ctx, ids, on_progress=None):
-    relevant = []
+    """Only excerpts the model marks as relevant AND as a demand signal (request, complaint, workaround)
+    count toward the evidence threshold. Product launches and ads are supply, not demand."""
+    relevant, not_demand = [], []
     batches = [ids[i:i + 5] for i in range(0, len(ids), 5)][:4]
     for n, batch in enumerate(batches, 1):
         def task(tid, batch=batch, n=n):
@@ -21,11 +36,22 @@ def screen(ctx, ids, on_progress=None):
         out = llm.run_task(ctx, f"{ctx.run_id}:screen:{n}:{ctx.data.get('p1_attempt', 1)}", task)
         for it in out["items"]:
             sid = it.get("source_id")
-            if sid in batch and it.get("relevant") and sid not in [r["source_id"] for r in relevant]:
-                relevant.append({"source_id": sid, "pain_point": it.get("pain_point", ""),
+            if sid not in batch or sid in [r["source_id"] for r in relevant]:
+                continue
+            url = ctx.sources[sid]["url"]
+            same = next((r["source_id"] for r in relevant if _norm(r["pain_point"]) == _norm(it.get("pain_point", ""))), None)
+            if it.get("relevant") and HOBBY_REPO.search(url):
+                not_demand.append({"source_id": sid, "signal": "developer_exercise_repo"})
+            elif it.get("relevant") and same:
+                not_demand.append({"source_id": sid, "signal": "same_pain_point_as_" + same})
+            elif it.get("relevant") and it.get("signal") in DEMAND_SIGNALS:
+                relevant.append({"source_id": sid, "pain_point": it.get("pain_point", ""), "signal": it["signal"],
                                  "source": ctx.sources[sid]["source"]})
+            elif it.get("relevant"):
+                not_demand.append({"source_id": sid, "signal": it.get("signal")})
     ctx.log("opportunity_analyst", "screen_summary", sources=[ctx.sources[r["source_id"]]["url"] for r in relevant],
-            screened_by_model=sum(len(b) for b in batches), relevant=len(relevant))
+            screened_by_model=sum(len(b) for b in batches), relevant=len(relevant),
+            excluded_not_demand=not_demand)
     return relevant
 
 
@@ -46,6 +72,10 @@ def score(ctx, relevant, on_progress=None):
     for opt in [out["idea"]] + out["alternatives"]:
         opt["fit"] = weighted(opt)
         cited = [s for s in opt.get("source_ids", []) if s in relevant_ids]
+        for kk in WEIGHTS:      # reasons with general claims and no source are labelled, not trusted
+            rs = (opt.get(kk) or {}).get("reason", "")
+            if GENERAL.search(rs) and not rs.upper().startswith("ASSUMPTION"):
+                opt[kk]["reason"] = "ASSUMPTION: " + rs
         opt["cited_relevant"] = cited
         opt["passes_evidence"] = len(cited) >= ctx.data["p1_thresholds"]["min_relevant"] and \
             len({src_of[s] for s in cited}) >= 2

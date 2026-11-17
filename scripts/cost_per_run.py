@@ -59,18 +59,33 @@ def main(argv=None):
     for rid, r in runs.items():
         tiers = "; ".join(f"{k}: {v['calls']} calls, {v['tokens']} tokens" for k, v in r["tiers"].items()) or "none (no model call)"
         lines.append(f"| {rid} | {r['outcome']} | {r['calls']} | {r['tokens']} ({r['prompt']} + {r['completion']}) | ${r['cost']:.2f} | {r['system_time_s']} | {tiers} |")
-    full = [r for r in runs.values() if r["label"] == "r" and 6 in r["phases"]]
+    required_phases = set(range(1, 7))
+    full = [(rid, r) for rid, r in runs.items() if required_phases.issubset(r["phases"])]
     if full:
-        r = max(full, key=lambda x: x["calls"])
-        lines += ["", f"Full-run measurement (from 1 complete run, label r): {r['calls']} model calls, {r['tokens']} tokens."]
+        rid, r = max(full, key=lambda item: item[1]["calls"])
+        lines += ["", f"Complete six-phase run {rid}: {r['calls']} model calls, {r['tokens']} tokens, ${r['cost']:.2f} observed charges."]
+    else:
+        lines += ["", "No logged run has output artifacts in all six phases; full-pipeline model/API cost has not been measured."]
     os.makedirs(os.path.join(ROOT, "docs"), exist_ok=True)
     open(os.path.join(ROOT, "docs", "cost_report.md"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
     print("\n".join(lines))
-    if not a.no_readme and full:
-        r = max(full, key=lambda x: x["calls"])
-        tiers = ", ".join(f"{v['tokens']} tokens on {v['model']}" for v in r["tiers"].values())
-        sentence = (f"About ${r['cost']:.2f} per run observed (run R: {r['calls']} model calls, about {r['tokens']} tokens: {tiers}; "
-                    f"system time {r['system_time_s']} s). Electricity not included (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).")
+    if not a.no_readme and not a.run_id:
+        if full:
+            rid, r = max(full, key=lambda item: item[1]["calls"])
+            sentence = (f"${r['cost']:.2f} in model/API charges observed for complete six-phase run {rid} "
+                        f"({r['calls']} model calls, {r['tokens']} tokens; {r['system_time_s']} s system time). "
+                        "Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).")
+        else:
+            candidates = [(rid, r) for rid, r in runs.items() if rid.endswith("-r")]
+            if candidates:
+                rid, r = max(candidates, key=lambda item: (len(item[1]["phases"]), item[1]["calls"]))
+                phases = ", ".join(str(p) for p in sorted(r["phases"])) or "none"
+                sentence = (f"${r['cost']:.2f} in model/API charges observed for partial run R {rid} "
+                            f"({r['calls']} model calls; artifacts in phases {phases}/6). A complete six-phase run cost is not yet measured. "
+                            "Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).")
+            else:
+                sentence = ("No complete six-phase run is recorded, so its model/API cost is not yet measured. "
+                            "Electricity and hardware are excluded (ASSUMPTION). Details: [docs/cost_report.md](docs/cost_report.md).")
         p = os.path.join(ROOT, "README.md")
         txt = open(p, encoding="utf-8").read()
         new = re.sub(r"(<!-- cost:start -->\n).*?(\n<!-- cost:end -->)", lambda m: m.group(1) + sentence + m.group(2), txt, flags=re.S)

@@ -1,0 +1,16 @@
+{
+  "banner": "UNVALIDATED · FOUNDER OVERRIDE",
+  "experiment_status": "not_started",
+  "allowed_status": [
+    "not_started",
+    "running",
+    "completed",
+    "abandoned"
+  ],
+  "started_at": null,
+  "ended_at": null,
+  "visitors": null,
+  "signups": 0,
+  "simulated_signups": null,
+  "note": "Enter real numbers only. Simulated counts are stored separately and never reach the gate."
+}

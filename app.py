@@ -39,7 +39,6 @@ GRAIN = ("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width=
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 :root{
   --ink:#0C0D0A; --ink-2:#15170F; --card:#1A1C14; --paper:#ECE8DC; --muted:#B3AE9F; --line:rgba(236,232,220,.14); --line-strong:rgba(236,232,220,.30);
   --accent:#E4FF4F; --go:#7FE3A5; --repeat:#F3C34E; --pivot:#86BEFF; --stop:#FF7262; --await:#C9C4B5;
@@ -153,7 +152,7 @@ def collect_job():
 
 def friendly(ev):
     who = ev.get("agent", "agent").replace("_", " ")
-    where = "the local model" if ev.get("tier") == "local" else "NVIDIA's model"
+    where = "the local model"
     stt = ev.get("status")
     if stt == "ok":
         return f'<span class="ok">done</span> · {who} finished (via {where}, {ev.get("elapsed_s")} s)'
@@ -164,13 +163,71 @@ def friendly(ev):
     return f"{stt} · {who}"
 
 
+
+# ------------------------------------------------------------------ readable rendering of structured data
+def _words(k):
+    return str(k).replace("_minor", " (cents)").replace("_", " ").strip().capitalize()
+
+
+def _cell(v):
+    if isinstance(v, bool):
+        return "yes" if v else "no"
+    if isinstance(v, (list, tuple)):
+        return ", ".join(_cell(x) for x in v) if all(not isinstance(x, (dict, list)) for x in v) else f"{len(v)} items"
+    if isinstance(v, dict):
+        return "; ".join(f"{_words(k)}: {_cell(x)}" for k, x in v.items())
+    return "" if v is None else str(v)
+
+
+def show_data(obj, depth=0):
+    """Show JSON as headings, short lines and tables, never as raw JSON."""
+    if isinstance(obj, str):
+        try:
+            obj = json.loads(obj)
+        except ValueError:
+            st.markdown(obj)
+            return
+    if isinstance(obj, list):
+        if obj and all(isinstance(x, dict) for x in obj):
+            keys = []
+            for x in obj:
+                keys += [k for k in x if k not in keys]
+            st.dataframe([{_words(k): _cell(x.get(k)) for k in keys} for x in obj], use_container_width=True, hide_index=True)
+        else:
+            st.markdown("\n".join(f"- {_cell(x)}" for x in obj) or "_(empty)_")
+        return
+    if not isinstance(obj, dict):
+        st.write(_cell(obj))
+        return
+    simple = {k: v for k, v in obj.items() if not isinstance(v, (dict, list)) or (isinstance(v, list) and all(not isinstance(x, (dict, list)) for x in v))}
+    if simple:
+        st.table({"Item": [_words(k) for k in simple], "Value": [_cell(v) for v in simple.values()]})
+    for k, v in obj.items():
+        if k in simple:
+            continue
+        if depth >= 2:
+            st.markdown(f"**{_words(k)}:** {_cell(v)}")
+            continue
+        st.markdown(f"{'####' if depth == 0 else '#####'} {_words(k)}")
+        show_data(v, depth + 1)
+
+
+def humanize(action):
+    return {"start_run": "Run started", "end_run": "Run ended", "screen_evidence": "Read and sorted evidence",
+            "search_sources": "Searched public sources", "write_output": "Wrote a document", "gate_decision": "Founder decided",
+            "score_idea_and_alternatives": "Scored the idea and two alternatives", "define_research_criteria": "Fixed the rules before searching",
+            "exclusion_check": "Checked the idea is an allowed product", "remove_duplicate_evidence": "Removed duplicate evidence",
+            "approval_approved": "Founder approved", "approval_rejected": "Founder rejected", "override": "Founder continued anyway",
+            "guardrail_refusal": "Refused a request that breaks a rule", "model_error": "Model problem (nothing decided)",
+            "would_publish": "Would publish (STUBBED)", "would_send": "Would send (STUBBED)"}.get(action, action.replace("_", " ").capitalize())
+
+
 # ------------------------------------------------------------------ state
 working = collect_job()
 ctx = RunContext.from_json(st.session_state["ctx_json"]) if "ctx_json" in st.session_state else None
-tiers = llm.status()
 ready, detail = llm.local_ready()
-remote_on = any(t["has_key"] and t["name"] != "local" and not t["disabled"] for t in tiers)
-model_line = "Model: NVIDIA Gemma 4 31B first, local Gemma 4 as backup" if remote_on else "Model: local Gemma 4 26B (on this computer)"
+served = llm.served_model(llm.tiers()[0]) if ready == "ready" else llm.tiers()[0]["model"]
+model_line = f"Model: {served} via llama.cpp, running on this computer. Nothing is sent to a hosted AI service."
 local_line = {"ready": "Local model: ready", "loading": "Local model: still loading, please wait a minute",
               "unreachable": "Local model: not running yet. Start it with: bash scripts/start_app_nodocker.sh"}[ready]
 
@@ -181,7 +238,7 @@ with st.sidebar:
     (st.success if ready == "ready" else st.warning)(local_line)
     st.markdown('<span class="chip">PUBLISHING · STUBBED</span><span class="chip">PAYMENTS · MOCKED</span>'
                 '<span class="chip">PERSONAS · SIMULATED</span>', unsafe_allow_html=True)
-    st.markdown('<div class="small">Nothing is posted, sent or charged. Every outside action needs your approval.</div>',
+    st.markdown('<div class="small">No posts, emails or payments leave this app. The model runs on this computer; only search words go to the public sources (HN, Stack Exchange, GitHub, Wikipedia).</div>',
                 unsafe_allow_html=True)
     if ctx and not working:
         st.write("")
@@ -248,7 +305,9 @@ if not ctx:
             ev_url = e1.text_input("A link that shows people have this problem")
             ev_claim = e2.text_input("What that link shows, in one line")
             label = st.text_input("Run name (a short tag added to every file name, e.g. r)", code or "mine", max_chars=8)
-        no_model = not remote_on and ready != "ready"
+        st.caption("Where your information goes: the AI model runs on this computer. Only search words built from your idea are sent "
+                   "to public sources (Hacker News, Stack Exchange, GitHub, Wikipedia), plus any link you add above.")
+        no_model = ready != "ready"
         go = st.form_submit_button("Start the agents", disabled=no_model, type="primary", use_container_width=True)
         if no_model:
             st.caption("The button unlocks when the local model is ready (see Status on the left).")
@@ -326,7 +385,27 @@ with tab_run:
             st.rerun()
     elif kind == "done":
         c, word = OUTCOME.get(ctx.final_outcome, ("var(--paper)", str(ctx.final_outcome)))
-        card("Run finished", word, c, "Everything the agents produced is in <b>Documents created</b>; every step they took is in <b>Activity log</b>.")
+        card("Run finished", word, c, "Below is the full report of this run. Every document is also in <b>Documents created</b>, "
+             "and every step in <b>Activity log</b>.")
+        reps = [a_ for a_ in ctx.artifacts if "_run_report_" in a_["path"]]
+        root_ = os.path.dirname(config.outputs_dir())
+        html_rep = next((a_ for a_ in reversed(reps) if a_["path"].endswith(".html")), None)
+        md_rep = next((a_ for a_ in reversed(reps) if a_["path"].endswith(".md")), None)
+        pdf = ctx.data.get("report_pdf")
+        d1, d2, d3 = st.columns(3)
+        if pdf and os.path.isfile(pdf):
+            d1.download_button("Download the report (PDF)", open(pdf, "rb").read(), file_name=f"run_report_{ctx.label}.pdf",
+                               mime="application/pdf", type="primary", use_container_width=True)
+        else:
+            d1.caption("PDF needs the reportlab package: pip install -r requirements.txt")
+        if html_rep:
+            body_ = open(os.path.join(root_, html_rep["path"]), encoding="utf-8").read()
+            d2.download_button("Download the report (web page)", body_, file_name=f"run_report_{ctx.label}.html",
+                               mime="text/html", use_container_width=True)
+            st.components.v1.html(body_, height=900, scrolling=True)
+        if md_rep:
+            d3.download_button("Download the report (text)", open(os.path.join(root_, md_rep["path"]), encoding="utf-8").read(),
+                               file_name=f"run_report_{ctx.label}.md", use_container_width=True)
     elif kind in ("gate", "error"):
         phase = pause.get("phase") or 1
         outcome = pause.get("gate", {}).get("outcome") or pause.get("outcome")
@@ -372,10 +451,8 @@ with tab_run:
             with st.container(border=True):
                 st.markdown(pause["content"])
         else:
-            try:
-                st.json(json.loads(pause["content"]), expanded=1)
-            except ValueError:
-                st.code(pause["content"][:6000], language=None)
+            with st.container(border=True):
+                show_data(pause["content"])
         a, r = st.columns(2)
         if a.button("Approve", key=pause["id"] + "_a", type="primary", use_container_width=True):
             answer({"choice": "approve"})
@@ -469,7 +546,10 @@ with tab_files:
             elif name.endswith(".html"):
                 st.components.v1.html(body, height=380, scrolling=True)
             elif name.endswith(".json"):
-                st.json(json.loads(body), expanded=1)
+                try:
+                    show_data(json.loads(body))
+                except ValueError:
+                    st.code(body[:5000], language=None)
             else:
                 st.code(body[:5000], language=None)
             st.download_button("Download", body, file_name=name, key="dl_" + name)
@@ -477,6 +557,8 @@ with tab_files:
 with tab_log:
     rows = logmod.entries(run_id=ctx.run_id)
     if rows:
-        st.dataframe([{k: (json.dumps(v) if isinstance(v, (list, dict)) else v) for k, v in r.items()
-                       if k in ("timestamp", "agent", "action", "model", "cost", "approved_by", "outcome")} for r in rows],
-                     use_container_width=True, hide_index=True)
+        st.caption(f"{len(rows)} steps recorded. Every step is also in decision_log.json.")
+        st.dataframe([{"Time (UTC)": r["timestamp"][11:19], "Who": r["agent"].replace("_", " "), "What happened": humanize(r["action"]),
+                       "Result": r.get("outcome") or r.get("choice") or "", "Model": (r.get("model") or "").split("/")[-1],
+                       "Approved by": r.get("approved_by") or "", "Cost": f"${float(r.get('cost') or 0):.2f}"} for r in rows],
+                      use_container_width=True, hide_index=True)

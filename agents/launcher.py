@@ -14,7 +14,20 @@ def _ctx_text(ctx):
     h1, h4 = ctx.handoffs["H1"], ctx.handoffs.get("H4", {})
     return (f"Product: {h1['idea_name']}: {h1['idea_description']}\nFormat: Markdown checklist + CSV tracker (A1), MIT licence.\n"
             f"Price: {h4.get('price')} {h4.get('currency')} one-time ({h4.get('price_basis')}).\n"
-            f"Segment: {h1.get('segment')}\nValidation status: {ctx.validation_status}")
+            f"Segment: {h1.get('segment')}\nValidation status: {ctx.validation_status}\n"
+            f"Files in the product (describe only these): {', '.join(f['role'] for f in (ctx.handoffs.get('H3') or {}).get('manifest', {}).get('files', []))}")
+
+
+WHAT = {"checklist": "Planning checklist (Markdown, imports into Notion)", "tracker": "Tracker spreadsheet (CSV, imports into Notion or any spreadsheet)",
+        "license": "Licence file (MIT)", "docs": "User guide (Markdown)"}
+
+
+def _what_you_get(ctx):
+    """The file list is written by code from the released manifest, never by the model, so the store
+    page cannot promise a file the product does not contain (an earlier real run listed a budget
+    template and a guest list that were never built)."""
+    files = (ctx.handoffs.get("H3") or {}).get("manifest", {}).get("files", [])
+    return [f"- {WHAT.get(f['role'], f['role'])}: `{f['path'].split('/')[-1]}`" for f in files] or ["- (no released files)"]
 
 
 def store_page(ctx, on_progress=None):
@@ -28,7 +41,7 @@ def store_page(ctx, on_progress=None):
     h4 = ctx.handoffs.get("H4", {})
     lines = ["STUBBED · NOT PUBLISHED", "", f"# {d['title']}", "", d["short_description"], "",
              f"**Price:** {h4.get('price')} {h4.get('currency')} one-time · Checkout: MOCKED (no payment of any kind runs)", "",
-             "## What you get", "", *[f"- {x}" for x in d["what_you_get"]], "", "## Who it is for", "", d["who_its_for"], "",
+             "## What you get", "", *_what_you_get(ctx), "", "## Who it is for", "", d["who_its_for"], "",
              "## FAQ", "", *[f"**{f['q']}**  \n{f['a']}\n" for f in d["faq"]],
              "", "Policies: Terms, Privacy, Refund and Delivery are DRAFT documents awaiting founder review."]
     return "\n".join(lines) + "\n"

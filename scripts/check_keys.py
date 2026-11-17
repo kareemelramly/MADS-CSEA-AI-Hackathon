@@ -14,7 +14,7 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 PROVIDERS = {
-    "nvidia": {"key": "NVIDIA_API_KEY", "base": "NVIDIA_BASE_URL", "model": "NVIDIA_MODEL", "base_default": "https://integrate.api.nvidia.com/v1",
+    "nvidia": {"key": "NVIDIA_API_KEY", "model": "NVIDIA_MODEL", "base": "https://integrate.api.nvidia.com/v1",
                "prefer": ["google/gemma-4-31b-it", "google/gemma-3-12b-it"],
                "extra": {"chat_template_kwargs": {"enable_thinking": False}}},
 }
@@ -62,7 +62,7 @@ def main():
         if not key:
             print("  no key in .env: tier skipped (that is fine; the local model still works)")
             continue
-        base = env.get(p["base"]) or p["base_default"]
+        base = p["base"]
         st, data = req(base.rstrip("/") + "/models", key)
         if st != 200:
             print(f"  provider refused the key (HTTP {st}). This tier is skipped; runs continue on the other tiers."
