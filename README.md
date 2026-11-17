@@ -43,19 +43,34 @@ Status rule: **Working** means the code exists and the named offline test passes
 | Guardrails against trick prompts (35-case eval set) | Working | `test_every_banned_case_refused_and_benign_allowed` |
 | Streamlit UI: verdict before buttons, approval panel, amber override bar, readiness line | Working | `test_approval_panel_shows_five_fields`, `test_amber_bar_after_override` |
 
-The committed demo outputs in `outputs/` and `decision_log.json` come from real runs of `scripts/demo_runs.sh` (weak brief W, excluded brief E, reasonable brief R); `docs/demo_runs.md` indexes them.
+<!-- runs:start -->
+Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):
+
+- `20261117T180747Z-w` (A mobile app that gamifies daily habit tracking with streaks): reached Phase 1 of 6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T180902Z-e` (A crypto trading signal bot that posts buy and sell alerts): reached Phase 1 of 6; final outcome `stop`; gates: phase1_gate: `stop`.
+- `20261117T180903Z-r` (Notion templates for wedding planners in Egypt: a planning c): reached Phase 1 of 6; final outcome `stop`; gates: phase1_gate: `go`.
+
+No committed run has reached Phase 6 yet, so the committed evidence does not demonstrate a complete six-phase run.
+<!-- runs:end -->
 
 ## Architecture
 
-A fixed Python state machine (`orchestrator.py`) runs Discover, Validate, Build, Commercial setup, Launch and Operate in order, pausing whenever the founder must decide. Agents are role functions (`agents/<role>.py`) with one prompt each (`prompts/`) and a JSON schema per call (`schemas/`); they cite fetched sources only by ID, and code renders the URLs. Gates (`gates.py`) are plain code that checks hard rules, then data completeness, then thresholds locked before the data, so thin search, an unrun experiment or a model outage gives `repeat` or `awaiting_evidence`, never a false `stop`. Every external effect goes through one approval executor (`approval.py`), and the sale-to-cash flow is a MOCKED SQLite ledger. Full design, diagrams and gate rules: [ARCHITECTURE.md](ARCHITECTURE.md).
+A fixed Python state machine (`orchestrator.py`) runs Discover, Validate, Build, Commercial setup, Launch and Operate in order, pausing whenever the founder must decide. Agents are role functions (`agents/<role>.py`) with one prompt each (`prompts/`) and a JSON schema per call (`schemas/`); they cite fetched sources only by ID, and code renders the URLs. Gates (`gates.py`) are plain code that checks hard rules, then data completeness, then thresholds locked before the data, so thin search, an unrun experiment or a model outage gives `repeat` or `awaiting_evidence`, never a false `stop`. Every external effect goes through one approval executor (`approval.py`), and the sale-to-cash flow is a MOCKED SQLite ledger. Full design, diagrams and gate rules: [ARCHITECTURE.md](ARCHITECTURE.md). Every hard rule is traced to the code that enforces it and the test that proves it in [docs/requirements_traceability.md](docs/requirements_traceability.md); the choices we rejected are in [docs/design_decisions.md](docs/design_decisions.md).
 
 ## Models and free resources
 
-- **Local (default, no key, no paid API):** Google **Gemma 4 26B A4B** instruction-tuned, GGUF **Q4_K_M** (unsloth `UD-Q4_K_M`, about 17 GB), served by **llama.cpp** `llama-server` (MIT). Weights licence: **Apache 2.0** (Google's Gemma 4 model card). Code licence: MIT (this repository).
-- **Measured local speed:** <!-- speed:start -->not measured yet; `scripts/model_check.py` writes the numbers here after the first run on the team laptop (16 GB GPU, `--n-cpu-moe 6`).<!-- speed:end -->
-- CPU-only machines run the same default compose file, slowly; a full run can take many minutes and is never cut short by the default 1800 s per-segment budget.
-- **Optional free remote tier** (free, no card, needs your own key in `.env`): NVIDIA Build serving Google `gemma-4-31b-it` (open weights, Apache 2.0). Remote calls receive prompt text, so use demo briefs only. Order is set by `LLM_ORDER` (default `nvidia,local`); no GPT-family model is used on any tier.
-- Evidence sources are keyless public APIs: HN Algolia, Stack Exchange, GitHub issues search; Wikipedia for background only. Reddit is not used (its data terms require credentials).
+No paid service is needed. A fresh clone with no `.env` runs entirely on the local model.
+
+| Tier | Model and runtime | Licence (source) | Cost and access (source) |
+|---|---|---|---|
+| Local (default, always on) | Google Gemma 4 26B A4B instruction-tuned, GGUF Q4_K_M (unsloth `UD-Q4_K_M`, about 17 GB), served by llama.cpp `llama-server` | Weights Apache 2.0 ([Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4)); llama.cpp MIT ([repository](https://github.com/ggml-org/llama.cpp)) | $0; runs on your machine |
+| Remote (optional) | NVIDIA Build hosted `google/gemma-4-31b-it`, OpenAI-compatible | Same Gemma 4 Apache 2.0 terms ([model card](https://ai.google.dev/gemma/docs/core/model_card_4)) | Free developer key, no card; prototyping use with rate limits ([NVIDIA NIM FAQ via build.nvidia.com](https://build.nvidia.com)). Exact limits vary by account (ASSUMPTION) |
+
+- **Measured local speed:** <!-- speed:start -->measured 2026-11-17T20:07:46 on the team laptop through llama.cpp: 10/10 schema-valid (correctness pass), about 81.6 tokens/s, slowest call 3.3 s (performance fast against the 40 tokens/s and 30 s planning limits).<!-- speed:end -->
+- CPU-only machines run the same default compose file, slowly; the default 1800 s per-segment budget (ASSUMPTION) keeps a slow machine from being cut off.
+- The remote tier is optional: add `NVIDIA_API_KEY` to `.env`. If it fails, lags or runs out of quota, calls fall back to the local model automatically (tested in `tests/test_llm_cascade.py`). Remote calls receive prompt text, so use demo briefs only. No GPT-family model is used on any tier.
+- Evidence sources are keyless public APIs: [HN Algolia search](https://hn.algolia.com/api), [Stack Exchange API](https://api.stackexchange.com/docs), [GitHub issue search](https://docs.github.com/en/rest/search/search); [Wikipedia](https://www.mediawiki.org/wiki/API:Search) for background only. Reddit is not used because its [data API terms](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki) require registered credentials.
+- All gate thresholds (20 items screened, 3 relevant items, fit 3 of 5, 100 sign-ups in 14 days, 200 visitors) are planning values labelled ASSUMPTION and logged before any data.
 
 ## Cost per run
 

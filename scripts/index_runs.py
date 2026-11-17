@@ -1,6 +1,7 @@
 """Generate docs/demo_runs.md from decision_log.json (SRS LOG-6). Generated, never edited."""
 import json
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,6 +21,9 @@ def main():
             r["gates"].append(f"{e['action']}: `{e.get('outcome')}`")
         if e["action"] == "write_output":
             r["files"].append(e["path"])
+            m = re.search(r"phase([1-6])_", os.path.basename(e["path"]))
+            if m:
+                r.setdefault("phases", set()).add(int(m.group(1)))
         if e.get("model"):
             r["tiers"].add(e["model"])
         if e["action"] == "end_run":
@@ -32,7 +36,21 @@ def main():
         L += [f"- [{f}](../{f})" for f in r["files"]] + [""]
     os.makedirs(os.path.join(ROOT, "docs"), exist_ok=True)
     open(os.path.join(ROOT, "docs", "demo_runs.md"), "w", encoding="utf-8").write("\n".join(L))
-    print(f"docs/demo_runs.md: {len(runs)} runs")
+    summary = []
+    for rid, r in runs.items():
+        if not r["brief"]:
+            continue
+        ph = max(r.get("phases") or {0})
+        summary.append(f"- `{rid}` ({r['brief'][:60]}): reached Phase {ph} of 6; final outcome `{r['outcome']}`; gates: {'; '.join(r['gates']) or 'none'}.")
+    full = any(max(r.get("phases") or {0}) == 6 for r in runs.values())
+    text = ("Committed demo runs (generated from `decision_log.json` by `scripts/index_runs.py`):\n\n" + "\n".join(summary) +
+            ("\n\nAt least one committed run went through all six phases." if full else
+             "\n\nNo committed run has reached Phase 6 yet, so the committed evidence does not demonstrate a complete six-phase run."))
+    rp = os.path.join(ROOT, "README.md")
+    txt = open(rp, encoding="utf-8").read()
+    txt = re.sub(r"(<!-- runs:start -->\n).*?(\n<!-- runs:end -->)", lambda m: m.group(1) + text + m.group(2), txt, flags=re.S)
+    open(rp, "w", encoding="utf-8").write(txt)
+    print(f"docs/demo_runs.md: {len(runs)} runs; README run summary updated")
     return 0
 
 

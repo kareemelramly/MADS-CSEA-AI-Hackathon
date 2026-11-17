@@ -46,6 +46,8 @@ class Net:
             return 401, {}, ""
         if step == "500":
             return 500, {}, ""
+        if step == "400":
+            return 400, {}, ""
         if step == "hang":
             self.clock.t += timeout
             raise socket.timeout("timed out")
@@ -243,3 +245,16 @@ def test_no_gpt_model_allowed(env, monkeypatch):
     monkeypatch.setenv("NVIDIA_MODEL", "openai/gpt-oss-20b")
     with pytest.raises(RuntimeError):
         llm.tiers()
+
+
+def test_remote_rejecting_request_shape_is_disabled_and_local_answers(env, setup):
+    clock, mp = setup
+    keys(mp)
+    net = Net(clock, {"nvidia": ["400"]})
+    llm.set_transport(net)
+    c = mkctx(clock)
+    assert ask(c) == {"answer": "ok"}
+    assert [x[0] for x in net.calls][-1] == "local"
+    net.calls.clear()
+    ask(c)
+    assert [x[0] for x in net.calls] == ["local"]          # never asked again in this session

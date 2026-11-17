@@ -68,7 +68,7 @@ It works whether or not `docker compose up` is running. It prints what to type b
 | Run R, Phase 2 gate (awaiting evidence) | `override`, then press Enter |
 | Run R, Phase 6 decision | `stop` |
 
-When it prints **Finished**, tell Claude "done". Nothing is committed or pushed by the script.
+When it prints **Finished**, review `outputs/` and `docs/demo_runs.md`. Nothing is committed or pushed by the script.
 
 ## E. If something goes wrong
 
@@ -78,4 +78,4 @@ When it prints **Finished**, tell Claude "done". Nothing is committed or pushed 
 | `could not select device driver "nvidia"` | Fix the GPU line in step A, or delete the `COMPOSE_FILE=` line in `.env` |
 | Port 8501 or 8081 busy | `docker compose down`, then try again |
 | Model will not load: out of GPU memory | Only one copy of the model fits: run `bash scripts/stop_local_llm.sh`, then `docker compose up` again |
-| A test fails | Copy the lines that start with `FAILED` and send them to Claude |
+| A test fails | Copy the lines that start with `FAILED` and share them with the team |

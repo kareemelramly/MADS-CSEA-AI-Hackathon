@@ -4,10 +4,7 @@ Observed charges come from the log (`cost` field, USD). Local and free-tier call
 
 | Run ID | Outcome | Model calls | Tokens (prompt + completion) | Observed charge | System time (s) | Tiers |
 |---|---|---|---|---|---|---|
-| 20261117T165636Z-w | None | 7 | 10902 (8213 + 2689) | $0.00 | None | tier3/llamacpp: 7 calls, 10902 tokens |
-| 20261117T165843Z-e | stop | 0 | 0 (0 + 0) | $0.00 | 0.0 | none (no model call) |
-| 20261117T165843Z-r | stop | 6 | 7935 (5790 + 2145) | $0.00 | 56.0 | tier3/llamacpp: 6 calls, 7935 tokens |
-| payment-test-20261117T170053Z | None | 0 | 0 (0 + 0) | $0.00 | None | none (no model call) |
-
-Full-run measurement (from 1 complete run, label r): 6 model calls, 7935 tokens.
-If every call went to Groq's free tier (200,000 tokens/day, provider page read 17 Nov 2026), about 25 full runs per day would fit (estimate).
+| 20261117T180747Z-w | stop | 5 | 7878 (6029 + 1849) | $0.00 | 46.1 | tier2/llamacpp: 5 calls, 7878 tokens |
+| 20261117T180902Z-e | stop | 0 | 0 (0 + 0) | $0.00 | 0.0 | none (no model call) |
+| 20261117T180903Z-r | stop | 6 | 7950 (5788 + 2162) | $0.00 | 48.4 | tier2/llamacpp: 6 calls, 7950 tokens |
+| payment-test-20261117T181003Z | None | 0 | 0 (0 + 0) | $0.00 | None | none (no model call) |

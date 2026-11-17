@@ -66,7 +66,19 @@ def valid(text):
     return all(p.get("evidence") == "ASSUMPTION" for p in o["pain_points"])
 
 
+def server_up():
+    try:
+        with urllib.request.urlopen(BASE.rstrip("/").rsplit("/v1", 1)[0] + "/health", timeout=5) as r:
+            return r.status == 200
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def main():
+    if not server_up():
+        print("The local model server is not running at " + BASE + ". Start it with: bash scripts/start_local_llm.sh "
+              "(if it stops again, run: tail -30 state/llama-server.log). No result was written.")
+        return 2
     ok, times, speeds = 0, [], []
     for i, b in enumerate(BRIEFS, 1):
         good = False
@@ -75,6 +87,10 @@ def main():
                 text, dt, tps = call(b)
             except Exception as e:  # noqa: BLE001
                 print(f"{i:2d} error {type(e).__name__}: {e}")
+                if not server_up():
+                    print("The local model server stopped while answering (it probably crashed). "
+                          "See: tail -30 state/llama-server.log. No result was written.")
+                    return 2
                 continue
             times.append(dt)
             speeds.append(tps)

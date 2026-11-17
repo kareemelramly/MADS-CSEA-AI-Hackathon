@@ -44,7 +44,7 @@ flowchart TD
     D[("SQLite: runs, sources, artifacts, gates, approvals, ledger, action_log")] -.-> J[("decision_log.json")]
 ```
 
-Design choices in one place:
+Design choices in one place (full record with rejected alternatives: [docs/design_decisions.md](docs/design_decisions.md); rule-to-test map: [docs/requirements_traceability.md](docs/requirements_traceability.md)):
 
 | Choice | Decision | Why |
 |---|---|---|

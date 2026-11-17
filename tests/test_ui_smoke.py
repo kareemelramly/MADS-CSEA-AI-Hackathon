@@ -16,7 +16,7 @@ def test_home_shows_status_readiness_and_brief_form(env):
     text = " ".join(m.value for m in list(at.info) + list(at.warning) + list(at.success))
     assert "Model:" in text and "Local model" in text
     assert any(t.label == "Idea" for t in at.text_area)
-    assert any(t.label.startswith("Run label") for t in at.text_input)
+    assert any(t.label.startswith("Run name") for t in at.text_input)
 
 
 def _at_with_pause(env, fake_llm, fake_sources, until):
@@ -37,8 +37,9 @@ def test_verdict_shown_before_buttons(env, fake_llm, fake_sources):
     at, _ = _at_with_pause(env, fake_llm, fake_sources, lambda p: p["kind"] == "gate")
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
-    assert "NOT validated" in md or "relevant" in md
-    assert [b.label for b in at.button if b.label in ("Continue", "Stop")]
+    assert "Checkpoint" in md and ("NOT validated" in md or "relevant" in md)
+    labels = [b.label for b in at.button]
+    assert any(l.startswith("Continue") for l in labels) and "Stop here" in labels
 
 
 def test_approval_panel_shows_five_fields(env, fake_llm, fake_sources):
@@ -71,6 +72,12 @@ def test_real_counts_form_submits_and_gate_waits(env, fake_llm, fake_sources):
     import json as _j
     llm_fake = fake_llm
     at.button[[b.label for b in at.button].index("Submit real results")].click().run()
+    import time as _t
+    for _ in range(40):
+        if "agents are working" not in " ".join(m.value for m in at.markdown):
+            break
+        _t.sleep(0.2)
+        at.run()
     assert not at.exception
     md = " ".join(m.value for m in at.markdown)
     assert "nothing is decided" in md

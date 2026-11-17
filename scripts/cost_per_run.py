@@ -20,7 +20,7 @@ def summarize(log):
         if not rid:
             continue
         r = runs.setdefault(rid, {"calls": 0, "tokens": 0, "prompt": 0, "completion": 0, "cost": 0.0, "tiers": {}, "system_time_s": None,
-                                  "outcome": None, "label": rid.split("-")[-1]})
+                                  "outcome": None, "label": rid.split("-")[-1], "phases": set()})
         if e.get("model"):
             r["calls"] += 1
             t = (e.get("prompt_tokens") or 0) + (e.get("completion_tokens") or 0)
@@ -35,6 +35,10 @@ def summarize(log):
         if e.get("action") == "end_run":
             r["system_time_s"] = e.get("system_time_s")
             r["outcome"] = e.get("outcome")
+        if e.get("action") == "write_output":
+            match = re.search(r"phase([1-6])_", os.path.basename(e.get("path", "")))
+            if match:
+                r["phases"].add(int(match.group(1)))
     return runs
 
 
@@ -55,7 +59,7 @@ def main(argv=None):
     for rid, r in runs.items():
         tiers = "; ".join(f"{k}: {v['calls']} calls, {v['tokens']} tokens" for k, v in r["tiers"].items()) or "none (no model call)"
         lines.append(f"| {rid} | {r['outcome']} | {r['calls']} | {r['tokens']} ({r['prompt']} + {r['completion']}) | ${r['cost']:.2f} | {r['system_time_s']} | {tiers} |")
-    full = [r for r in runs.values() if r["label"] == "r"]
+    full = [r for r in runs.values() if r["label"] == "r" and 6 in r["phases"]]
     if full:
         r = max(full, key=lambda x: x["calls"])
         lines += ["", f"Full-run measurement (from 1 complete run, label r): {r['calls']} model calls, {r['tokens']} tokens."]

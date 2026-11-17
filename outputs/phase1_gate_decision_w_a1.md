@@ -2,7 +2,7 @@
 
 **Outcome:** `stop`
 
-Founder fit 1.45 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
+Founder fit 1.60 of 5 is below the threshold 3.0. No alternative passes. What would change it: more time, budget or matching skills in the brief.
 
 | Measure | Value |
 |---|---|
@@ -10,7 +10,7 @@ Founder fit 1.45 of 5 is below the threshold 3.0. No alternative passes. What wo
 | items_screened | 61 |
 | relevant_items | 13 |
 | relevant_sources | 2 |
-| fit_score | 1.45 |
+| fit_score | 1.6 |
 | threshold_min_sources_ok | 2 |
 | threshold_min_items_screened | 20 |
 | threshold_min_relevant | 3 |

@@ -39,7 +39,7 @@ elif ! python scripts/model_check.py "$LOCAL_URL"; then
   [ "$ans" = "y" ] || exit 1
 fi
 
-curl -sf "${LOCAL_URL%/v1}/health" >/dev/null 2>&1 || { tail -25 state/llama-server.log 2>/dev/null; die "The local model server is not running (log above). Send Claude the lines above."; }
+curl -sf "${LOCAL_URL%/v1}/health" >/dev/null 2>&1 || { tail -25 state/llama-server.log 2>/dev/null; die "The local model server is not running (log above). Share the lines above with the team."; }
 
 step "Step 6 of 8 · Clear old results (moved to state/, nothing is deleted)"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
@@ -71,5 +71,5 @@ python scripts/cost_per_run.py > /dev/null && echo "docs/cost_report.md written;
 python scripts/check_outputs.py --all
 python scripts/check_docs.py
 
-printf "\n${G}${B}Finished.${X} Tell Claude \"done\" so it can review outputs/, decision_log.json and docs/.\n"
+printf "\n${G}${B}Finished.${X} Review outputs/, decision_log.json and docs/ before committing.\n"
 printf "Nothing was committed or pushed.\n"

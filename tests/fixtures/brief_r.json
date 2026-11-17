@@ -70,6 +70,17 @@
       "waitlist_signups": 100,
       "paying_customers": 5
     },
-    "p6_metrics": []
+    "p6_metrics": [],
+    "demo_hints": {
+      "gate:1": "continue (or override if it says STOP/PIVOT)",
+      "gate:2": "override",
+      "gate:3": "continue",
+      "gate:4": "retry",
+      "gate:5": "retry",
+      "gate:6": "stop",
+      "approval": "approve",
+      "input": "y",
+      "error": "try_again"
+    }
   }
 }

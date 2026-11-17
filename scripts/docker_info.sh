@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prints which kind of Docker is installed (no changes). Send the output to Claude.
+# Prints which kind of Docker is installed (no changes). Share the output with the team.
 echo "context: $(docker context show 2>/dev/null)"
 echo "server:  $(docker info --format '{{.OperatingSystem}} | runtimes: {{json .Runtimes}}' 2>/dev/null)"
 command -v snap >/dev/null && snap list docker 2>/dev/null | tail -1 | sed 's/^/snap:    /'

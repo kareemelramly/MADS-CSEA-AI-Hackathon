@@ -9,5 +9,10 @@
   "values": "Privacy, no ads, no manipulative design",
   "search_terms": "habit tracker app",
   "founder_evidence": [],
-  "founder_inputs": {}
+  "founder_inputs": {
+    "demo_hints": {
+      "gate:1": "stop",
+      "error": "try_again"
+    }
+  }
 }

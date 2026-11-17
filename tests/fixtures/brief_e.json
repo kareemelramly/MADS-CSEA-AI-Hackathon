@@ -7,5 +7,7 @@
   "target_market": "Retail traders",
   "countries": "Global",
   "values": "Speed",
-  "founder_inputs": {}
+  "founder_inputs": {
+    "demo_hints": {}
+  }
 }

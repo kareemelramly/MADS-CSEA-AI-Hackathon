@@ -606,6 +606,8 @@ def phase6(ctx, prog):
     finish(ctx, {"persevere": "go", "pivot": "pivot_back", "stop": "stop"}.get(dec["choice"], "stop"), "Phase 6 decision recorded")
 
 
+_state_probe = {"enabled": True}
+
 PHASES = {"p1": phase1, "p2": phase2, "p3": phase3, "p4": phase4, "p5": phase5, "p6": phase6}
 
 
@@ -614,6 +616,10 @@ def run_until_gate(ctx, on_progress=None, clock=time.monotonic):
     if ctx.finished:
         return {"id": "done", "kind": "done", "outcome": ctx.final_outcome}
     ctx.start_segment(clock)
+    if _state_probe["enabled"]:
+        res = llm.probe_remote()
+        if res and any(v != "ok" for v in res.values()):
+            ctx.log("llm", "remote_tier_unavailable", detail=res, fallback="local")
     try:
         while not ctx.finished:
             stage = ctx.stage

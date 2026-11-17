@@ -130,6 +130,30 @@ def status():
     return out
 
 
+def probe_remote(timeout=4):
+    """Once per segment: a cheap GET /models on each remote tier. A tier that does not answer is
+    cooled down (or disabled on 401/403) before any agent call, so a failing provider costs seconds,
+    not one timeout per call."""
+    out = {}
+    for t in tiers():
+        if t["local"] or not available(t):
+            continue
+        req = urllib.request.Request(t["base"].rstrip("/") + "/models", headers={"Authorization": "Bearer " + t["key"]})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                out[t["name"]] = "ok" if r.status == 200 else f"HTTP {r.status}"
+        except urllib.error.HTTPError as e:
+            out[t["name"]] = f"HTTP {e.code}"
+            if e.code in (401, 403):
+                _state["disabled"].add(t["name"])
+            else:
+                _cool(t["name"], config.cooldown_default())
+        except Exception as e:  # noqa: BLE001
+            out[t["name"]] = type(e).__name__
+            _cool(t["name"], config.cooldown_default())
+    return out
+
+
 def has_remote_key():
     return any(t["key"] and not t["local"] for t in tiers())
 
@@ -187,7 +211,7 @@ def _body(t, system, user, schema, max_tokens, with_extra=True, plain_json=False
             "temperature": 0.2, "max_tokens": max_tokens, "stream": False}
     if t["local"] and not plain_json:
         body["response_format"] = {"type": "json_schema", "json_schema": {"name": "output", "schema": schema}}
-    else:
+    elif not plain_json:
         body["response_format"] = {"type": "json_object"}
     if with_extra:
         body.update(t.get("extra") or {})
@@ -319,10 +343,15 @@ def ask(system, user, schema, agent, action, *, ctx, sources=(), task_id=None,
                 with_extra = False      # provider rejected an optional parameter; retry plain once
                 attempts -= 1
                 continue
-            if status_code == 400 and t["local"] and not plain_json:
-                plain_json = True       # server rejected the schema grammar; fall back to JSON mode + schema in prompt
+            if status_code == 400 and not plain_json:
+                plain_json = True       # server rejected the response format; retry once with the schema in the prompt only
                 attempts -= 1
                 continue
+            if status_code == 400 and not t["local"]:
+                _state["disabled"].add(t["name"])   # the provider does not accept our request shape: stop asking it
+                reasons.append(f"{t['name']}: HTTP 400 (request not accepted), tier disabled")
+                jump_local = True
+                break
             if status_code >= 500 or status_code != 200:
                 _cool(t["name"], config.cooldown_default())
                 reasons.append(f"{t['name']}: HTTP {status_code}")

@@ -23,7 +23,7 @@ else
         "Run: sed -i 's|^LOCAL_MODEL_DIR=.*|LOCAL_MODEL_DIR=$(dirname "$FOUND")|' .env   (create .env first with: cp .env.example .env)"
     case "$(basename "$FOUND")" in *Q4_K_M*) ;; *) echo "       -> Also run: sed -i 's|^LOCAL_MODEL_FILE=.*|LOCAL_MODEL_FILE=$(basename "$FOUND")|' .env";; esac
   else
-    bad "No .gguf model file found in $MODEL_DIR or ~/models" "Tell Claude the full path of your .gguf file (run: find ~ -name '*.gguf' 2>/dev/null)"
+    bad "No .gguf model file found in $MODEL_DIR or ~/models" "Set LOCAL_MODEL_DIR in .env to the folder of your .gguf file (run: find ~ -name '*.gguf' 2>/dev/null)"
   fi
 fi
 command -v python3 >/dev/null && ok "python3 installed" || bad "python3 missing" "sudo apt install python3"
