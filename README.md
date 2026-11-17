@@ -136,4 +136,7 @@ $0.00 in model/API charges observed for complete six-phase run 20261117T210325Z-
 | **Next 3 months** | Arabic and English output for MENA founders; two more product shapes (HTML guide, template pack); a real-results import so Phase 2 and Phase 6 can judge actual experiments |
 | **6 to 12 months** | Consented real integrations (form provider, store, email) behind the same approval executor, still with no payment handled by the system; a public evaluation set of briefs and trick prompts |
 | **Community** | Issues and pull requests; each new agent ships with a prompt file, a schema and an offline test; university entrepreneurship clubs as the first users and testers |
+| **Business case** | Customer, positioning, sustainability and milestones in one page: [docs/business_case.md](docs/business_case.md) |
+| **Safety case** | Each hard rule, the code that enforces it and the test that proves it: [docs/safety_case.md](docs/safety_case.md) |
+| **Pitch and FAQ** | Slide-by-slide pitch with its evidence: [docs/pitch_outline.md](docs/pitch_outline.md); questions founders ask: [docs/faq.md](docs/faq.md) |
 | **Funding** | None committed today. Running it costs $0.00 in model or API charges, so the project survives on volunteer time; we will apply to university innovation grants and open-source sponsorship. Core features stay free |
