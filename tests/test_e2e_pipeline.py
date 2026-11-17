@@ -8,7 +8,7 @@ from conftest import FakeLLM, FakeSources, TestFounder, drive, load_brief
 import llm
 import sources
 
-NAME = re.compile(r"^(phase[1-6]_(step\d+|gate)_[a-z0-9_]+-[a-z0-9]+-a\d+\.(md|json|csv|txt|html)|payment_test_log\.md)$")
+NAME = re.compile(r"^(phase[1-6]_(step\d+|gate)_[a-z0-9_]+_[a-z0-9]+_a\d+\.(md|json|csv|txt|html)|payment_test_log\.md)$")
 
 
 def _log(env):
@@ -21,7 +21,7 @@ def test_brief_e_stops_on_exclusion(env, fake_llm, fake_sources):
     p = orchestrator.run_until_gate(ctx)
     assert p["kind"] == "done" and ctx.final_outcome == "stop"
     assert fake_llm.calls == []                      # no model call for an excluded brief
-    g = json.load(open(env / "outputs" / "phase1_gate_decision-e-a1.json"))
+    g = json.load(open(env / "outputs" / "phase1_gate_decision_e_a1.json"))
     assert g["gate"]["outcome"] == "stop" and g["gate"]["overridable"] is False
 
 
@@ -47,7 +47,7 @@ def test_brief_w_weak_fit_stops(env, fake_sources):
     orchestrator.respond(ctx, {"choice": "stop"}, "button")
     assert orchestrator.run_until_gate(ctx)["kind"] == "done"
     names = os.listdir(env / "outputs")
-    assert "phase1_gate_decision-w-a1.md" in names
+    assert "phase1_gate_decision_w_a1.md" in names
 
 
 def test_brief_r_full_run_with_override(env, fake_llm, fake_sources):
@@ -61,7 +61,7 @@ def test_brief_r_full_run_with_override(env, fake_llm, fake_sources):
     for n in out:
         assert NAME.match(n), n
     # Phase 2 waited for evidence and the founder overrode it.
-    g2 = json.load(open(env / "outputs" / "phase2_gate_decision-r-a1.json"))
+    g2 = json.load(open(env / "outputs" / "phase2_gate_decision_r_a1.json"))
     assert g2["gate"]["outcome"] == "awaiting_evidence"
     assert ctx.validation_status == "UNVALIDATED_FOUNDER_OVERRIDE"
     # Every later output carries the override banner.
@@ -70,7 +70,7 @@ def test_brief_r_full_run_with_override(env, fake_llm, fake_sources):
             text = open(env / "outputs" / n, encoding="utf-8").read()
             assert "UNVALIDATED · FOUNDER OVERRIDE" in text, n
     # Phase 6 never says persevere on awaiting evidence.
-    memo = open(env / "outputs" / "phase6_step1_memo-r-a1.md", encoding="utf-8").read()
+    memo = open(env / "outputs" / "phase6_step1_memo_r_a1.md", encoding="utf-8").read()
     assert "`go`" not in memo
     log = _log(env)
     for e in log:
@@ -87,4 +87,4 @@ def test_no_file_overwritten_across_runs(env, fake_llm, fake_sources):
         ctx = orchestrator.new_run(b, "e")
         orchestrator.run_until_gate(ctx)
     names = os.listdir(env / "outputs")
-    assert "phase1_gate_decision-e-a1.md" in names and "phase1_gate_decision-e-a2.md" in names
+    assert "phase1_gate_decision_e_a1.md" in names and "phase1_gate_decision_e_a2.md" in names

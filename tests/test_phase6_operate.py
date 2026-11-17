@@ -45,7 +45,7 @@ def test_targets_logged_first_and_every_number_labelled(env, fake_llm, fake_sour
     drive(ctx, TestFounder(pre))
     acts = [e["action"] for e in json.load(open(env / "decision_log.json"))]
     assert acts.index("set_phase6_targets") < acts.index("draft_support_faq")
-    memo = open(env / "outputs" / "phase6_step1_memo-t-a1.md", encoding="utf-8").read()
+    memo = open(env / "outputs" / "phase6_step1_memo_t_a1.md", encoding="utf-8").read()
     rows = [l for l in memo.splitlines() if l.startswith("| ") and not l.startswith("| Metric") and "|---" not in l and "Target" not in l]
     metric_rows = [l for l in rows if l.count("|") == 5]
     assert metric_rows and all(any(t in l for t in ("| real |", "| MOCKED |", "| SIMULATED |")) for l in metric_rows)

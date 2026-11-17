@@ -1,6 +1,6 @@
 """Check the optional remote tiers with your .env keys (never prints a key, writes nothing to the
-committed log). For Groq and NVIDIA Build it lists the served models, confirms the configured model
-exists (picking the closest open-weight Qwen model if not, and updating .env), and makes one tiny
+committed log). For NVIDIA Build it lists the served models, confirms the configured model
+exists (picking the closest open-weight Gemma model if not, and updating .env), and makes one tiny
 JSON call.        python scripts/check_keys.py
 """
 import json
@@ -14,10 +14,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.path.join(ROOT, ".env")
 PROVIDERS = {
-    "groq": {"key": "GROQ_API_KEY", "base": "GROQ_BASE_URL", "model": "GROQ_MODEL", "base_default": "https://api.groq.com/openai/v1",
-             "prefer": ["qwen/qwen3.8-27b", "qwen/qwen3-32b"], "extra": {"reasoning_effort": "none"}},
     "nvidia": {"key": "NVIDIA_API_KEY", "base": "NVIDIA_BASE_URL", "model": "NVIDIA_MODEL", "base_default": "https://integrate.api.nvidia.com/v1",
-               "prefer": ["qwen/qwen3.8-27b", "qwen/qwen3-next-80b-a3b-instruct", "qwen/qwen3-235b-a22b", "qwen/qwen2.5-coder-32b-instruct"],
+               "prefer": ["google/gemma-4-31b-it", "google/gemma-3-12b-it"],
                "extra": {"chat_template_kwargs": {"enable_thinking": False}}},
 }
 
@@ -67,13 +65,14 @@ def main():
         base = env.get(p["base"]) or p["base_default"]
         st, data = req(base.rstrip("/") + "/models", key)
         if st != 200:
-            print(f"  model list failed: HTTP {st}. Check the key in .env.")
+            print(f"  provider refused the key (HTTP {st}). This tier is skipped; runs continue on the other tiers."
+                  )
             continue
         ids = [m["id"] for m in data.get("data", []) if not re.search("gpt", m["id"], re.I)]
         want = env.get(p["model"]) or p["prefer"][0]
-        model = want if want in ids else next((m for m in p["prefer"] if m in ids), None) or next((m for m in ids if "qwen" in m.lower()), None)
+        model = want if want in ids else next((m for m in p["prefer"] if m in ids), None) or next((m for m in ids if "gemma" in m.lower()), None)
         if not model:
-            print(f"  no open-weight Qwen model served; available: {ids[:8]}")
+            print(f"  no suitable open-weight model served; available: {ids[:8]}")
             continue
         if model != want:
             print(f"  '{want}' is not served here; using '{model}' instead (written to .env)")

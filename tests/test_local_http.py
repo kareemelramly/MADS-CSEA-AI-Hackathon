@@ -69,6 +69,6 @@ def test_full_run_over_local_http(env, server, fake_sources):
     assert SEEN and all(s["response_format"]["type"] == "json_schema" for s in SEEN)
     assert all("Authorization" not in json.dumps(s) for s in SEEN)
     log = json.load(open(env / "decision_log.json"))
-    calls = [e for e in log if (e.get("model") or "").startswith("tier3/llamacpp/")]
+    calls = [e for e in log if (e.get("model") or "").startswith("tier2/llamacpp/")]
     assert len(calls) == len(SEEN) <= 16
     assert all(e["cost"] == 0 and e["prompt_tokens"] > 0 for e in calls)

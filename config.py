@@ -43,7 +43,7 @@ def decision_log_path():
 
 # Model access (SRS 4.2)
 def llm_order():
-    return [t.strip() for t in os.environ.get("LLM_ORDER", "groq,nvidia,local").split(",") if t.strip()]
+    return [t.strip() for t in os.environ.get("LLM_ORDER", "nvidia,local").split(",") if t.strip()]
 
 
 def remote_timeout():

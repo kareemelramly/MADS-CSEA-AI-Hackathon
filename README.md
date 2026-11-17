@@ -1,4 +1,4 @@
-# Agentic Venture Builder
+# Agentic Venture Builder · Team Delulu
 
 An open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, market, values) through six gated phases toward a validated, sellable **digital** product, and says **stop** when the evidence is weak. Code decides every gate; the founder approves every external action; publishing is STUBBED and payments are MOCKED.
 
@@ -14,7 +14,7 @@ Open http://localhost:8501. The page shows a model status line and a local-model
 - NVIDIA GPU: `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up`.
 - Check your machine first: `bash scripts/doctor.sh`. Step-by-step guide: [docs/how_to_run.md](docs/how_to_run.md).
 - Tests (offline, no keys): `docker compose run --rm app pytest -q`.
-- Optional free remote tiers: copy `.env.example` to `.env` and add a Groq and/or NVIDIA Build key.
+- Optional free remote tier: copy `.env.example` to `.env` and add an NVIDIA Build key.
 - Headless CLI with typed founder answers: `python -m orchestrator --brief tests/fixtures/brief_r.json --label r`.
 
 ## What works and what is mocked
@@ -39,7 +39,7 @@ Status rule: **Working** means the code exists and the named offline test passes
 | 6 Operate: metrics labelled real / MOCKED / SIMULATED, template memo, founder decision | Working | `test_mock_only_never_persevere`, `test_founder_decision_logged` |
 | `pivot_back` routes: Build re-plan, Commercial → Build, Launch → Commercial | Working | `test_g3_rescope_once_then_stop`, `test_g4_rejected_offer_pivots_to_phase3`, `test_g5_rejected_drafts_retry` |
 | Founder approval executor (action, content, destination, amount, run ID; single use) | Working | `test_approval_refused_after_any_field_change`, `test_consumed_approval_cannot_run_twice` |
-| Model chain Groq → NVIDIA → local llama.cpp, sticky per task, time budget | Working (fake HTTP) | `test_llm_cascade` |
+| Model chain NVIDIA Build → local llama.cpp, sticky per task, time budget | Working (fake HTTP) | `test_llm_cascade` |
 | Guardrails against trick prompts (35-case eval set) | Working | `test_every_banned_case_refused_and_benign_allowed` |
 | Streamlit UI: verdict before buttons, approval panel, amber override bar, readiness line | Working | `test_approval_panel_shows_five_fields`, `test_amber_bar_after_override` |
 
@@ -54,7 +54,7 @@ A fixed Python state machine (`orchestrator.py`) runs Discover, Validate, Build,
 - **Local (default, no key, no paid API):** Google **Gemma 4 26B A4B** instruction-tuned, GGUF **Q4_K_M** (unsloth `UD-Q4_K_M`, about 17 GB), served by **llama.cpp** `llama-server` (MIT). Weights licence: **Apache 2.0** (Google's Gemma 4 model card). Code licence: MIT (this repository).
 - **Measured local speed:** <!-- speed:start -->not measured yet; `scripts/model_check.py` writes the numbers here after the first run on the team laptop (16 GB GPU, `--n-cpu-moe 6`).<!-- speed:end -->
 - CPU-only machines run the same default compose file, slowly; a full run can take many minutes and is never cut short by the default 1800 s per-segment budget.
-- **Optional free remote tiers** (free tier, no card, needs your own key in `.env`): Groq `qwen/qwen3.8-27b` (Apache-2.0) and NVIDIA Build. Remote tiers receive prompt text, so use demo briefs only. Order is set by `LLM_ORDER` (default `groq,nvidia,local`); no GPT-family model is used on any tier.
+- **Optional free remote tier** (free, no card, needs your own key in `.env`): NVIDIA Build serving Google `gemma-4-31b-it` (open weights, Apache 2.0). Remote calls receive prompt text, so use demo briefs only. Order is set by `LLM_ORDER` (default `nvidia,local`); no GPT-family model is used on any tier.
 - Evidence sources are keyless public APIs: HN Algolia, Stack Exchange, GitHub issues search; Wikipedia for background only. Reddit is not used (its data terms require credentials).
 
 ## Cost per run
@@ -80,7 +80,7 @@ Not recorded yet. The video (at most 3 minutes) will show a STOP verdict, the ap
 
 ## How the project stays alive after the hackathon
 
-- **Maintainers:** the four team members who built it keep triaging issues and reviewing pull requests on `main`.
+- **Maintainers:** the four members of Team Delulu, who built it, keep triaging issues and reviewing pull requests on `main`.
 - **Roadmap:** product shapes A2 (HTML guide) and A3 (template pack); Arabic and English output for MENA founders; consented real integrations behind the same approval executor (see ARCHITECTURE.md, Roadmap).
 - **Community:** contributions through issues and pull requests; every new agent needs a prompt file, a schema and an offline test, and `pytest -q` must pass without keys.
 - **Funding:** none today. Running costs stay at $0 because the default path is local and open-weight.

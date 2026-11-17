@@ -67,6 +67,6 @@ def test_persona_test_is_simulated_and_excluded(env, fake_sources):
     f = ctx.final("phase2_step4_persona_stress_test")
     text = open(env / "outputs" / os.path.basename(f["path"]), encoding="utf-8").read()
     assert text.count("SIMULATED") >= 6
-    g2 = json.load(open(env / "outputs" / "phase2_gate_decision-p-a1.json"))["gate"]
+    g2 = json.load(open(env / "outputs" / "phase2_gate_decision_p_a1.json"))["gate"]
     assert g2["outcome"] == "awaiting_evidence" and g2["numbers"]["simulated_signups_excluded"] == 5
     assert g2["numbers"]["real_signups"] == 0

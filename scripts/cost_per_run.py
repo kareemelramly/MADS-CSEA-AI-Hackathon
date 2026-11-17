@@ -59,8 +59,6 @@ def main(argv=None):
     if full:
         r = max(full, key=lambda x: x["calls"])
         lines += ["", f"Full-run measurement (from 1 complete run, label r): {r['calls']} model calls, {r['tokens']} tokens."]
-        if r["tokens"]:
-            lines.append(f"If every call went to Groq's free tier (200,000 tokens/day, provider page read 17 Nov 2026), about {200000 // r['tokens']} full runs per day would fit (estimate).")
     os.makedirs(os.path.join(ROOT, "docs"), exist_ok=True)
     open(os.path.join(ROOT, "docs", "cost_report.md"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
     print("\n".join(lines))

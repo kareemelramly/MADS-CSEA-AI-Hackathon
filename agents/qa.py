@@ -10,7 +10,7 @@ import config
 import guardrails
 
 MAX_FILE, MAX_TOTAL = 100_000, 300_000
-NAME_OK = re.compile(r"^phase3_(step\d+|gate)_[a-z0-9_]+-[a-z0-9]+-a\d+\.(md|csv|txt|json)$")
+NAME_OK = re.compile(r"^phase3_(step\d+|gate)_[a-z0-9_]+_[a-z0-9]+_a\d+\.(md|csv|txt|json)$")
 CLAIM_LINE = re.compile(r"(\d+\s?%|\$\s?\d|€\s?\d|£\s?\d|\b(EGP|USD)\s?\d|\bmarket (size|share)\b|\bstud(y|ies) (show|found)\b|\bsurvey\b|\bstatistic)", re.I)
 OVERRIDE = "UNVALIDATED · FOUNDER OVERRIDE"
 

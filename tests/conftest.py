@@ -28,7 +28,7 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv("OUTPUTS_DIR", str(tmp_path / "outputs"))
     monkeypatch.setenv("DECISION_LOG_PATH", str(tmp_path / "decision_log.json"))
     for k in list(os.environ):
-        if k.startswith(("LLM_", "GROQ_", "NVIDIA_", "LOCAL_", "DISCOVER_", "VALIDATE_", "MAX_BUILD", "MOCK_", "RUN_TIME", "WORKFLOW_")):
+        if k.startswith(("LLM_", "NVIDIA_", "LOCAL_", "DISCOVER_", "VALIDATE_", "MAX_BUILD", "MOCK_", "RUN_TIME", "WORKFLOW_")):
             monkeypatch.delenv(k, raising=False)
     monkeypatch.setenv("WORKFLOW_TIME_BUDGET_S", "1800")
     llm.reset_state()

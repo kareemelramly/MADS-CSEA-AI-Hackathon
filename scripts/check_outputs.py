@@ -12,9 +12,9 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NAME = re.compile(r"^phase[1-6]_(step\d+|gate)_[a-z0-9_]+-(?P<label>[a-z0-9]+)-a\d+\.(md|json|csv|txt|html)$")
+NAME = re.compile(r"^phase[1-6]_(step\d+|gate)_[a-z0-9_]+_(?P<label>[a-z0-9]+)_a\d+\.(md|json|csv|txt|html)$")
 KEYS = ("timestamp", "agent", "action", "sources", "model", "cost", "approved_by", "run_id")
-SECRET = re.compile(r"gsk_[A-Za-z0-9]{6,}|nvapi-[A-Za-z0-9_\-]{6,}")
+SECRET = re.compile(r"nvapi-[A-Za-z0-9_\-]{6,}")
 
 
 def main(argv=None):

@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 import config
 
 REQUIRED_KEYS = ("timestamp", "agent", "action", "sources", "model", "cost", "approved_by", "run_id")
-_SECRET = re.compile(r"(gsk_[A-Za-z0-9]{6,}|nvapi-[A-Za-z0-9_\-]{6,}|Bearer\s+[A-Za-z0-9._\-]{8,})")
+_SECRET = re.compile(r"(nvapi-[A-Za-z0-9_\-]{6,}|Bearer\s+[A-Za-z0-9._\-]{8,})")
 _lock = threading.Lock()
 
 

@@ -22,6 +22,14 @@ sudo systemctl restart docker
 
 ## B. Open the app (one command)
 
+**On the team laptop** (Snap Docker cannot pass the GPU to containers), use:
+
+```bash
+bash scripts/start_app.sh
+```
+
+It starts the model on the GPU with your `llama-server` (no download) and the app in Docker. On any other machine:
+
 ```bash
 docker compose up
 ```

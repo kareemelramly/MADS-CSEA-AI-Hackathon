@@ -4,7 +4,7 @@
 
 The system is an open-source team of AI agents that takes a founder's brief (idea, skills, budget, time, target market, values) through six gated phases: Discover, Validate, Build, Commercial setup, Launch, and Operate and learn. It aims at a validated, sellable **digital** product, and it says "stop" when the evidence is weak. A fixed Python state machine (`orchestrator.py`) runs the phases in order. Each agent is a role function (`agents/<role>.py`) with its own prompt (`prompts/<role>.md`), JSON schema and log entry. The agents only propose text and JSON; plain code decides every gate, checks every rule, keeps the MOCKED ledger, and runs an approval executor that is the only path to any external effect. Nothing is published, sent, spent or released without the founder approving that exact action. No payment of any kind runs, including sandbox and test mode.
 
-Models: every agent uses one model chain (`llm.py`). Tier 1 is Groq `qwen/qwen3.8-27b` (Apache-2.0, free tier, no card). Tier 2 is NVIDIA Build (free developer tier). Tier 3 is local **Gemma 4 26B A4B, Q4_K_M** served by llama.cpp's `llama-server` (OpenAI-compatible API), used as the backup and as the only tier when no API key is set, so `docker compose up` on a fresh clone works without keys. All calls of one agent task stay on one tier. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
+Models: every agent uses one model chain (`llm.py`). Tier 1 is NVIDIA Build serving Google `gemma-4-31b-it` (open weights, Apache 2.0, free developer tier, optional key). Tier 2 is local **Gemma 4 26B A4B, Q4_K_M** served by llama.cpp's `llama-server` (OpenAI-compatible API), used as the backup and as the only tier when no API key is set, so `docker compose up` on a fresh clone works without keys. All calls of one agent task stay on one tier. State, sources, approvals and the mock ledger live in SQLite; `decision_log.json` is exported from it.
 
 ```mermaid
 flowchart TD
@@ -40,7 +40,7 @@ flowchart TD
     P6 --> G6{"Operate gate + founder decision"}
     G6 -->|persevere / pivot / stop| E["Memo and decision"]
     X["Approval executor<br/>action, content, destination, amount, run ID"] -.-> P2 & P3 & P4 & P5 & P6
-    L["llm.py: Groq → NVIDIA → local Gemma (llama.cpp)"] -.-> P1 & P2 & P3 & P4 & P5 & P6
+    L["llm.py: NVIDIA Build → local Gemma (llama.cpp)"] -.-> P1 & P2 & P3 & P4 & P5 & P6
     D[("SQLite: runs, sources, artifacts, gates, approvals, ledger, action_log")] -.-> J[("decision_log.json")]
 ```
 
@@ -53,13 +53,13 @@ Design choices in one place:
 | Decisions | Code owns exclusions, thresholds, gate outcomes, QA, price math, ledger | Safety and money must not depend on model wording |
 | Evidence | Fetched-source registry; the model cites source IDs, code renders URLs | No invented links; unsourced claims become `ASSUMPTION` |
 | Approval | One executor checks a single-use binding of action, content hash, destination, amount and run ID | A changed payload or a direct code call cannot pass |
-| Models | Groq → NVIDIA → local Gemma, sticky per task | Fast free remote tiers for the demo; a no-key local path that always works |
+| Models | NVIDIA Build → local Gemma, sticky per task | A fast free remote tier for the demo; a no-key local path that always works |
 | State | SQLite (WAL) on a Docker volume; write-once text outputs | Crash-safe approvals and idempotent mock sales |
 | UI | Streamlit on `127.0.0.1:8501` | Single-founder local demo; not a multi-user authorization system |
 
 ## Phases
 
-Every phase writes its files to `outputs/` as `phase<N>_step<M>_<name>-<label>-a<attempt>.<ext>` and its gate as `phase<N>_gate_<name>-<label>-a<attempt>.<ext>`, where `<label>` names the run and `<attempt>` the retry. Files are written once and never overwritten. Every agent action appends a log entry with `timestamp`, `agent`, `action`, `sources`, `model`, `cost`, `approved_by` and `run_id`. Every market claim carries a source URL or the label `ASSUMPTION`. Model calls validate against a JSON schema in code; a model failure is never a business verdict.
+Every phase writes its files to `outputs/` as `phase<N>_step<M>_<name>_<label>_a<attempt>.<ext>` and its gate as `phase<N>_gate_<name>_<label>_a<attempt>.<ext>`, where `<label>` names the run and `<attempt>` the retry. Files are written once and never overwritten. Every agent action appends a log entry with `timestamp`, `agent`, `action`, `sources`, `model`, `cost`, `approved_by` and `run_id`. Every market claim carries a source URL or the label `ASSUMPTION`. Model calls validate against a JSON schema in code; a model failure is never a business verdict.
 
 ### Phase 1: Discover
 
@@ -257,7 +257,7 @@ flowchart LR
 | Signal | Action |
 |---|---|
 | No key for a tier | Skip it (a clone without `.env` uses the local tier only) |
-| Groq tokens or requests exhausted (headers or HTTP 429) | Move to NVIDIA at once; Groq returns after its reset |
+| Remote quota exhausted (rate-limit headers or HTTP 429) | Move to the local tier at once; the remote tier returns after its reset |
 | Remote tier lags (no answer within 20 s), 5xx, 401/403 | Move to the local tier; the task restarts from its first call |
 | Output fails the schema or a source ID is unknown | One repair on the same tier, then the next tier; at most 4 attempts per call |
 | All tiers fail or the run budget is used | `repeat` with "nothing decided"; no quality attempt is used |
@@ -289,7 +289,7 @@ Status words follow one rule: a row says **Working** only when its code exists a
 | Support FAQ and replies | Drafts working; sending **STUBBED** behind approval | `tests/test_phase6_operate.py` |
 | Metrics and persevere-or-pivot memo | Working on real, founder-entered data; mock data never gives persevere | `test_mock_only_never_persevere` |
 | Founder approval executor and override | Working | `tests/test_backbone.py` |
-| Model chain (Groq → NVIDIA → local llama.cpp) | Working with fake HTTP; local tier measured by `scripts/model_check.py`; remote tiers optional and unmeasured until keys are added | `tests/test_llm_cascade.py` |
+| Model chain (NVIDIA Build → local llama.cpp) | Working with fake HTTP; local tier measured by `scripts/model_check.py`; remote tiers optional and unmeasured until keys are added | `tests/test_llm_cascade.py` |
 | Guardrails against trick prompts | Working on the team's 35-case eval set (in-sample; paraphrases outside it can be missed) | `tests/test_guardrails_eval.py` |
 | Streamlit UI (brief, verdict, approval panel, override bar, readiness) | Working | `tests/test_ui_smoke.py` |
 | G3/G4/G5 `pivot_back` routes | Working | `tests/test_pivot_routes.py` |
@@ -301,7 +301,7 @@ Not in this system at all: real payments of any kind, real publishing or posting
 
 | When | Item |
 |---|---|
-| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; Groq → NVIDIA → local Gemma (llama.cpp) chain; tests and guardrail eval set |
+| Now (this release) | Six phases with code gates; A1 checklist product; source registry; approval executor; MOCKED sale-to-cash; NVIDIA Build → local Gemma (llama.cpp) chain; tests and guardrail eval set |
 | Next | A CI workflow running `pytest -q` on every push; persona test with several calls instead of one |
 | Next | Product shapes A2 (short HTML guide) and A3 (template pack), with script-integrity checks for HTML; more keyless or founder-keyed evidence sources; import of real experiment results from the founder's own form provider, behind approval; measured A/B test of an optional critic for page and store copy |
 | Next | Arabic and English output for MENA founders; richer Phase 6 metrics from founder-uploaded exports |

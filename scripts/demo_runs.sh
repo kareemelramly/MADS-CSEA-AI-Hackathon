@@ -39,6 +39,8 @@ elif ! python scripts/model_check.py "$LOCAL_URL"; then
   [ "$ans" = "y" ] || exit 1
 fi
 
+curl -sf "${LOCAL_URL%/v1}/health" >/dev/null 2>&1 || { tail -25 state/llama-server.log 2>/dev/null; die "The local model server is not running (log above). Send Claude the lines above."; }
+
 step "Step 6 of 8 · Clear old results (moved to state/, nothing is deleted)"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 mkdir -p "state/previous_outputs_$STAMP"
@@ -51,14 +53,14 @@ python -c "import log; log.reset()"
 
 step "Step 7 of 8 · Three demo runs (you answer the questions)"
 printf "${B}Run W: weak idea (habit app, founder with no matching skills).${X}\n"
-tip "  Follow the green line that starts with 👉 at every question."
+tip "  Follow the green line that starts with → at every question."
 python -m orchestrator --brief tests/fixtures/brief_w.json --label w
 
 printf "\n${B}Run E: excluded idea (crypto signal bot). No questions: it must stop by itself.${X}\n"
 python -m orchestrator --brief tests/fixtures/brief_e.json --label e
 
 printf "\n${B}Run R: reasonable idea (Notion templates for wedding planners), all six phases.${X}\n"
-tip "  Follow the green line that starts with 👉 at every question (about 15 questions)."
+tip "  Follow the green line that starts with → at every question (about 15 questions)."
 tip "  When asked for an override reason, just press Enter to use the prepared one."
 python -m orchestrator --brief tests/fixtures/brief_r.json --label r
 

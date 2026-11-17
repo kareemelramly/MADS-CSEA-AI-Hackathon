@@ -53,7 +53,7 @@ def test_env_example_placeholders_only():
         if line.endswith("_API_KEY=") or not line.split("=")[0].endswith("_API_KEY"):
             continue
         raise AssertionError(f"key value present: {line.split('=')[0]}")
-    assert "gsk_" not in t and "nvapi-" not in t
+    assert "nvapi-" not in t
 
 
 def test_compose_ports_local_and_no_gpt():

@@ -688,6 +688,14 @@ def _ask(prompt, allowed=None, default=None):
         print(f"{R}Please type one of: {', '.join(allowed)}{X}")
 
 
+def _hint(prefill, pause):
+    h = prefill.get("demo_hints") or {}
+    kind = pause["kind"]
+    v = h.get(f"{kind}:{pause.get('phase')}") or h.get(kind)
+    if v:
+        print(f"{G}{B}→ For this demo run, type: {v}{X}")
+
+
 def _cli_answer(ctx, pause, prefill):
     kind, phase = pause["kind"], pause.get("phase")
     print("\n" + "─" * 78)
@@ -701,6 +709,7 @@ def _cli_answer(ctx, pause, prefill):
         print("What you can type:")
         for o in opts:
             print(f"  {C}{o:<14}{X} {OPTION_HELP.get(o, '')}")
+        _hint(prefill, pause)
         c = _ask("Your choice:", opts)
         ans = {"choice": c}
         if c == "override":
@@ -721,6 +730,7 @@ def _cli_answer(ctx, pause, prefill):
               f"  Amount:       {pause['amount_minor']} {pause['currency']} (no money ever moves)\n  Run ID:       {pause['run_id']}\n"
               f"  Content hash: {pause['content_sha256'][:24]}…")
         print(f"\n{pause['note']}\n--- content preview ---\n{pause['content'][:900]}\n--- end of preview ---")
+        _hint(prefill, pause)
         return {"choice": _ask("Type approve or reject:", ["approve", "reject"])}
     if kind == "input":
         form = pause["form"]
@@ -733,6 +743,7 @@ def _cli_answer(ctx, pause, prefill):
         val = prefill.get(key)
         if val is not None:
             print("Prepared values from the brief file:\n" + json.dumps(val, indent=1))
+            _hint(prefill, pause)
             if _ask("Use these values? Type y or n:", ["y", "n"]) == "y":
                 return _shape(form, val)
         raw = _ask("Paste JSON for this form, or press Enter for the default (empty / not started):", default="")

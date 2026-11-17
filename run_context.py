@@ -121,7 +121,7 @@ class RunContext:
         odir = config.outputs_dir()
         attempt = 1
         while True:
-            path = os.path.join(odir, f"{name}-{self.label}-a{attempt}.{ext}")
+            path = os.path.join(odir, f"{name}_{self.label}_a{attempt}.{ext}")
             try:
                 with open(path, "x", encoding="utf-8", newline="") as f:
                     f.write(body)

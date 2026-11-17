@@ -1,13 +1,12 @@
 """One model client for every agent (SRS 4.2, runbook section 2a).
 
-Tiers, in LLM_ORDER (default groq,nvidia,local):
-  1 groq    Groq free tier, OpenAI-compatible, GROQ_MODEL (qwen/qwen3.8-27b)
-  2 nvidia  NVIDIA Build free tier, OpenAI-compatible, NVIDIA_MODEL
-  3 local   llama.cpp `llama-server` (OpenAI-compatible) serving Gemma 4 26B A4B Q4_K_M
+Tiers, in LLM_ORDER (default nvidia,local):
+  1 nvidia  NVIDIA Build free tier, OpenAI-compatible, NVIDIA_MODEL (google/gemma-4-31b-it)
+  2 local   llama.cpp `llama-server` (OpenAI-compatible) serving Gemma 4 26B A4B Q4_K_M
 
-Switching rules (MOD-4): a tier without a key is skipped silently; Groq out of tokens or requests
-(pre-emptive header check or HTTP 429) -> next tier at once; a remote tier that lags (no answer
-within LLM_REMOTE_TIMEOUT_S), returns 5xx or 401/403 -> local tier; invalid output -> one retry on
+Switching rules (MOD-4): a tier without a key is skipped silently; the remote tier out of quota
+(rate-limit headers or HTTP 429), lagging (no answer within LLM_REMOTE_TIMEOUT_S), returning 5xx
+or 401/403 -> local tier at once; invalid output -> one retry on
 the same tier, then next tier; at most LLM_MAX_ATTEMPTS_PER_CALL attempts; no attempt starts with
 less than LLM_MIN_ATTEMPT_S left in the segment or run budget. All calls of one task stay on one
 tier (MOD-5); a mid-task switch raises TierSwitched and `run_task` restarts the task.
@@ -45,20 +44,14 @@ class TierSwitched(Exception):
 def tiers():
     out = []
     for name in config.llm_order():
-        if name == "groq":
-            out.append(dict(name="groq", n=1, provider="groq", local=False,
-                            base=config.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
-                            model=config.get("GROQ_MODEL", "qwen/qwen3.8-27b"),
-                            key=config.get("GROQ_API_KEY", ""),
-                            extra=_json_env("GROQ_EXTRA_BODY", '{"reasoning_effort": "none"}')))
-        elif name == "nvidia":
-            out.append(dict(name="nvidia", n=2, provider="nvidia", local=False,
+        if name == "nvidia":
+            out.append(dict(name="nvidia", n=1, provider="nvidia", local=False,
                             base=config.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
-                            model=config.get("NVIDIA_MODEL", "qwen/qwen3.8-27b"),
+                            model=config.get("NVIDIA_MODEL", "google/gemma-4-31b-it"),
                             key=config.get("NVIDIA_API_KEY", ""),
                             extra=_json_env("NVIDIA_EXTRA_BODY", '{"chat_template_kwargs": {"enable_thinking": false}}')))
         elif name in ("local", "ollama", "llamacpp"):
-            out.append(dict(name="local", n=3, provider="llamacpp", local=True,
+            out.append(dict(name="local", n=2, provider="llamacpp", local=True,
                             base=config.get("LOCAL_BASE_URL", "http://127.0.0.1:8080/v1"),
                             model=config.get("LOCAL_MODEL", "gemma-4-26b-a4b-it-q4_k_m"),
                             key="local",
@@ -160,7 +153,7 @@ def _cool(name, seconds):
 
 
 def _parse_reset(v):
-    """Groq reset headers look like '7.66s', '2m59.56s', '1h2m3s'."""
+    """Rate-limit reset headers look like '7.66s', '2m59.56s', '1h2m3s'."""
     if not v:
         return None
     try:
@@ -263,20 +256,15 @@ def ask(system, user, schema, agent, action, *, ctx, sources=(), task_id=None,
                 reasons.append("time budget used")
                 _fail_log(ctx, agent, action, reasons, attempts)
                 raise ModelError(reasons, kind="budget")
-            # Pre-emptive Groq check (MOD-4): skip without spending an attempt.
+            # Pre-emptive quota check (MOD-4): skip without spending an attempt.
             h = _state["headers"].get(t["name"], {})
             est = (len(system) + len(user) + len(json.dumps(schema))) / 4 + max_tokens
             rem_tok = h.get("x-ratelimit-remaining-tokens")
-            rem_req = h.get("x-ratelimit-remaining-requests")
-            if t["name"] == "groq" and rem_tok is not None and _num(rem_tok) < est:
+            if not t["local"] and rem_tok is not None and _num(rem_tok) < est:
                 _cool(t["name"], _parse_reset(h.get("x-ratelimit-reset-tokens")) or config.cooldown_default())
-                reasons.append(f"groq: tokens_low ({rem_tok} < {int(est)})")
+                reasons.append(f"{t['name']}: tokens_low ({rem_tok} < {int(est)})")
                 _emit(on_progress, call=call_no, agent=agent, task=task_id, tier=t["name"], status="fallback",
                       reason="tokens_low", elapsed_s=round(_clock() - t_start, 1), budget_left_s=round(left, 1))
-                break
-            if t["name"] == "groq" and rem_req is not None and _num(rem_req) <= 0:
-                _cool(t["name"], _parse_reset(h.get("x-ratelimit-reset-requests")) or config.cooldown_default())
-                reasons.append("groq: requests exhausted")
                 break
             timeout = min(config.local_timeout() if t["local"] else config.remote_timeout(), left)
             attempts += 1

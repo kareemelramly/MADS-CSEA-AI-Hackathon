@@ -25,19 +25,19 @@ def test_log_entries_have_required_keys(env):
 
 
 def test_log_never_contains_keys(env):
-    log.log("llm", "x", detail="Authorization: Bearer gsk_abcdefghijklmnop nvapi-1234567890abc")
+    log.log("llm", "x", detail="Authorization: Bearer abcdefghijklmnop nvapi-1234567890abc")
     raw = open(env / "decision_log.json").read()
-    assert "gsk_abc" not in raw and "nvapi-123" not in raw
+    assert "abcdefghijklmnop" not in raw and "nvapi-123" not in raw
 
 
 def test_write_once_and_attempts(env):
     c = ctx()
     a1 = c.out("phase1_step1_opportunities", "md", "one")
     a2 = c.out("phase1_step1_opportunities", "md", "two")
-    assert a1["path"].endswith("-t-a1.md") and a2["path"].endswith("-t-a2.md")
+    assert a1["path"].endswith("_t_a1.md") and a2["path"].endswith("_t_a2.md")
     assert a1["status"] == "superseded" and a2["status"] == "final"
     with pytest.raises(FileExistsError):
-        open(env / "outputs" / "phase1_step1_opportunities-t-a1.md", "x")
+        open(env / "outputs" / "phase1_step1_opportunities_t_a1.md", "x")
     with pytest.raises(ValueError):
         c.out("random_name", "md", "x")
 

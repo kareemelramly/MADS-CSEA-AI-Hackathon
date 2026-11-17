@@ -17,3 +17,6 @@ model_check_result.json
 notebook_check_result.json
 scratch*
 .decision_log.*.tmp
+Claude/
+Phases-Research/
+documents/
