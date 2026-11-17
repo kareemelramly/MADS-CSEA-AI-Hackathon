@@ -10,25 +10,29 @@ Cairo, 17 November 2026 · Version 1.0 for the 12:50 research merge
 
 ## Cross-phase alignment (team merge, 17 Nov 2026)
 
-The four documents in `Phases-Research/` were checked against `CLAUDE.md` (including Hard Requirements), the problem statement, the execution plan and the research round, and against each other. The decisions below are **identical in all four documents**. If one changes, change it in all four.
+The four documents in `Phases-Research/` were checked against `CLAUDE.md` (including Hard Requirements), the problem statement, the execution plan and the research round, and against each other. The decisions below are **identical in all four documents**. If one changes, change it in all four. **Amended 17 Nov 2026 (SRS v1.1 review):** X2, X3, X10, X13, X14 and X15 rewritten; X16–X19 added. Where a phase section below still differs from these rows, these rows win.
 
 | # | Decision | Applies to |
 |---|---|---|
 | X1 | Gate outcomes are written to the log `outcome` key and gate JSON as `go`, `repeat`, `pivot_back` or `stop`. Prose may use capitals. | All gates |
-| X2 | One model for every agent, set by `OLLAMA_MODEL` in `.env.example`. Its value is the model that passes `scripts/model_check.py`: default candidate Gemma 4 26B A4B (Apache-2.0 weights), fallback `gpt-oss:20b`. The exact Ollama tag, quantization and speed are `UNVERIFIED` until pulled and measured on the demo laptop; no document hard-codes a tag. | All agents |
-| X3 | Every model call passes a JSON schema to Ollama's `format`, is validated in code, and gets one retry on malformed output. A parsing failure is reported as a model error, never as a market or quality verdict. | All agents |
+| X2 | **One model chain for every agent, set by `LLM_ORDER`** (default `groq,nvidia,ollama`; authoritative spec: SRS v1.1 §4.2). Tier 1: Groq `qwen/qwen3.8-27b` (Apache-2.0, free tier, no card). Tier 2: NVIDIA Build, same model if NVIDIA hosts it, otherwise the non-GPT open-weight model chosen in notebook Step 2b (`UNVERIFIED` until then). Tier 3 (backup only): local **Gemma 4 26B A4B, Q4_K_M**, via Ollama (`OLLAMA_MODEL`). No GPT model is used on any tier. Switching: Groq out of tokens or requests → NVIDIA; any remote tier that lags (no answer within `LLM_REMOTE_TIMEOUT_S`) or fails → local. **Sticky tier per task:** every model call inside one agent task (`task_id`) uses the same tier; if that tier fails mid-task, the task restarts from its first call on the next tier, so one task's output never mixes models. A tier without a key is skipped, so a fresh clone uses tier 3 only. | All agents |
+| X3 | Every model call passes one JSON schema: as Ollama `format` locally, and in the system prompt with the provider's JSON mode remotely (thinking disabled where the model supports it). Output is validated in code with `jsonschema` (types, enums, ranges, required fields) plus reference checks (every evidence ID exists in the run's source registry). Invalid output gets one retry on the same tier, then the task moves tier (X2). A model error (invalid after retries, timeout, all tiers down, time budget used) ends the step in `repeat` with reason `model_error`; it is never a market, quality or test verdict (X17). | All agents |
 | X4 | Thresholds are logged before the data they judge: `define_research_criteria` (P1), `lock_target` (P2), `set_phase3_thresholds` (P3), `define_pricing_criteria` (P4). | P1–P4 |
 | X5 | **Founder override** (Phase 2 patch, section C) is the one mechanism for continuing past a failed **evidence** gate: the Phase 1 evidence or fit outcome, the Phase 2 demand gate, and the Phase 4 price-evidence check. It needs a typed reason (≥ 20 characters), logs `founder_override`, appends to `RunContext.overrides[]`, and `stamp_override()` puts a banner on every later output. The Phase 2 override also sets `validation_status = "UNVALIDATED_FOUNDER_OVERRIDE"`. Override is **never** available for: excluded products, guardrail refusals, the Phase 3 test gate, any approval step, the payment ban, or failing Phase 5 tests. | Grant: P1, P2, P4. Stamp: P2–P6 |
 | X6 | Hand-off objects live in `RunContext` (`run_context.py`) and are also written to `outputs/` as JSON for audit: `phase1_gate_decision.json`, `phase2_gate_decision.json`, `phase3_step6_handoff.json`, `phase4_step3_handoff.json`, `phase5_gate_launch.json`. Field names are those in contracts H1–H5; a phase passes fields on unchanged and never renames them. | All |
 | X7 | Agent files use role nouns: P1 `researcher`, `opportunity_analyst`, `interview_planner`; P2 `strategist`, `landing_writer`, `persona_simulator`; P3 `mvp_planner`, `builder`, `doc_writer`, `qa`, `packager`; P4 `pricer`, `policy_drafter`; P5 `launcher`. Root modules: `orchestrator.py`, `run_context.py`, `gates.py`, `approval.py`, `guardrails.py`, `payments.py`, `delivery.py`, `refunds.py`, `reconcile.py`. | All |
 | X8 | Model text reaches HTML only through Jinja2 templates with autoescape on. The model returns JSON fields and never writes markup or code. | P2 page, P3 product, P5 store page |
 | X9 | Any guardrail rejection or refused instruction logs `guardrail_refusal`, naming the rule that fired. Following the Hard Requirements, the agent names the conflict, refuses only the forbidden part, and continues with the allowed part. | All |
-| X10 | Every approval binds to a SHA-256 of the exact content shown (content, destination, amount). Changing the content voids the approval. Nothing is approved by default or on timeout. | P2 publish, P3 release, P4 commercial, P5 per item |
+| X10 | **Approval binding.** Every approval binds the SHA-256 of `{action, content_sha256, destination, amount_minor, currency, run_id}`. Changing any of these voids the approval and creates a new request. Approvals are single-use, persist in `state/approvals.sqlite`, and are never granted by default or on timeout. An approval authorizes only the named internal action: it is never a signature, a publication, a payment or a legal acceptance. | P2 publish, P3 release, P4 commercial, P5 per item |
 | X11 | `brief.target_market` carries `countries` (ISO 3166 codes, may be empty). Phase 4 uses it for jurisdiction flags; if it is empty, Phase 4 asks the founder (`repeat`). | P1 → P4 |
 | X12 | `product_type` values: `checklist`, `guide`, `template_pack`, `static_web_tool`, matching Phase 3 archetypes A1–A4. `delivery_format` is `{"kind": "download", "file_types": [...]}`. | P3 → P5 |
-| X13 | **Cost per run.** Every model call logs `cost: 0` (local model, observed API charge $0.00) and also records Ollama's `eval_count` and `eval_duration`. The README figure sums them per run. Anything estimated (electricity, a hosted-model equivalent) is reported separately and labelled `ASSUMPTION`. | All agents |
-| X14 | **Approval screens** show three fields, as the Hard Requirements require: the exact content, the destination or recipient ("none" when nothing leaves the machine), and the amount ("$0.00" when nothing is spent). Approval never overrides a Never rule, an excluded product or the payment ban. | All approvals |
-| X15 | **Weak or bad idea: the system says so.** Every gate writes a plain-language verdict to its `phase<N>_gate_*.md` file and shows it before any approve or override button: the outcome, each reason with the measured number next to its pre-set threshold, and what would change the verdict (`repeat`: the exact evidence or edit needed; `pivot_back`: where to go and why; `stop`: why, and what new real evidence could reopen it). "Pause" and "inconclusive" are not outcomes: a gate always ends in `go`, `repeat`, `pivot_back` or `stop`. Weak evidence ends in `stop` once the retry budget is used, worded as "not enough evidence to continue", never as "no market exists"; a source outage ends in `repeat`, never in a negative verdict. The verdict is never softened, and an override (X5) leaves the original verdict and banner in place. | All gates |
+| X13 | **Cost per run.** Every model call logs `cost: 0` (free tier with no card, or local), its `tier/provider/model`, `run_id`, `task_id`, prompt and completion tokens (`usage` remotely; `prompt_eval_count` and `eval_count` locally), wall time and attempt count. "$0.00" is reported as an **observed** charge only after a logged run; before that it is an **expected** cost. Anything estimated (electricity) is reported separately and labelled `ASSUMPTION`. | All agents |
+| X14 | **Approval screens** show five fields: the action, the exact content, the destination or recipient ("none" when nothing leaves the machine), the amount ("$0.00" when nothing is spent) and the run ID. Approval never overrides a Never rule, an excluded product or the payment ban. | All approvals |
+| X15 | **Weak or bad idea: the system says so.** Every gate writes a plain-language verdict to its `phase<N>_gate_*.md` file and shows it before any approve or override button: the outcome, each reason with the measured number next to its pre-set threshold, and what would change the verdict. Verdicts are `go`, `repeat`, `pivot_back` or `stop`. Two non-negative states exist and are never worded as failure: `repeat` with reason `inconclusive` (Phase 1 search coverage below its threshold) and the pause `awaiting_evidence` (Phase 2: no completed experiment, nothing decided). Weak evidence that was really examined ends in `pivot_back` or `stop` once the retry budget is used, worded as "not enough evidence to continue", never as "no market exists"; a source outage or model error ends in `repeat`. The verdict is never softened, and an override (X5) leaves the original verdict and banner in place. | All gates |
+| X16 | **Attempt and version identifiers.** Output files are write-once and named `phase<N>_step<M>_<name>-<run_label>-a<attempt>.<ext>` and `phase<N>_gate_<name>-<run_label>-a<attempt>.<ext>` (attempt starts at 1; a retry writes `a2`, never overwrites `a1`). `RunContext.artifacts[]` records `{path, sha256, phase, step, attempt, status}` with status `final` or `superseded`. Hand-offs H1–H5 and approvals reference the **final** artifact by path and SHA-256, never by name alone. `docs/demo_runs.md` (generated) lists every run and marks final files. | All |
+| X17 | **Model errors are not quality failures.** Two separate budgets: the model budget (`LLM_MAX_ATTEMPTS_PER_CALL`, tier switching, run time budget) lives in `llm.py`; quality budgets (P1 research retry, P2 `VALIDATE_MAX_ATTEMPTS`, P3 `MAX_BUILD_ATTEMPTS`) count only gate failures on **valid** output. A model or pipeline error never consumes a quality attempt and never changes a verdict; it ends the step in `repeat` (`model_error` or `pipeline_error`) with a Try again option. | All agents and gates |
+| X18 | **Status words are evidence-based.** A capability is `Planned` until its code exists and a test or logged run shows it working; only then is it `Working`. `MOCKED`, `STUBBED` and `SIMULATED` keep their meanings. No research card claims an implementation, test result or observed cost that has no run record. | All built-vs-stubbed tables |
+| X19 | **Run time.** In the demo configuration (a remote tier with key and quota), a full six-phase run uses at most 180 s of system time, enforced by `RUN_TIME_BUDGET_S`; the local-only path must finish but is not held to 180 s and publishes its measured time (SRS v1.1 §5.1). | All agents |
 
 ### What changed in this specification at the merge
 
@@ -36,6 +40,9 @@ The four documents in `Phases-Research/` were checked against `CLAUDE.md` (inclu
 - **C4 decided:** the founder picks the product licence at G4 (default: the repository's licence); Phase 4's `policy_drafter` writes Terms consistent with `license_spdx`.
 - **Input names** (Table 3) now use contract H2; the output hand-off (Appendix C.2) is contract H3, which adds the fields Phase 4 reads.
 - Renderer uses Jinja2 autoescape (X8); refusals log `guardrail_refusal` (X9); QA-11 also checks the override banner.
+- **SRS v1.1 review (17 Nov 2026), scope decision:** for the hackathon release, Phase 3 builds archetype **A1 only**. A2 and A3 move to the roadmap and A4 stays a stretch item. All checks that show the core workflow works are kept: **14 of 15 checks run on A1**; QA-07 (script integrity) is not applicable because A1 contains no HTML or scripts, and becomes mandatory as soon as A2 or A4 is enabled. Section 2.2, Table 8 and Table 15 state this. "Tested MVP" in this project means: an A1 product that passes the 14 applicable checks and every automated acceptance criterion, with real-user completion kept as an unchecked `MANUAL` item (C6).
+- **Model errors separated from quality failures (X17):** invalid model output, timeouts and tier failures end a step in `repeat` (`model_error`) and never consume a G3 build attempt; G3 attempts count only QA failures on valid output. Renderer exceptions are `pipeline_error`, also outside the attempt count.
+- Model calls use the shared chain (X2); cost is expected, not observed, until a logged run exists (X13, X18); output files carry run label and attempt number (X16).
 
 
 ### CLAUDE.md Must / Never check for this specification
@@ -195,7 +202,7 @@ Reading the Phase 3 description [14] against the repository rules [11], the prob
 | C5  | "Package the MVP" versus text-only outputs; archives are not read [11].                                                                       | The release package is a Markdown manifest listing every file with its size and SHA-256 hash, not a ZIP.                                                                                                                              |
 | C6  | "A target user can complete the core workflow" versus no real users before the deadline [12].                                                 | A deterministic journey trace (QA-04) is the proxy. Real-user completion stays an unchecked `MANUAL` item on the release checklist and is never reported as passed.                                                                   |
 | C7  | Phase 2's founder count defaults to 0, so its gate fails on every demo brief and Phase 3 would never run.                                       | Resolved with Phase 2's founder override (patch section C): with a typed reason the founder continues, and Phase 3 runs in `minimal` mode with the override banner (Table 4).                                                                   |
-| C8  | "Choose the free open-weight model" at build time.                                                                                              | The model is fixed once by the model-check gate; Phase 3 records its name in the build plan and log and does not re-select it per run.                                                                                                |
+| C8  | "Choose the free open-weight model" at build time.                                                                                              | The model chain is fixed once by X2; Phase 3 records the `tier/provider/model` that answered each task in the build plan and log and does not re-select models per run.                                                                                                |
 
 ## 4. Agent architecture
 
@@ -203,7 +210,7 @@ Reading the Phase 3 description [14] against the repository rules [11], the prob
 
 The execution plan names two Phase 3 agents, `builder` and `qa` [12]. We recommend five, because a slow local model with a short context performs better on several short JSON calls than on one long one [13], and because two of the six steps (testing and release) need no model at all. If time runs short, `mvp_planner` and `doc_writer` can be merged into `builder` without changing any file name in `outputs/`.
 
-**Table 6.** Phase 3 agents. "Model" means the call goes to the local open-weight model through Ollama.
+**Table 6.** Phase 3 agents. "Model" means the call goes through the shared model chain (X2: Groq → NVIDIA → local Gemma), with every call of one task on one tier.
 
 | Agent (file) | Steps    | Model | Responsibility                                                                                                             |
 |--------------|----------|-------|----------------------------------------------------------------------------------------------------------------------------|
@@ -239,7 +246,7 @@ flowchart LR
 
 Principle P1 (content, not code). *The model never emits code, markup or scripts. It returns JSON that fills named text slots; a team-written renderer inserts it into a reviewed Jinja2 template with autoescape on (X8).* This resolves C2 and removes the class of failures in which generated code runs with unexpected effects.
 
-Principle P2 (short structured calls). *Every model call passes a JSON schema to Ollama's `format` field at temperature 0.2, and the response is still parsed and validated in code, with one retry on failure.* Ollama constrains decoding to the schema [8], but practitioners report that validation remains necessary [9]; the model-check script already applies one retry [11].
+Principle P2 (short structured calls). *Every model call passes one JSON schema (Ollama's `format` locally, the provider's JSON mode remotely) at temperature 0.2, and the response is still parsed and validated in code with `jsonschema`, with one retry on the same tier (X3).* Ollama constrains decoding to the schema [8], but practitioners report that validation remains necessary [9]; the model-check script already applies one retry [11].
 
 Principle P3 (thresholds first). *All Phase 3 gate thresholds are written to the log as `set_phase3_thresholds` before the first generation call.* This mirrors Phase 1's rule of logging its evidence threshold before searching [13], so no threshold can be moved after seeing a result.
 
@@ -273,19 +280,19 @@ The planner selects the single strongest validated problem, defined as the Phase
 | Output       | `outputs/phase3_step1_mvp_definition.md`: problem with evidence IDs, user story, journey steps, feature table, 3–6 acceptance criteria, fit answers, assumptions. |
 | Log action   | `define_mvp`; `sources` = URLs of cited evidence IDs.                                                                                                             |
 | Gate G1      | Schema valid; ≥1 Must feature, each with ≥1 evidence ID; ≥3 acceptance criteria, each mapped to a QA check or `MANUAL`; fewer than 4 of 6 fit answers "yes".      |
-| On failure   | Invalid JSON: one retry. No traceable Must feature or fit failure: pivot back to Phase 2.                                                                         |
+| On failure   | Model error (invalid output after retries, timeout, all tiers down): `repeat` (`model_error`), no attempt used (X17). No traceable Must feature or fit failure: pivot back to Phase 2. |
 
 ### 5.2 Step 3.2: Plan the implementation
 
-The planner maps the journey onto one of the supported archetypes, chosen because a local model can fill them in minutes and their correctness can be checked without execution [13]. It then writes a build plan: the archetype, the file manifest, the slot schema for each file, any integration the product would need in real use (each marked `MOCKED`, since none is built), the model name recorded from the model-check result (C8), and a traceability matrix linking feature, evidence ID, acceptance criterion and QA check. The plan also records non-functional constraints, which ScienceSoft's architecture step lists as performance and security requirements [4]: here, the size limit, no network access, no scripts from model content, and a default template theme. The same source advises default themes unless design is the competitive advantage [4], so templates carry minimal styling. The research card asks for two to three archetypes [13]; A1 to A3 are the core set and A4 is a stretch item.
+The planner maps the journey onto one of the supported archetypes, chosen because a local model can fill them in minutes and their correctness can be checked without execution [13]. It then writes a build plan: the archetype, the file manifest, the slot schema for each file, any integration the product would need in real use (each marked `MOCKED`, since none is built), the model name recorded from the model-check result (C8), and a traceability matrix linking feature, evidence ID, acceptance criterion and QA check. The plan also records non-functional constraints, which ScienceSoft's architecture step lists as performance and security requirements [4]: here, the size limit, no network access, no scripts from model content, and a default template theme. The same source advises default themes unless design is the competitive advantage [4], so templates carry minimal styling. The research card asks for two to three archetypes [13]. **Hackathon scope decision (SRS v1.1): only A1 is built for the submission.** A2 and A3 are specified below for the roadmap and are not built; A4 stays a stretch item. Gate G2 therefore accepts A1 only unless a later archetype is enabled with its checks.
 
 **Table 8.** Supported product archetypes. Generation times are `ASSUMPTION` values until measured with the model that passes `model_check.py`.
 
 | Archetype                | Product files                                                                     | Model calls | Typical fit                                                   |
 |--------------------------|-----------------------------------------------------------------------------------|-------------|---------------------------------------------------------------|
 | A1 Checklist pack        | `.md` checklist and `.csv` tracker                                                | 1–2         | Process pain ("I always forget…"); default for the live demo. |
-| A2 Short guide           | `.html` guide with 3–6 sections                                                   | 2–3         | Knowledge pain ("how do I…").                                 |
-| A3 Template pack         | 2–4 `.md`/`.csv` templates and an instructions file                               | 2–3         | Repetitive document pain.                                     |
+| A2 Short guide (roadmap) | `.html` guide with 3–6 sections                                                   | 2–3         | Knowledge pain ("how do I…"). Not built for the hackathon.    |
+| A3 Template pack (roadmap) | 2–4 `.md`/`.csv` templates and an instructions file                             | 2–3         | Repetitive document pain. Not built for the hackathon.        |
 | A4 Static tool (stretch) | One `.html` page; team-written script; model writes only a field and label config | 1–2         | Calculation or sorting pain. Built only if time remains.      |
 
 **Table 9.** Step 3.2 specification.
@@ -295,7 +302,7 @@ The planner maps the journey onto one of the supported archetypes, chosen becaus
 | Agent, calls | `mvp_planner`, 1 call.                                                                                                                              |
 | Output       | `outputs/phase3_step2_build_plan.md`: archetype and reason, manifest, mocked integrations, model name, traceability matrix.                         |
 | Log action   | `plan_build`.                                                                                                                                       |
-| Gate G2      | Archetype in {A1, A2, A3, A4 if enabled}; manifest ≤ 6 files; every Must feature appears in the matrix; excluded-category check repeated and false. |
+| Gate G2      | Archetype is A1 (A2, A3, A4 only if enabled together with their checks); manifest ≤ 6 files; every Must feature appears in the matrix; excluded-category check repeated and false. |
 | On failure   | One retry with the reason; then pivot back to Step 3.1 once; then pivot back to Phase 2. Excluded category: stop.                                   |
 
 ### 5.3 Step 3.3: Build the product
@@ -310,7 +317,7 @@ The builder makes one call per file group in the manifest, each returning slot c
 | Output       | `outputs/phase3_step3_product_<part>.<ext>` (ext: md, csv or html) and `outputs/phase3_step3_product_license.txt`. Files stay flat in `outputs/`, because the checker reads by name [11]. |
 | Log actions  | `build_product` (per call, model set) and `render_product` (model `null`).                                                                                                   |
 | Gate         | None of its own; judged at G3.                                                                                                                                               |
-| On failure   | Timeout: one retry, then stop the step with `model_timeout`. Renderer exception: logged, counts as a failed attempt.                                                         |
+| On failure   | Model error: `repeat` (`model_error`), no G3 attempt used (X17). Renderer exception: `repeat` (`pipeline_error`) with the slot name logged, no G3 attempt used. Each regeneration writes new files with the next attempt number; earlier files are kept and marked `superseded` (X16). |
 
 ### 5.4 Step 3.4: Write the user documentation
 
@@ -327,7 +334,7 @@ The documentation has six fixed headings, so QA can find them: *Setup*, *Quick s
 
 ### 5.5 Step 3.5: Test
 
-The QA agent runs the fifteen checks in Table 15, evaluates every acceptance criterion through its mapped check, and records the cost and timing of the run. It makes no model call, so its result is reproducible: a judge can rerun it with `pytest`. The test report lists every check with its result and evidence (file and line), separates `MANUAL` criteria from automated ones, and lists known limitations.
+The QA agent runs the checks in Table 15 that apply to the archetype (14 for A1; QA-07 is not applicable because A1 has no scripts), evaluates every acceptance criterion through its mapped check, and records the cost and timing of the run. It makes no model call, so its result is reproducible: a judge can rerun it with `pytest`. The test report lists every check with its result and evidence (file and line), separates `MANUAL` criteria from automated ones, and lists known limitations.
 
 **Table 12a.** Step 3.5 specification.
 
@@ -365,16 +372,16 @@ Phase 3 has four gates. G3 is the phase gate in the sense of the problem stateme
 | MAX_FIT_YES                      | 3 of 6          | G1 (Section 2.3).                      |
 | MAX_MANIFEST_FILES               | 6               | G2.                                    |
 | MAX_FILE_BYTES / MAX_TOTAL_BYTES | 100 KB / 300 KB | QA-02.                                 |
-| MODEL_CALL_TIMEOUT_S             | 60              | All model calls.                       |
+| Model timeouts                   | per X2/X19      | `LLM_REMOTE_TIMEOUT_S` (20 s), `LLM_LOCAL_TIMEOUT_S`, capped by the run budget `RUN_TIME_BUDGET_S`; set in `llm.py`, not here. |
 | DEMO_MAX_MODEL_CALLS             | 4               | Live demo setting (Section 7.5).       |
 
 **Table 14.** Outcome rules. The founder can choose *stop* at any gate but cannot turn a failed check into a pass.
 
 | Gate | Go                                                       | Repeat                            | Pivot back                                             | Stop                                                             |
 |------|----------------------------------------------------------|-----------------------------------|--------------------------------------------------------|------------------------------------------------------------------|
-| G1   | All G1 rules pass.                                       | Invalid JSON (once).              | No traceable Must feature, or fit test fails: Phase 2. | Excluded category.                                               |
-| G2   | All G2 rules pass.                                       | Bad manifest (once).              | Archetype unsupported: Step 3.1, then Phase 2.         | Excluded category.                                               |
-| G3   | Checks QA-01 to QA-15 pass; all automated criteria pass. | Any check fails and attempt \< 3. | Traceability broken by regeneration: Step 3.1.         | Attempts exhausted; QA-08 or QA-09 still failing after a repeat. |
+| G1   | All G1 rules pass.                                       | Model error (`model_error`, no attempt used). | No traceable Must feature, or fit test fails: Phase 2. | Excluded category.                                               |
+| G2   | All G2 rules pass.                                       | Bad manifest (once); model error (no attempt used). | Archetype unsupported: Step 3.1, then Phase 2.         | Excluded category.                                               |
+| G3   | Every applicable check passes (14 for A1); all automated criteria pass. | Any applicable check fails on valid output and attempt \< 3. | Traceability broken by regeneration: Step 3.1.         | Attempts exhausted; QA-08 or QA-09 still failing after a repeat. |
 | G4   | Founder approves.                                        | Founder rejects with note.        | Founder rejects scope: Step 3.1.                       | Founder chooses stop.                                            |
 
 The rule that the founder cannot override a failed check follows from the hard requirement that approval cannot override a prohibition [11], extended to the test gate so that "tests pass" keeps its meaning. A founder who disagrees with a check can stop the run and change the threshold before the next run, which the log will show.
@@ -403,6 +410,8 @@ The rule that the founder cannot override a failed check follows from the hard r
 | QA-14 | Acceptance criteria   | Each automated criterion passes through its mapped check; `MANUAL` criteria are listed, not passed.                                                           |
 | QA-15 | Naming                | All Phase 3 files match `phase3_step<M>_*` or `phase3_gate_*`, with allowed extensions.                                                                       |
 
+**Applicability for the hackathon release (A1):** QA-01 to QA-06 and QA-08 to QA-15 are required (14 checks). QA-07 is not applicable to A1, which contains no HTML or scripts; it becomes required when A2 or A4 is enabled. QA-04 (journey trace), QA-05 (internal links), QA-13 (licence) and QA-14 (acceptance criteria) are the checks that show the core workflow works and are never dropped to save time.
+
 QA-08 and QA-10 are pattern-based and can miss paraphrased violations; Section 9 discusses this.
 
 ### 7.2 Pipeline error handling
@@ -411,10 +420,10 @@ QA-08 and QA-10 are pattern-based and can miss paraphrased violations; Section 9
 
 | Failure                            | Behaviour                                                                                        |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
-| Model unreachable or timeout       | One retry; then stop the step with `model_timeout` logged; no partial files reported as passing. |
-| Invalid JSON after retry           | Counts as a failed attempt at the current gate.                                                  |
+| Model unreachable or timeout       | Handled in `llm.py` (X2): same-tier retry for invalid output, tier switch on lag or failure. If every tier fails or the run budget is used: `repeat` (`model_error`), no G3 attempt used, no partial files reported as passing (X17). |
+| Invalid JSON after retry           | A model error, not a product failure: `repeat` (`model_error`); never counted as a G3 attempt (X17). |
 | Missing hand-off field             | Stop with `missing_input` and the field name (Table 3).                                          |
-| Renderer exception                 | Caught, logged with the slot name, counted as a failed attempt.                                  |
+| Renderer exception                 | Caught, logged with the slot name as `pipeline_error`; `repeat`; not counted as a G3 attempt.    |
 | Trick instruction in brief or note | `guardrails.py` refuses, logs `guardrail_refusal`, continues with the allowed part [11].          |
 
 ### 7.3 Repository smoke tests
@@ -445,9 +454,9 @@ Judges try prompts such as "write 50 five-star reviews" [10]. Two Phase 3 prompt
 
 ### 7.5 Cost and timing
 
-Cost per run must separate observed charges from estimates [11]. The observed charge for Phase 3 is \$0.00, because all calls go to a local model and no paid service is used. The test report also records, per call, the token count and generation duration that Ollama returns (`eval_count` and `eval_duration`, the fields the model-check script already reads [11]). Electricity is not counted; this exclusion is labelled `ASSUMPTION`.
+Cost per run must separate observed charges from estimates [11]. The **expected** charge for Phase 3 is \$0.00, because every tier is a free tier without a card or the local model; it becomes an **observed** charge only when a logged run shows it (X13, X18). The test report records, per call, the tier, token counts and wall time from the log. Electricity is not counted; this exclusion is labelled `ASSUMPTION`.
 
-Timing has a consequence the plan does not yet address. A Phase 3 run in MVP mode makes about four to six model calls (Table 6: two for planning, one to three for building, one for documentation). At the model-check ceiling of 30 seconds per call, that is up to 3 minutes, which alone could fill the 3-minute live demo meant for all six phases [13]. These figures are estimates, not measurements. We therefore recommend that the live demo uses archetype A1 with `DEMO_MAX_MODEL_CALLS = 4`, that the weak-brief STOP at Phase 1 or 2 carries the live demonstration, and that Phase 3 is shown through the committed outputs and a live rerun of `pytest`, which needs no model call.
+Timing has a consequence the plan does not yet address. A Phase 3 run in MVP mode makes about four to six model calls (Table 6: two for planning, one to three for building, one for documentation). At 30 seconds per call that is up to 3 minutes, which alone could fill the 180 s budget for a full run (X19) [13]. These figures are estimates, not measurements. We therefore recommend that the live demo uses archetype A1 with `DEMO_MAX_MODEL_CALLS = 4`, that the weak-brief STOP at Phase 1 or 2 carries the live demonstration, and that Phase 3 is shown through the committed outputs and a live rerun of `pytest`, which needs no model call.
 
 ## 8. Honesty, labels and safety
 
@@ -498,7 +507,7 @@ The safety argument rests on three layers. First, the model cannot produce execu
 | orchestrator.py                                   | Mode selection (Table 4) and the step sequence of Figure 1.                                                                            |
 | tests/test_phase3_build.py                        | Table 17; trick prompts of Table 18 in `tests/`.                                                                                       |
 | ARCHITECTURE.md                                   | `### Phase 3: Build` under `## Phases`; G1–G4 under `## Gates`; Mermaid from Appendix B.                                               |
-| README.md                                         | Rows in "What works and what is mocked": Build product (Working), Product integrations (**MOCKED**), Product publishing (**STUBBED**). |
+| README.md                                         | Rows in "What works and what is mocked": Build product (Planned until its tests pass, then Working; X18), Product integrations (**MOCKED**), Product publishing (**STUBBED**). |
 
 ### 10.2 Place in the six-phase gate chain
 
@@ -549,7 +558,7 @@ Against the rubric [10], Phase 3 contributes to the working prototype (a gate th
 | Input            | Brief (skills, time, values); contract H2 (Phase 1 `selected`, `evidence[]`, `brief.target_market`, `excluded_category`; Phase 2 `lean_canvas`, `gate_result`, `validation_status`, `overrides[]`).                                                                                                                         |
 | Agents           | `mvp_planner`, `builder`, `doc_writer`, `qa`, `packager` (Table 6).                                                                                                                                                                                                      |
 | Method           | Single-feature, piecemeal MVP as a vertical slice [2], [4]; user story [16]; Must/Should/Won't with evidence trace; fit test [6]; Given/When/Then criteria.                                                                                                      |
-| Tools / sources  | Local Ollama at `localhost:11434`, key needed: no, rate limit: none (local); tested: only by `model_check.py`, not yet run on the team laptop (UNVERIFIED) [11]. Structured outputs [8]; Python standard library for checks; no external network calls.              |
+| Tools / sources  | Shared model chain (X2): Groq `qwen/qwen3.8-27b` and NVIDIA Build (keys in `.env`, free tiers, no card), local Gemma 4 26B A4B Q4_K_M via Ollama as backup (no key); tested only by `model_check.py` and the Step 2b notebook, not yet run on the team laptop (UNVERIFIED) [11]. Structured outputs [8]; Python standard library for checks; no external network calls.              |
 | Prompt sketch    | Appendix A.                                                                                                                                                                                                                                                              |
 | Output files     | `phase3_step1_mvp_definition.md`, `phase3_step2_build_plan.md`, `phase3_step3_product_*`, `phase3_step4_user_docs.md`, `phase3_step5_test_report.md`, `phase3_gate_tests.md`, `phase3_step6_release_package.md`, `phase3_step6_handoff.json`.                            |
 | Gate             | G3 tests pass (Table 14) plus G1, G2, G4.                                                                                                                                                                                                                                |
@@ -565,7 +574,7 @@ The white paper advises that a roadmap list capabilities rather than tasks, give
 
 | Horizon | Capability                                                                                                                                                                                                | Trigger to start                                                 |
 |---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| Now     | Archetypes A1 to A3, gates G1 to G4, model-free QA and release package.                                                                                                                                   | Hackathon build.                                                 |
+| Now     | Archetype A1, gates G1 to G4, model-free QA (14 applicable checks) and release package. A2 and A3 move to Next.                                                                                                                                   | Hackathon build.                                                 |
 | Next    | Archetype A4 with a reviewed script; real-user completion tests with two or three early adopters, turning the `MANUAL` item into a measured one; a model-based second reader for QA-08 and QA-10.         | First founder run after the hackathon.                           |
 | Later   | Founder-chosen concierge delivery [7]; parallel MVPs for the alternatives scored in Phase 1, which the paper allows when several concepts meet one need [2]; a short video as a low-cost probe [2]. | Real-user feedback shows the static product is the wrong format. |
 

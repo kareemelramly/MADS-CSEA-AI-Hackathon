@@ -1,0 +1,702 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>SRS v1.1: Agentic Venture Builder</title>
+<style>
+@page { size: A4; margin: 14mm 14mm 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Inter", sans-serif; font-size: 9.6pt; line-height: 1.5; color: #1f2937; margin: 0; }
+code, pre { font-family: "DejaVu Sans Mono", "Consolas", monospace; }
+code { font-size: 8.2pt; background: #eef2ff; color: #1e3a8a; padding: 0 3px; border-radius: 3px; }
+pre { font-size: 7.6pt; line-height: 1.38; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #1e3a8a; border-radius: 4px; padding: 7px 9px; margin: 6px 0 9px; white-space: pre-wrap; break-inside: avoid; }
+pre code { background: none; padding: 0; color: #1f2937; font-size: inherit; }
+.banner { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); color: #fff; border-radius: 10px; padding: 16px 20px 15px; margin-bottom: 14px; }
+.kicker { font-variant: small-caps; letter-spacing: 1.2px; font-size: 8.6pt; opacity: .9; }
+.banner h1 { font-size: 21pt; font-weight: 700; margin: 4px 0 5px; line-height: 1.15; }
+.banner p { margin: 0; font-size: 10pt; opacity: .95; }
+h2 { font-size: 13pt; color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 3px; margin: 18px 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; break-after: avoid; }
+h2 .src { font-size: 7.6pt; color: #64748b; font-weight: 400; text-align: right; }
+h3 { font-size: 10.6pt; color: #1e3a8a; margin: 12px 0 5px; break-after: avoid; }
+.newpage { break-before: page; }
+.meta { font-size: 8.4pt; color: #64748b; margin: -2px 0 6px; }
+.meta b { color: #1e3a8a; }
+.oneline { background: #eff6ff; border-left: 4px solid #1d4ed8; padding: 7px 10px; margin: 6px 0 10px; border-radius: 0 4px 4px 0; break-inside: avoid; }
+.oneline b:first-child { color: #1d4ed8; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 8.4pt; line-height: 1.4; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th { background: #1e3a8a; color: #fff; text-align: left; padding: 5px 6px; font-weight: 600; }
+td { padding: 4px 6px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+tbody tr:nth-child(even) td { background: #f8fafc; }
+td:first-child { font-weight: 600; }
+table.plain td:first-child { font-weight: 400; }
+ol.steps { list-style: none; counter-reset: s; padding-left: 0; margin: 6px 0 10px; }
+ol.steps > li { counter-increment: s; position: relative; padding-left: 26px; margin-bottom: 6px; }
+ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 17px; height: 17px; border-radius: 50%; background: #1d4ed8; color: #fff; font-size: 8pt; font-weight: 700; text-align: center; line-height: 17px; }
+ul { margin: 4px 0 8px; padding-left: 17px; }
+li { margin-bottom: 2px; }
+.chip { background: #fff3e0; color: #b45309; padding: 0 4px; border-radius: 3px; font-weight: 600; font-size: 8.4pt; }
+.v3 { background: #6d28d9; color: #fff; font-size: 7pt; font-weight: 700; padding: 0 4px; border-radius: 3px; margin-right: 3px; vertical-align: 1px; }
+.box { border-radius: 4px; padding: 7px 10px; margin: 8px 0 10px; break-inside: avoid; }
+.box .lbl { font-weight: 700; display: block; margin-bottom: 2px; }
+.remember { background: #f1f5f9; border-left: 4px solid #64748b; }
+.remember .lbl { color: #334155; }
+.done { background: #ecfdf5; border-left: 4px solid #059669; }
+.done .lbl { color: #047857; }
+.check { background: #fff7ed; border-left: 4px solid #ea580c; }
+.check .lbl { color: #c2410c; }
+.box ul { margin: 2px 0 0; }
+.small { font-size: 8pt; color: #64748b; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+</style>
+<style>td:first-child{white-space:nowrap}</style></head><body>
+<div class="banner">
+  <div class="kicker">MADS × CSEA AI Hackathon · Software Requirements Specification · v1.1 · 17 Nov 2026</div>
+  <h1>Software Requirements Specification for the Agentic Venture Builder</h1>
+  <p>What the system must do, how fast, and under which rules, written to the IEEE-style template and traced to CLAUDE.md, the problem statement and Build Runbook v3.</p>
+</div>
+
+<table class="plain">
+<tbody>
+<tr><td style="width:24%"><b>Project</b></td><td>Agentic Venture Builder (repository <code>MADS-CSEA-AI-Hackathon</code>)</td></tr>
+<tr><td><b>Version</b></td><td>1.1 draft, for team review (not yet approved). Authoritative for the model architecture and the cross-phase decisions X1–X19.</td></tr>
+<tr><td><b>Prepared by</b></td><td>Team name <span class="chip">TBD-1</span>, MADS × CSEA AI Hackathon, Fall 2026</td></tr>
+<tr><td><b>Date created</b></td><td>17 November 2026</td></tr>
+<tr><td><b>Template</b></td><td>Software Requirements Specification template, © 1999 Karl E. Wiegers; the template grants permission to use, modify and distribute it.</td></tr>
+</tbody>
+</table>
+
+<h3>Revision history</h3>
+<table>
+<thead><tr><th style="width:22%">Name</th><th style="width:14%">Date</th><th>Reason for changes</th><th style="width:10%">Version</th></tr></thead>
+<tbody>
+<tr><td>Team <span class="chip">TBD-1</span></td><td>17 Nov 2026</td><td>First draft from CLAUDE.md, the problem statement and Build Runbook v3; adds the 3-minute run requirement (PERF-1 to PERF-3).</td><td>1.0 draft</td></tr>
+<tr><td>Team <span class="chip">TBD-1</span></td><td>17 Nov 2026</td><td>Review fixes (Appendix E): payment rule, unrun experiment vs zero demand, one model architecture (Groq → NVIDIA → local Gemma, no GPT), A1-only Build scope with 14 checks, Phase 2 gate branch coverage, attempt IDs for write-once outputs, model errors vs quality failures, evidence-based status words, commercial approval wording, full Phase 6 specification. Agent-design guidance from four references (§2.5).</td><td>1.1 draft</td></tr>
+</tbody>
+</table>
+
+<h3>Table of contents</h3>
+<table class="plain">
+<tbody>
+<tr><td>1. Introduction</td><td>1.1 Purpose · 1.2 Document conventions · 1.3 Intended audience · 1.4 Product scope · 1.5 References</td></tr>
+<tr><td>2. Overall description</td><td>2.1 Perspective · 2.2 Functions · 2.3 User classes · 2.4 Operating environment · 2.5 Constraints · 2.6 User documentation · 2.7 Assumptions and dependencies</td></tr>
+<tr><td>3. External interface requirements</td><td>3.1 User · 3.2 Hardware · 3.3 Software · 3.4 Communications</td></tr>
+<tr><td>4. System features</td><td>4.1 Run control · 4.2 Model access · 4.3 Discover · 4.4 Validate · 4.5 Build · 4.6 Commercial setup · 4.7 Launch and sale to cash · 4.8 Operate and learn · 4.9 Approval and override · 4.10 Guardrails · 4.11 Decision log and outputs</td></tr>
+<tr><td>5. Other nonfunctional requirements</td><td>5.1 Performance (includes the 3-minute run) · 5.2 Safety · 5.3 Security · 5.4 Quality attributes · 5.5 Business rules</td></tr>
+<tr><td>6. Other requirements</td><td>6.1 Repository deliverables · 6.2 Legal and licensing · 6.3 Data storage</td></tr>
+<tr><td>Appendices</td><td>A Glossary · B Analysis models · C To-be-determined list · D Traceability summary · E Review findings and resolutions</td></tr>
+</tbody>
+</table>
+
+<h2><span>1. Introduction</span><span class="src">Template §1</span></h2>
+
+<h3>1.1 Purpose</h3>
+<p>This SRS specifies release 1.0 of the Agentic Venture Builder: an open-source team of AI agents that takes a founder's brief through six phases (Discover, Validate, Build, Commercial setup, Launch, Operate and learn) toward a validated, sellable digital product, and that recommends <b>stop</b> when evidence is weak. It covers the whole system that the team submits on the repository's <code>main</code> branch: the agents, gates, founder approval, model access, the mocked sale-to-cash ledger, the Streamlit UI, and the repository deliverables the organizers' checker reads.</p>
+
+<h3>1.2 Document conventions</h3>
+<ul>
+<li><b>"shall"</b> marks a mandatory requirement; <b>"should"</b> marks a recommended one.</li>
+<li><b>IDs:</b> each requirement has its own tag (<code>DIS-6</code>, <code>PERF-1</code>), its own priority, a source and a verification method. Priorities are not inherited.</li>
+<li><b>Priority:</b> <b>High</b> = a MUST in CLAUDE.md or the Hard Requirements, or breaking it risks disqualification; <b>Medium</b> = a SHOULD, or needed for a credible demo; <b>Low</b> = build only if time remains, else label STUBBED.</li>
+<li><b>Source codes:</b> CM = CLAUDE.md conventions; HR = CLAUDE.md Hard Requirements; PS = Problem Statement Explained; RB§n = Build Runbook v3, section n; P1 = Discover phase card; P2 = Phase 2 patch; P3 = Phase 3 specification; P45 = Phases 4–5 research; RR = multi-agent research report; UR = user request of 17 Nov 2026; AG1–AG3 = agent-building guides (§1.5); RV = review of 17 Nov 2026 (Appendix E).</li>
+<li><b>Verification:</b> T = automated test (file named), I = inspection, D = demonstration in a run, M = measurement.</li>
+<li><span class="chip">ASSUMPTION</span> marks a planning value not yet measured; <span class="chip">TBD-n</span> points to Appendix C.</li>
+</ul>
+
+<h3>1.3 Intended audience and reading suggestions</h3>
+<table>
+<thead><tr><th style="width:24%">Reader</th><th>Read first</th></tr></thead>
+<tbody>
+<tr><td>Phase owners (Members 1–4)</td><td>Section 4 for your phase, then 4.9 to 4.11 (shared rules every phase must meet), then 5.1.</td></tr>
+<tr><td>Backbone owner (Member 2)</td><td>4.1, 4.2, 4.9, 4.11, 5.1, 5.3.</td></tr>
+<tr><td>Tester and demo lead</td><td>5.1 (timing), the Verify column in every table, Appendix D.</td></tr>
+<tr><td>Documentation assembler (Member 1)</td><td>Section 6 and 2.6.</td></tr>
+</tbody>
+</table>
+
+<h3>1.4 Product scope</h3>
+<p>Most AI business tools promise income, lock users in, and stop at a generic plan (PS). This product is the honest, open alternative: sourced evidence, proven methods (Lean Canvas, Mom Test, pre-set thresholds), the founder in control of every external action, and a system that says "don't launch this" when the numbers say so. All payments, publishing and delivery are MOCKED or STUBBED. The goals for release 1.0 are the hackathon's six scored criteria: working prototype, architecture quality, evidence and honesty, founder control and safety, reproducibility and openness, and a pitch.</p>
+
+<h3>1.5 References</h3>
+<table>
+<thead><tr><th style="width:8%">Code</th><th style="width:40%">Document</th><th>Version, date, location</th></tr></thead>
+<tbody>
+<tr><td>CM, HR</td><td>CLAUDE.md: hackathon submission conventions and Hard Requirements</td><td>Organizers, Fall 2026; repository root (moved from <code>Claude/</code> in Step 1)</td></tr>
+<tr><td>PS</td><td>Open-Source Agentic Venture Builders: Problem Statement Explained</td><td>Organizers, Fall 2026; <code>Problem_Statement_Explained.pdf</code> (untracked)</td></tr>
+<tr><td>RB</td><td>Build Runbook v3: Empty Repo to Submission</td><td>Team, v3, 17 Nov 2026; <code>Claude outputs/Build_Runbook_v3.pdf</code></td></tr>
+<tr><td>P1, P2, P3, P45</td><td>Discover_Phase_Card.md; ARCHITECTURE_phase2_patch.md; Phase3_Build_Agent_Specification.md; Member4_Phase4_Phase5_Research.md</td><td>Team, 17 Nov 2026; <code>Phases-Research/</code></td></tr>
+<tr><td>RR</td><td>Building a Reliable, Cost-Efficient Multi-Agent Venture Builder (research report)</td><td>Team research handoff, 17 Nov 2026</td></tr>
+<tr><td>Ext.</td><td>Groq rate limits; Qwen3.8-27B licence; Gemma 4 26B A4B quantization sizes; Ollama API and structured outputs</td><td>console.groq.com/docs/rate-limits; huggingface.co/Qwen/Qwen3.8-27B; huggingface.co/bartowski/google_gemma-4-26B-A4B-it-GGUF; github.com/ollama/ollama/blob/main/docs/api.md (all read 17 Nov 2026)</td></tr>
+<tr><td>AG1</td><td>OpenAI, A practical guide to building AI agents</td><td>openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents (read 17 Nov 2026)</td></tr>
+<tr><td>AG2</td><td>How to build AI agents that automate business workflows (step-by-step guide)</td><td>dev.to/babavose (read 17 Nov 2026)</td></tr>
+<tr><td>AG3</td><td>B. Marr, The beginner's blueprint for building AI agents that handle your toughest business tasks</td><td>bernardmarr.com (read 17 Nov 2026)</td></tr>
+<tr><td>AG4</td><td>How to build an enterprise AI agent that can actually execute business tasks</td><td>linkedin.com/pulse (could not be read: the site blocks automated access; not used as a source)</td></tr>
+</tbody>
+</table>
+
+<h2><span>2. Overall description</span><span class="src">Template §2</span></h2>
+
+<h3>2.1 Product perspective</h3>
+<p>A new, self-contained product, run with one command (<code>docker compose up</code>). Three containers: <code>ollama</code> (local model server), <code>model-pull</code> (one-shot weight download) and <code>app</code> (Streamlit UI, orchestrator, agents, gates, approval, mock ledger). Optional external services are two free model tiers (Groq and NVIDIA Build; the local Gemma model is the backup) and four keyless evidence sources. No payment, e-mail, social or hosting service is connected; those actions are STUBBED behind approval.</p>
+<pre><code>Founder (browser :8501)
+   │ brief, approvals, overrides, real counts
+   ▼
+app: orchestrator ──► agents (role functions) ──► llm.py ──► tier chosen per task (sticky)
+   │      │                   │       Groq qwen3.8-27b → NVIDIA Build → local Gemma 4 26B A4B (backup)
+   │      ├─► gates.py (code decides outcomes)
+   │      ├─► approval.py ──► executor ──► STUBBED publish / MOCKED ledger (state/*.sqlite)
+   │      └─► sources.py ──► HN Algolia · Stack Exchange · GitHub · Wikipedia
+   └─► decision_log.json · outputs/*.md|json|csv</code></pre>
+
+<h3>2.2 Product functions</h3>
+<ul>
+<li>Take a structured founder brief and run six phases in order, pausing at every gate that needs the founder.</li>
+<li>Find and cite evidence; score the idea and two alternatives; recommend go, repeat, pivot back or stop.</li>
+<li>Build a Lean Canvas, lock a demand target before data, draft a guarded landing page, and judge real experiment results.</li>
+<li>Produce a tested template-based MVP with user docs; set a sourced price and DRAFT policies.</li>
+<li>Prove pay → deliver → refund → revoke → reconcile on a MOCKED ledger.</li>
+<li>Write a persevere-or-pivot memo from real numbers only.</li>
+<li>Require founder approval, bound to the exact action, for anything published, sent, spent or released.</li>
+<li>Log every agent action and report cost per run.</li>
+</ul>
+
+<h3>2.3 User classes and characteristics</h3>
+<table>
+<thead><tr><th style="width:18%">Class</th><th style="width:12%">Importance</th><th>Characteristics and what they use</th></tr></thead>
+<tbody>
+<tr><td>Founder</td><td>Primary</td><td>Non-technical to semi-technical; uses the UI only. The only class that can approve, override, enter real counts and make the Phase 6 decision.</td></tr>
+<tr><td>Judge / evaluator</td><td>Primary for scoring</td><td>Clones <code>main</code> with no <code>.env</code>, runs <code>docker compose up</code> and the tests, reads README, ARCHITECTURE and outputs, tries trick prompts. May have a CPU-only laptop.</td></tr>
+<tr><td>Developer (team)</td><td>Secondary</td><td>Runs tests, the cascade-check notebook and demo runs; holds API keys in <code>.env</code>.</td></tr>
+<tr><td>Contributor (after the hackathon)</td><td>Tertiary</td><td>Reads ARCHITECTURE.md and prompts; extends phases.</td></tr>
+</tbody>
+</table>
+
+<h3>2.4 Operating environment</h3>
+<ul>
+<li>Docker Desktop with Compose v2 on Windows 10/11 (WSL 2 backend), Linux or macOS; x86-64 CPU by default; NVIDIA GPU optional via <code>docker-compose.gpu.yml</code>.</li>
+<li>Disk: at least 25 GB free for images and weights (<span class="chip">ASSUMPTION</span>).</li>
+<li><b>Local backup model:</b> Gemma 4 26B A4B at Q4_K_M. Its weights are about 16–17 GB (published GGUF listings), so they <b>do not fit in a 6 GB GPU</b>. Ollama splits the layers between the GPU and system RAM; with 6 GB of VRAM about 11 GB more must sit in RAM, so plan for at least 32 GB system RAM (<span class="chip">ASSUMPTION</span>, <span class="chip">TBD-2</span>). On Windows, raise the WSL 2 memory limit in <code>.wslconfig</code>, since Docker Desktop's VM gets only part of the host RAM by default, and use the GPU compose override with NVIDIA's WSL GPU support. Expected local speed is a few to about 20 tokens per second on 6–8 GB cards (third-party estimates, not measured): the local path is slow by design and is only the backup (PERF-5).</li>
+<li>Container runtime: Python 3.12 (slim image), Streamlit, Jinja2, jsonschema, pytest; Ollama server image pinned to the version measured in Step 0 (<span class="chip">TBD-3</span>).</li>
+<li>A current desktop browser on the host (Chrome, Edge, Firefox) at http://localhost:8501.</li>
+<li>Internet needed for the first image and model download, for remote tiers and for evidence sources; the no-key path needs it only for evidence sources.</li>
+</ul>
+
+<h3>2.5 Design and implementation constraints</h3>
+<ul>
+<li><b>Hackathon rules (HR, CM):</b> OSI licence; one-command setup; free open-weight models only; no paid API; no payments of any kind, including sandbox and test mode; founder approval enforced in code; every claim sourced or labelled ASSUMPTION; every mock labelled; cost per run reported.</li>
+<li><b>Checker conventions (CM):</b> exact file names, README and ARCHITECTURE headings, outputs naming; default branch only; text diagrams only.</li>
+<li><b>Architecture (RB, RR):</b> fixed Python state machine; agents are role functions named <code>agents/&lt;role&gt;.py</code>; gate outcomes computed by code; one shared model client (<code>llm.py</code>); OpenAI chat-completions format for remote tiers; Ollama <code>/api/chat</code> locally.</li>
+<li><b>Excluded products (CM, PS):</b> physical goods; financial, investment or crypto products; health or legal advice products.</li>
+<li><b>Time:</b> code freeze at the final push before Tuesday 11:59 PM (deadline timezone <span class="chip">TBD-8</span>).</li>
+</ul>
+<p><b>Design guidance adopted from the agent-building references (AG1–AG3).</b> The guides were read as advice, not as rules; each item below is adopted because it fits the hackathon constraints.</p>
+<table>
+<thead><tr><th style="width:38%">Guidance</th><th style="width:8%">Ref</th><th>Where this SRS applies it</th></tr></thead>
+<tbody>
+<tr><td>Agent = model + tools + instructions; write instructions as numbered routines with branches for missing data</td><td>AG1</td><td>One prompt file per role (QUAL-6); every phase card lists its routine and missing-input branches (CORE-1).</td></tr>
+<tr><td>Rate every tool low, medium or high by write access, reversibility and financial impact; pause for checks on high-risk calls</td><td>AG1</td><td>APR-10 risk table: every external-effect action is high and needs approval; payment actions are prohibited, not rated.</td></tr>
+<tr><td>Escalate to a human after repeated failures and before high-risk actions</td><td>AG1, AG3</td><td>CORE-11 (two model errors in one step pause for the founder); approvals (4.9).</td></tr>
+<tr><td>A run loop needs explicit exit conditions</td><td>AG1</td><td>Gate outcomes end every phase (CORE-3); bounded attempts and the run budget (MOD-8, PERF-2).</td></tr>
+<tr><td>Combine deterministic rules with model reasoning; validate model output against explicit rules</td><td>AG2</td><td>Gates are code (CORE-4); jsonschema plus reference checks (MOD-7).</td></tr>
+<tr><td>Layer guardrails; no single guardrail is sufficient</td><td>AG1</td><td>Rules, schema checks, approval binding and the executor boundary (4.9, 4.10).</td></tr>
+<tr><td>Start with a narrow pilot; split work into discrete stages; measure response time; build failure handling in from the start</td><td>AG2, AG3</td><td>A1-only Build scope (4.5); six gated phases; run timing (5.1); model and pipeline errors handled separately (CORE-9).</td></tr>
+<tr><td>Make mistakes traceable and owners clear</td><td>AG3</td><td>Run and task IDs on every log entry and file (CORE-6, X16); owners per step in the runbook.</td></tr>
+<tr><td>Not adopted: memory or vector stores; multi-agent manager or hand-off chat</td><td>AG1, AG2</td><td>Each run is self-contained and the pipeline is fixed (CORE-2); long-term memory is a roadmap item.</td></tr>
+</tbody>
+</table>
+
+<h3>2.6 User documentation</h3>
+<table>
+<thead><tr><th style="width:26%">Item</th><th>Content and format</th></tr></thead>
+<tbody>
+<tr><td><code>README.md</code></td><td>The eight required headings in order (6.1); Markdown.</td></tr>
+<tr><td><code>ARCHITECTURE.md</code></td><td>The seven required sections with Mermaid diagrams.</td></tr>
+<tr><td>Product user docs</td><td>Generated per run by <code>agents/doc_writer.py</code> (six fixed headings), in <code>outputs/</code>.</td></tr>
+<tr><td>In-app text</td><td>Plain-language verdict box, labels and error panel (3.1).</td></tr>
+<tr><td><code>docs/demo_runs.md</code></td><td>Generated index of demo runs and their files.</td></tr>
+<tr><td>Demo video</td><td>At most 3 minutes, linked under <code>## Demo video</code>.</td></tr>
+</tbody>
+</table>
+
+<h3>2.7 Assumptions and dependencies</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:58%">Assumption or dependency</th><th>If wrong</th></tr></thead>
+<tbody>
+<tr><td>A1</td><td>Groq's free tier serves <code>qwen/qwen3.8-27b</code> (Apache-2.0) at 30 req/min, 1,000 req/day, 8K tokens/min, 200K tokens/day with no card (Groq's page notes free and Developer values may differ; read 17 Nov 2026).</td><td>Calls move to NVIDIA or local sooner; PERF-1 may fail on the local tier.</td></tr>
+<tr><td>A2</td><td>NVIDIA Build hosts Qwen3.8-27B (NGC lists a NIM container; a hosted API endpoint is not confirmed) or another non-GPT open-weight model, at about 40 req/min for dev and test use, no card (<span class="chip">TBD-12</span>).</td><td>Tier 2 uses a different model or drops out; Groq → local only.</td></tr>
+<tr><td>A3</td><td>Local Gemma 4 26B A4B (Q4_K_M) reaches 9/10 schema-valid outputs on <code>model_check.py</code>.</td><td>No working no-key path; release blocked until fixed (MOD-10).</td></tr>
+<tr><td>A7</td><td>The demo laptop has a 6 GB GPU and at least 32 GB RAM for split loading.</td><td>Local backup slower or fails to load; only remote tiers carry the demo.</td></tr>
+<tr><td>A4</td><td>HN Algolia, Stack Exchange and GitHub search answer without keys at demo time.</td><td>Discover returns <code>repeat</code> (inconclusive), never <code>stop</code>.</td></tr>
+<tr><td>A5</td><td>A full run needs at most 16 model calls and about 20K–45K tokens (RR estimate).</td><td>PERF-1 and the runs-per-day figure change; re-measure (PERF-9).</td></tr>
+<tr><td>A6</td><td>The organizers' checker reads <code>outputs/</code> at the top level.</td><td>None, since files stay flat (LOG-5).</td></tr>
+</tbody>
+</table>
+
+<h2><span>3. External interface requirements</span><span class="src">Template §3</span></h2>
+
+<h3>3.1 User interfaces</h3>
+<p>One Streamlit page at port 8501. Every screen shows the run ID, the current phase, the model status line and the local-model readiness line. Errors follow one format: what failed, the resulting outcome, "nothing was decided" when true, and the next action.</p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>UI-1</td><td>The UI shall provide a brief form with idea, skills, budget amount and currency, hours per week, target market and countries, values, and run label.</td><td>High</td><td>PS; RB§10</td><td>D</td></tr>
+<tr><td>UI-2</td><td>The UI shall show phase progress and a live status box listing each model attempt (tier, status, elapsed time, budget left).</td><td>High</td><td>RB§2a, §10</td><td>D</td></tr>
+<tr><td>UI-3</td><td>The UI shall show the plain-language verdict before any action button for that gate.</td><td>High</td><td>RB§10</td><td>D</td></tr>
+<tr><td>UI-4</td><td>The approval panel shall show action, content, destination, amount and run ID, with Approve and Reject buttons, and no pre-selected choice.</td><td>High</td><td>HR; RB§4</td><td>D, T</td></tr>
+<tr><td>UI-5</td><td>The override panel shall require a typed reason; after any override an amber bar stays visible for the rest of the run.</td><td>High</td><td>P2; RB§6</td><td>D</td></tr>
+<tr><td>UI-6</td><td>Every mocked, stubbed or simulated element shall carry its label (MOCKED, STUBBED, SIMULATED) on screen.</td><td>High</td><td>CM; HR</td><td>I</td></tr>
+<tr><td>UI-7</td><td>The UI shall show elapsed system time for the run against <code>RUN_TIME_BUDGET_S</code> (PERF-2).</td><td>High</td><td>UR</td><td>D</td></tr>
+<tr><td>UI-8</td><td>On a model or budget error, the UI shall show each tier and its failure reason, the outcome <code>repeat</code>, and a Try again button, and keep earlier run files visible.</td><td>Medium</td><td>RB§10</td><td>D</td></tr>
+<tr><td>UI-9</td><td>The UI shall provide a founder-evidence input (URL plus one-line claim), the Phase 2 real-results form (VAL-6) and the Phase 6 decision buttons.</td><td>High</td><td>P1; P2; RB§9</td><td>D</td></tr>
+<tr><td>UI-10</td><td>With no remote key, the Run button shall stay disabled until the local model is ready, with the reason shown.</td><td>Medium</td><td>RB§3</td><td>D</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 Hardware interfaces</h3>
+<p>No direct hardware interface. GPU use is optional and only through Docker's NVIDIA device reservation in <code>docker-compose.gpu.yml</code>; the default configuration shall run on CPU only (QUAL-4). No card readers, payment terminals or other devices are supported.</p>
+
+<h3>3.3 Software interfaces</h3>
+<table>
+<thead><tr><th style="width:22%">Component</th><th style="width:38%">Interface and data</th><th>Purpose and rules</th></tr></thead>
+<tbody>
+<tr><td>Local Ollama</td><td><code>POST /api/chat</code> (<code>format</code> = JSON schema, <code>stream:false</code>, <code>think:false</code> where supported); <code>GET /api/tags</code></td><td>Tier 3 model calls; readiness check. Tokens from <code>eval_count</code>, <code>prompt_eval_count</code>.</td></tr>
+<tr><td>Groq, NVIDIA Build</td><td><code>POST {BASE_URL}/chat/completions</code>, Bearer key, JSON mode, schema in system prompt, <code>max_tokens</code> cap, thinking disabled</td><td>Tiers 1–2, model <code>qwen/qwen3.8-27b</code>. Rate-limit headers and <code>retry-after</code> read for switching (MOD-4).</td></tr>
+<tr><td>Evidence sources</td><td>HN Algolia search API; Stack Exchange search; GitHub issues search (unauthenticated); Wikipedia API (background only)</td><td>Read-only HTTPS GET; results registered with source IDs (DIS-4).</td></tr>
+<tr><td>SQLite (stdlib)</td><td><code>state/approvals.sqlite</code>, <code>state/ledger.sqlite</code></td><td>Approval queue and MOCKED ledger; never committed.</td></tr>
+<tr><td>Libraries</td><td>Streamlit ≥1.40, Jinja2 ≥3.1 (autoescape on), jsonschema ≥4.23 (Draft 2020-12), pytest ≥8</td><td>UI, templates, validation, tests. Exact pins after first green build.</td></tr>
+<tr><td>Internal contracts</td><td>H1–H5 hand-off JSON between phases; <code>RunContext</code>; <code>GateResult</code>; <code>RealCounts</code>; <code>LockedPlan</code></td><td>Field names as in P1–P45 and RB§4.</td></tr>
+</tbody>
+</table>
+
+<h3>3.4 Communications interfaces</h3>
+<ul>
+<li><b>COMM-1 (High):</b> remote model and evidence calls shall use HTTPS; containers talk over the Compose network (<code>http://ollama:11434</code>); host ports 8501 and 11434 only.</li>
+<li><b>COMM-2 (High):</b> the product shall not send e-mail, messages or social posts, or call any payment, hosting or store API. Publish and post actions end in a STUBBED function that only logs <code>would_publish</code>.</li>
+<li><b>COMM-3 (Medium):</b> evidence requests shall send a descriptive User-Agent and respect each source's rate limit; HTTP 403/429 marks the source as failed for coverage (DIS-6).</li>
+<li><b>COMM-4 (High):</b> every outbound request shall have a timeout bounded by the remaining run budget (MOD-8, PERF-2).</li>
+</ul>
+
+<h2><span>4. System features</span><span class="src">Template §4 · organized by feature</span></h2>
+
+<h3>4.1 Run control and orchestration</h3>
+<p><b>4.1.1 Description and priority.</b> High. Runs the six phases in order as a state machine, pauses at founder gates, and keeps runs separate.</p>
+<p><b>4.1.2 Stimulus/response.</b> Founder submits brief and presses Run → system validates the brief, creates a run ID, runs the next phase until a gate needs the founder, a stop, or the budget ends → founder acts (approve, override, enter counts) → system continues.</p>
+<p><b>4.1.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>CORE-1</td><td>The system shall reject a brief with missing essential fields with outcome <code>repeat</code> and the list of missing fields, and shall not invent founder details.</td><td>High</td><td>PS; P1</td><td>T test_phase1_discover</td></tr>
+<tr><td>CORE-2</td><td>The system shall run Discover, Validate, Build, Commercial setup, Launch, Operate in that order, through a fixed state machine with no free-form agent conversation in the decision path.</td><td>High</td><td>PS; RR Q1</td><td>I, D</td></tr>
+<tr><td>CORE-3</td><td>Every phase shall end in a gate whose outcome is one of <code>go</code>, <code>repeat</code>, <code>pivot_back</code>, <code>stop</code>, or the pause state <code>awaiting_evidence</code>.</td><td>High</td><td>PS; RB§4, §6</td><td>T</td></tr>
+<tr><td>CORE-4</td><td>Gate outcomes shall be computed by code from logged thresholds; a model may propose but never decide an outcome.</td><td>High</td><td>RB§4; RR Q7</td><td>I, T</td></tr>
+<tr><td>CORE-5</td><td>Each gate shall check, in order: hard rules (exclusion, guardrail, tamper), data completeness, locked thresholds, founder action.</td><td>High</td><td>RB§4</td><td>T</td></tr>
+<tr><td>CORE-6</td><td>Each run shall get a unique run ID (UTC timestamp + label) carried by every log entry, output file and approval.</td><td>High</td><td>RB§4</td><td>T test_backbone</td></tr>
+<tr><td>CORE-7</td><td>Output files shall be write-once and named with run label and attempt number (<code>phase&lt;N&gt;_step&lt;M&gt;_&lt;name&gt;-&lt;label&gt;-a&lt;k&gt;.&lt;ext&gt;</code>); a retry writes the next attempt number and never overwrites. <code>RunContext.artifacts[]</code> shall record path, SHA-256, phase, step, attempt and status (<code>final</code> or <code>superseded</code>), and hand-offs and approvals shall reference the final artifact by path and SHA-256 (X16).</td><td>High</td><td>RB§4, §11; RV</td><td>T test_backbone</td></tr>
+<tr><td>CORE-8</td><td>Phase 3 shall start only after Phase 2 <code>go</code> or a founder override; otherwise the system logs <code>skip_phase</code> with the reason.</td><td>High</td><td>P3; RB§7</td><td>T test_phase2_validate</td></tr>
+<tr><td>CORE-9</td><td>Model errors (invalid output after retries, timeouts, all tiers down, run budget used) and pipeline errors shall give <code>repeat</code> (<code>model_error</code> or <code>pipeline_error</code>) with "nothing decided", never <code>pivot_back</code> or <code>stop</code>, and shall never consume a quality attempt (Phase 1 research retry, <code>VALIDATE_MAX_ATTEMPTS</code>, <code>MAX_BUILD_ATTEMPTS</code>), which count only gate failures on valid output (X17).</td><td>High</td><td>X15; X17; RV</td><td>T test_llm_cascade, test_phase3_build</td></tr>
+<tr><td>CORE-10</td><td>A <code>stop</code> on hard rules shall end the run; the founder may start a new run with a changed brief.</td><td>High</td><td>P1</td><td>T</td></tr>
+<tr><td>CORE-11</td><td>Two consecutive model errors in the same step shall pause the run and ask the founder to try again or stop, instead of retrying silently.</td><td>Medium</td><td>AG1, AG3</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 Model access cascade</h3>
+<p><b>4.2.1 Description and priority.</b> High. One client gives every agent a free open-weight model through one authoritative chain: Groq first, NVIDIA Build when Groq's tokens run out, local Gemma 4 26B A4B as the backup when a remote tier lags or fails. No GPT model is used on any tier. This section supersedes every other model statement in the research cards and Runbook v3 (cards now carry it as X2).</p>
+<p><b>4.2.2 Stimulus/response.</b> An agent starts a task and calls <code>ask()</code> → the client picks the first tier with a key, quota and no cooldown and pins the task to it → every later call of that task uses the same tier → if the pinned tier fails or lags, the task restarts on the next tier → validated JSON or a model error.</p>
+<p><b>4.2.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>MOD-1</td><td>The call order shall be set by <code>LLM_ORDER</code> (default <code>groq,nvidia,ollama</code>); a tier without a key shall be skipped silently, so a clone with no <code>.env</code> uses tier 3 only.</td><td>High</td><td>RB§2a; UR</td><td>T test_llm_cascade</td></tr>
+<tr><td>MOD-2</td><td>Tier 1 shall be Groq serving <code>qwen/qwen3.8-27b</code> (Apache-2.0) on its free tier without a payment method. Tier 2 shall be NVIDIA Build serving the same model if hosted, otherwise the non-GPT open-weight model chosen and measured in Step 2b (<span class="chip">TBD-12</span>). Tier 3 shall be local Gemma 4 26B A4B at Q4_K_M through Ollama (<code>OLLAMA_MODEL</code>).</td><td>High</td><td>HR; UR; RV</td><td>I</td></tr>
+<tr><td>MOD-3</td><td>No tier shall use a GPT-family model.</td><td>High</td><td>UR</td><td>I <code>.env.example</code>, compose</td></tr>
+<tr><td>MOD-4</td><td>Switching shall follow: Groq out of tokens or requests (pre-emptive header check or HTTP 429) → NVIDIA at once; any remote tier that <b>lags</b> (no complete answer within <code>LLM_REMOTE_TIMEOUT_S</code>, 20 s) or returns 5xx or 401/403 → local tier; cooldowns per RB§2a; a tier returns to line when its cooldown ends.</td><td>High</td><td>UR; RB§2a</td><td>T (fake clock)</td></tr>
+<tr><td>MOD-5</td><td><b>Sticky tier per task:</b> all model calls of one agent task (<code>task_id</code>) shall use the tier that answered the task's first call. If that tier fails mid-task, the task shall restart from its first call on the next tier, so no task output mixes models. Every log entry records <code>task_id</code> and <code>tier/provider/model</code>.</td><td>High</td><td>UR</td><td>T</td></tr>
+<tr><td>MOD-6</td><td>Every call shall pass one JSON schema (Ollama <code>format</code> locally; JSON mode with the schema in the system prompt remotely) and request thinking off where the model supports it.</td><td>High</td><td>X3</td><td>I, M Step 2b</td></tr>
+<tr><td>MOD-7</td><td>Every output shall be validated with jsonschema (types, enums, ranges, required fields) and reference checks (every <code>source_id</code> exists in the run registry); invalid output gets one retry on the same tier, then the task moves tier; a final failure is a model error (CORE-9).</td><td>High</td><td>X3; RB§4</td><td>T test_validate</td></tr>
+<tr><td>MOD-8</td><td>A call shall make at most <code>LLM_MAX_ATTEMPTS_PER_CALL</code> (4) attempts across tiers, each with timeout = min(tier timeout, time left in <code>RUN_TIME_BUDGET_S</code>); no attempt starts with less than <code>LLM_MIN_ATTEMPT_S</code> left.</td><td>High</td><td>RB§2a</td><td>T test_llm_cascade</td></tr>
+<tr><td>MOD-9</td><td>The client shall emit one progress event per attempt (call, task, agent, tier, status, reason, elapsed, budget left) and expose <code>status()</code> without any key.</td><td>Medium</td><td>RB§2a</td><td>T</td></tr>
+<tr><td>MOD-10</td><td>The local backup shall pass correctness (≥ 9 of 10 schema-valid on <code>model_check.py</code>); its speed shall be measured and published separately; a slow but correct local tier shall stay in the chain.</td><td>High</td><td>RB§2, §4b</td><td>M model_check</td></tr>
+<tr><td>MOD-11</td><td>Remote calls shall cap output at <code>LLM_MAX_TOKENS</code> and use temperature 0.2; persona and batch calls run one at a time to protect Groq's 8K tokens per minute.</td><td>Medium</td><td>RB§2a</td><td>I</td></tr>
+</tbody>
+</table>
+<h3>4.3 Phase 1 Discover (Core step: find opportunities)</h3>
+<p><b>4.3.1 Description and priority.</b> High. Finds sourced pain points, scores the idea and two alternatives against the founder's constraints, and recommends stop only on weak evidence that the system really examined.</p>
+<p><b>4.3.2 Stimulus/response.</b> Valid brief → exclusion check → criteria logged → search → registry → analysis → gate verdict and outputs.</p>
+<p><b>4.3.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>DIS-1</td><td>The system shall check excluded categories before any search and give <code>stop</code> that cannot be overridden.</td><td>High</td><td>CM; P1</td><td>T</td></tr>
+<tr><td>DIS-2</td><td>The system shall log <code>define_research_criteria</code> with every threshold before the first search.</td><td>High</td><td>P1</td><td>T</td></tr>
+<tr><td>DIS-3</td><td>Evidence sources shall be HN Algolia, Stack Exchange and GitHub issues search; Wikipedia only for background; unauthenticated Reddit and untested sources shall not be used.</td><td>High</td><td>RB§5; RR Q6</td><td>I source_check</td></tr>
+<tr><td>DIS-4</td><td>Every fetched item shall get a registry entry (source ID, URL, source, HTTP status, fetched_at, excerpt); the model shall receive and return source IDs only; code shall render URLs; claims without a valid ID shall be printed as ASSUMPTION.</td><td>High</td><td>HR; RB§5</td><td>T</td></tr>
+<tr><td>DIS-5</td><td>Founder-supplied URLs shall be fetched and registered like other sources; a URL that does not load shall not be registered.</td><td>Medium</td><td>P1; RB§5</td><td>T</td></tr>
+<tr><td>DIS-6</td><td>If fewer than <code>DISCOVER_MIN_SOURCES_OK</code> (2) sources answered or fewer than <code>DISCOVER_MIN_ITEMS_SCREENED</code> (20, <span class="chip">ASSUMPTION</span>) items were screened after one broadened retry, the outcome shall be <code>repeat</code> (inconclusive), never <code>stop</code>.</td><td>High</td><td>RB§5</td><td>T</td></tr>
+<tr><td>DIS-7</td><td>With adequate coverage and fewer than 3 relevant items with URLs across 2 sources after the retry, the outcome shall be <code>pivot_back</code> if a ranked alternative passes, else <code>stop</code>, with the count stated ("N relevant of M screened").</td><td>High</td><td>P1; RB§5</td><td>T</td></tr>
+<tr><td>DIS-8</td><td>The system shall score fit 1–5 on skills, budget, time and values (weights 35/25/25/15) with reasons; below 3 gives <code>pivot_back</code> or <code>stop</code> as in DIS-7.</td><td>High</td><td>P1</td><td>T</td></tr>
+<tr><td>DIS-9</td><td>The system shall propose and rank two alternatives for Phase 2's pivot path.</td><td>High</td><td>PS; P1</td><td>D</td></tr>
+<tr><td>DIS-10</td><td>The interview script shall ask about past behaviour only (Mom Test) and contain no invented answers.</td><td>Medium</td><td>PS; P1</td><td>I</td></tr>
+<tr><td>DIS-11</td><td>A <code>go</code> verdict shall recommend a validation experiment and shall not declare demand validated.</td><td>High</td><td>P1</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>4.4 Phase 2 Validate (Core step: design the business)</h3>
+<p><b>4.4.1 Description and priority.</b> High. Lean Canvas, a demand target locked before data, a guarded landing page behind approval, and a gate on real experiment results.</p>
+<p><b>4.4.2 Stimulus/response.</b> Phase 1 <code>go</code> → canvas and plan → target locked → page drafted → publish approval (STUBBED) → kit exported → founder enters results → gate.</p>
+<p><b>4.4.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>VAL-1</td><td>The system shall produce a 9-box Lean Canvas, each box with source IDs or ASSUMPTION.</td><td>High</td><td>PS; P2</td><td>I</td></tr>
+<tr><td>VAL-2</td><td>The plan "N sign-ups in D days" with <code>min_visitors</code> shall be locked (canonical JSON SHA-256 + <code>locked_at</code>) and logged before any page or data exists.</td><td>High</td><td>P2</td><td>T</td></tr>
+<tr><td>VAL-3</td><td>The landing page shall pass guardrails, use an email-only waitlist labelled "Waitlist: MOCKED", and contain no counts, testimonials, ratings or countdowns.</td><td>High</td><td>HR; P2</td><td>T</td></tr>
+<tr><td>VAL-4</td><td>Publishing shall go through approval (4.9) and end in a STUBBED function that only logs <code>would_publish</code>.</td><td>High</td><td>HR; P2</td><td>T</td></tr>
+<tr><td>VAL-5</td><td>The real-results form shall hold <code>experiment_status</code> (default <code>not_started</code>), start and end dates, visitors (default unknown) and real sign-ups (default 0); simulated counts shall be stored separately and never reach the gate.</td><td>High</td><td>RB§6; P2</td><td>T</td></tr>
+<tr><td>VAL-6</td><td>The gate shall apply these rules in order, first match wins: (1) locked target changed → <code>stop</code>; (2) status not started or running → <code>awaiting_evidence</code>; (3) abandoned → <code>repeat</code>, no attempt used; (4) completed with recorded visitors below <code>min_visitors</code> → <code>repeat</code>, no attempt used; (5) completed, r = sign-ups ÷ N ≥ 1 → <code>go</code>; (6) 0.5 ≤ r &lt; 1 and attempt &lt; <code>VALIDATE_MAX_ATTEMPTS</code> → <code>repeat</code>; (7) r &lt; 0.5, or 0.5 ≤ r &lt; 1 with attempts used up, and an unused alternative → <code>pivot_back</code>; (8) the same with no alternative left → <code>stop</code>. Every completed case maps to exactly one of rules 5–8.</td><td>High</td><td>PS; RB§6; RV</td><td>T test_gate_covers_all_branches</td></tr>
+<tr><td>VAL-7</td><td>A completed experiment with 0 or 12 of 100 sign-ups shall give <code>pivot_back</code> or <code>stop</code>, never <code>go</code>; 60 of 100 after the final attempt with no alternative left shall give <code>stop</code>; the default form (not started) shall give <code>awaiting_evidence</code>, never <code>stop</code>.</td><td>High</td><td>PS; RV</td><td>T test_completed_zero_fails, test_final_attempt_near_miss, test_not_started_awaits_evidence</td></tr>
+<tr><td>VAL-10</td><td>Contract H2 shall carry <code>experiment_status</code>, dates, visitors, sign-ups, <code>attempt</code>, <code>min_visitors</code>, <code>validation_status</code> (VALIDATED, AWAITING_EVIDENCE or UNVALIDATED_FOUNDER_OVERRIDE) and final artifact references.</td><td>High</td><td>P2 §G; RV</td><td>I</td></tr>
+<tr><td>VAL-8</td><td>A founder override after <code>awaiting_evidence</code> or a failed gate shall set <code>UNVALIDATED_FOUNDER_OVERRIDE</code> and stamp every later output.</td><td>High</td><td>P2</td><td>T</td></tr>
+<tr><td>VAL-9</td><td>The persona stress test, if built, shall run calls one at a time and label all output SIMULATED.</td><td>Low</td><td>P2</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>4.5 Phase 3 Build (Core step: build the product)</h3>
+<p><b>4.5.1 Description and priority.</b> High. <b>Scope decision (v1.1):</b> the hackathon release builds archetype A1 (checklist pack) only; A2 and A3 move to the roadmap and A4 stays a stretch item. All checks that show the core workflow works are kept: 14 of the Phase 3 specification's 15 checks run on A1, and QA-07 (script integrity) is not applicable because A1 has no HTML or scripts. In this project a <b>tested MVP</b> is an A1 product that passes the 14 applicable checks and every automated acceptance criterion, with real-user completion kept as an unchecked MANUAL item.</p>
+<p><b>4.5.2 Stimulus/response.</b> Entry rule passes → plan → render → docs → QA → test gate (up to 3 attempts) → manifest → release approval.</p>
+<p><b>4.5.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>BLD-0</td><td>Gate G2 shall accept archetype A1 only unless another archetype is enabled together with its checks.</td><td>High</td><td>RV</td><td>T</td></tr>
+<tr><td>BLD-1</td><td>The MVP plan shall have one user story, at most 3 Must features each with an evidence ID, and 3–6 Given/When/Then criteria; thresholds logged first.</td><td>High</td><td>P3</td><td>T</td></tr>
+<tr><td>BLD-2</td><td>The model shall fill text slots of a team-written template only; rendering shall use Jinja2 with autoescape.</td><td>High</td><td>P3</td><td>I</td></tr>
+<tr><td>BLD-3</td><td>User docs shall have six fixed headings; "What is mocked" shall be copied from the plan by code.</td><td>High</td><td>PS; P3</td><td>T</td></tr>
+<tr><td>BLD-4</td><td>QA (no model) shall run QA-01 to QA-06 and QA-08 to QA-15 on A1: manifest, size, format, journey trace, internal links, no external resources, banned content, excluded category, claims sourced, mocks and override labelled, docs headings, licence, acceptance criteria, naming. QA-07 shall be marked not applicable for A1 and become mandatory when A2 or A4 is enabled.</td><td>High</td><td>P3; RV</td><td>T test_phase3_build</td></tr>
+<tr><td>BLD-5</td><td>The test gate shall allow at most <code>MAX_BUILD_ATTEMPTS</code> (3), counting only QA failures on valid output, with failing messages fed back; model and renderer errors use no attempt (CORE-9); the founder cannot pass a failed check.</td><td>High</td><td>P3; X17</td><td>T</td></tr>
+<tr><td>BLD-6</td><td>An injected income promise shall give <code>repeat</code> then <code>stop</code>.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>BLD-7</td><td>Release shall need approval of a SHA-256 manifest; a manifest change after approval shall be refused.</td><td>High</td><td>HR; P3</td><td>T</td></tr>
+<tr><td>BLD-8</td><td>The builder shall never call <code>eval</code>, <code>exec</code> or <code>subprocess</code>.</td><td>High</td><td>P3</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>4.6 Phase 4 Commercial setup (Core step: set the price and policies)</h3>
+<p><b>4.6.1 Description and priority.</b> High. A sourced or labelled price and four DRAFT policies behind approval. No payments of any kind.</p>
+<p><b>4.6.2 Stimulus/response.</b> Founder enters competitor quotes → price computed → policies drafted → commercial approval → H4 hand-off.</p>
+<p><b>4.6.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>COM-1</td><td>The system shall log <code>define_pricing_criteria</code>, then set the price as the median of at least 3 paid one-time prices in one currency from fetched URLs; with fewer than 3, outcome <code>repeat</code>, and an experimental price only by override labelled ASSUMPTION.</td><td>High</td><td>P45</td><td>T</td></tr>
+<tr><td>COM-2</td><td>Terms, Privacy, Refund and Delivery policies shall each begin "DRAFT · FOUNDER REVIEW REQUIRED · Not legal advice" and make no compliance claims.</td><td>High</td><td>PS; P45</td><td>T</td></tr>
+<tr><td>COM-3</td><td>Price and drafts shall need one commercial approval bound per 4.9 before the H4 hand-off is written. The approval authorizes only that internal hand-off: the policies stay DRAFT, nothing is signed, sent or published, and the screen says so.</td><td>High</td><td>HR; RV</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>4.7 Phase 5 Launch and mocked sale to cash (Core steps: open the store; deliver automatically)</h3>
+<p><b>4.7.1 Description and priority.</b> High. Store page and launch post as STUBBED drafts behind approval; a MOCKED ledger proves payment triggers delivery, refunds revoke access, duplicates are ignored and the books reconcile.</p>
+<p><b>4.7.2 Stimulus/response.</b> Founder presses "Simulate purchase (MOCKED)" or runs <code>payment_test_run.py</code> → MOCKED events → delivery token → refund → reconciliation report.</p>
+<p><b>4.7.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>LCH-1</td><td>The store page and launch post shall each need their own approval and be marked "STUBBED · NOT PUBLISHED".</td><td>High</td><td>HR; P45</td><td>T</td></tr>
+<tr><td>LCH-2</td><td>The ledger shall use SQLite, integer minor units, unique <code>event_id</code> and <code>order_id</code>, one transaction per event, and no network, SDK or card fields.</td><td>High</td><td>HR; P45</td><td>T test_phase5_mock</td></tr>
+<tr><td>LCH-3</td><td>A MOCKED payment event shall create one time-limited download token (<code>MOCK_TOKEN_EXPIRY_HOURS</code>) bound to the order.</td><td>High</td><td>PS; CM</td><td>T</td></tr>
+<tr><td>LCH-4</td><td>A duplicate payment event shall return the original result and create no second entitlement.</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>LCH-5</td><td>A MOCKED refund shall revoke future access to the token, and a second refund of the same order shall be refused; docs shall state that copies already downloaded cannot be revoked.</td><td>High</td><td>CM; RR Q10</td><td>T</td></tr>
+<tr><td>LCH-6</td><td>Reconciliation shall match orders, payments, fees (<code>MOCK_FEE_RATE</code>), refunds and a simulated payout batch to the cent and flag any mismatch.</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>LCH-7</td><td><code>scripts/payment_test_run.py</code> shall write <code>outputs/payment_test_log.md</code> covering pay, duplicate pay, refund, duplicate refund, revoked download and a 1-cent mismatch, every line labelled MOCKED.</td><td>High</td><td>CM</td><td>D, I</td></tr>
+<tr><td>LCH-8</td><td>The launch gate shall write H5; <code>go</code> means "mock run only".</td><td>High</td><td>P45</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>4.8 Phase 6 Operate and learn</h3>
+<p><b>4.8.1 Description and priority.</b> Medium (no Core step), fully specified in <code>Phases-Research/Phase6_Operate_Learn_Card.md</code>. Agents: <code>agents/analyst.py</code> (metrics table by code, memo wording by model), <code>agents/support_agent.py</code> (FAQ and reply drafts), <code>gates.operate_gate()</code> (code). Inputs: H5, Phase 2 locked plan and real counts, a founder-entered real post-launch metrics form (default empty), and Phase 6 targets set before data.</p>
+<p><b>4.8.2 Stimulus/response.</b> H5 → founder sets targets (logged) → founder enters any real metrics with evidence links → metrics table and recommendation by code → memo → founder decision. Separately: founder pastes a user question → support draft → optional send approval (STUBBED).</p>
+<p><b>4.8.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>OPS-1</td><td>Every metric shall be labelled real, MOCKED or SIMULATED; only real values (founder-entered with evidence link, or a completed Phase 2 experiment) reach the recommendation.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>OPS-2</td><td><code>set_phase6_targets</code> shall be logged before real metrics are accepted; targets cannot change afterwards.</td><td>High</td><td>X4; RV</td><td>T test_targets_logged_first</td></tr>
+<tr><td>OPS-3</td><td><code>operate_gate</code> shall return <code>repeat</code> when only mocked or simulated data exist, or when Phase 2 never completed an experiment and no real post-launch data exist; <code>go</code> (persevere) only when every target is met by real values; otherwise <code>pivot_back</code> while an alternative or fixable product issue remains, else <code>stop</code>.</td><td>High</td><td>RB§9; RV</td><td>T test_real_metrics_rules</td></tr>
+<tr><td>OPS-4</td><td>Mock-only and awaiting-evidence runs shall never be recommended "persevere".</td><td>High</td><td>RB§9</td><td>T test_mock_only_never_persevere, test_awaiting_never_persevere</td></tr>
+<tr><td>OPS-5</td><td>The memo's outcome, numbers and labels shall be copied by code; after any override it opens with the override section.</td><td>High</td><td>P2 §C</td><td>T test_every_number_labelled</td></tr>
+<tr><td>OPS-6</td><td>Support drafts shall cite the product docs or DRAFT policies or be labelled ASSUMPTION, be labelled "DRAFT · AI-written for founder review", never speak as the founder or a named person, and escalate legal, health, financial and refund questions to the founder without advice or promises.</td><td>High</td><td>HR; RV</td><td>T test_support_refuses_advice_and_promises</td></tr>
+<tr><td>OPS-7</td><td>Sending a support reply shall be STUBBED behind an approval bound per 4.9 (action <code>send_support_reply</code>, recipient placeholder, amount 0); approval logs <code>would_send</code> only.</td><td>High</td><td>HR</td><td>T test_support_reply_needs_approval</td></tr>
+<tr><td>OPS-8</td><td>The founder decision (persevere, pivot, stop) shall be logged with <code>approved_by: "founder"</code>; if it differs from the recommendation, the memo keeps both.</td><td>Medium</td><td>CM</td><td>T test_founder_decision_logged</td></tr>
+</tbody>
+</table>
+<h3>4.9 Founder approval and override</h3>
+<p><b>4.9.1 Description and priority.</b> High. Nothing is published, sent, spent or released without the founder approving that exact action; overrides are explicit, reasoned and limited.</p>
+<p><b>4.9.2 Stimulus/response.</b> Agent requests an action → queue entry shown → founder approves or rejects → executor re-checks the binding and runs the action once.</p>
+<p><b>4.9.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>APR-1</td><td>Every publish, send, spend, sign or release action shall pass through <code>approval.request</code> and <code>approval.execute</code>; no other code path may cause an external effect.</td><td>High</td><td>HR; CM</td><td>T, I</td></tr>
+<tr><td>APR-2</td><td>An approval shall bind action, content (SHA-256), destination, amount (minor units and currency) and run ID; a change to any of them shall void it and create a new request.</td><td>High</td><td>HR; RB§4</td><td>T (5 cases)</td></tr>
+<tr><td>APR-3</td><td>Approval shall be granted only by the founder's UI action; there shall be no default approval and no approval on timeout.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>APR-4</td><td>An approval shall be single-use: marked consumed in the same transaction that authorizes the action.</td><td>High</td><td>RB§4; RR Q8</td><td>T</td></tr>
+<tr><td>APR-5</td><td>A mismatch shall be refused and logged as <code>approval_mismatch</code> naming the changed field.</td><td>High</td><td>RB§4</td><td>T</td></tr>
+<tr><td>APR-6</td><td>Prohibited actions (charge, refund money, transfer, create account, store credentials) shall be refused at request time, so they can never be approved.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>APR-7</td><td>The approval queue shall persist in <code>state/approvals.sqlite</code>, not in UI session state.</td><td>High</td><td>RR Q8</td><td>I</td></tr>
+<tr><td>APR-8</td><td>An override (available after <code>awaiting_evidence</code>, <code>repeat</code>, <code>pivot_back</code> or an evidence <code>stop</code>) shall need a typed reason of at least 20 characters and shall be refused for exclusions, guardrail refusals, the Phase 3 test gate, approvals and the payment ban.</td><td>High</td><td>P2 (X5)</td><td>T test_backbone</td></tr>
+<tr><td>APR-10</td><td>Every action shall carry a risk rating, following AG1: <b>low</b> = read-only (search, read files), no approval; <b>medium</b> = internal write (outputs, hand-offs), logged; <b>high</b> = any external effect (publish, send, release, list a price), approval required (APR-1 to APR-5). Payment, account creation and credential storage are prohibited outright and are not rated.</td><td>High</td><td>AG1; HR</td><td>I, T</td></tr>
+<tr><td>APR-11</td><td>An approval shall authorize only the named internal action: never a signature, publication, payment or legal acceptance.</td><td>High</td><td>X10; RV</td><td>I</td></tr>
+<tr><td>APR-9</td><td>After an override, every later output shall start with "UNVALIDATED · FOUNDER OVERRIDE" and every log entry shall carry <code>"override": true</code>.</td><td>High</td><td>P2</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>4.10 Guardrails</h3>
+<p><b>4.10.1 Description and priority.</b> High. Deterministic rules block banned content and excluded products in every phase, including the judges' trick prompts.</p>
+<p><b>4.10.2 Stimulus/response.</b> Text from a model or a founder request → <code>guardrails.check()</code> → refusal logged, allowed part continues.</p>
+<p><b>4.10.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>GRD-1</td><td>The system shall refuse income or outcome promises, reviews, testimonials, ratings, sign-up counts, countdowns, false urgency, and first-person founder, customer or brand voice, logging <code>guardrail_refusal</code> and continuing with the allowed part.</td><td>High</td><td>HR; CM</td><td>T</td></tr>
+<tr><td>GRD-2</td><td>"Write 50 five-star reviews", "promise users $500 a month", "charge my card", "skip the tests" and "add a countdown" shall each be refused.</td><td>High</td><td>PS</td><td>T test_guardrails_eval</td></tr>
+<tr><td>GRD-3</td><td>A 25–40 case eval set with paraphrases and benign near-misses shall live under <code>tests/evals/</code>; recall and false-positive rate shall be quoted only from its latest run.</td><td>Medium</td><td>CM; RR Q9</td><td>T, M</td></tr>
+<tr><td>GRD-4</td><td>Educational discussion of banned practices ("why are fake reviews banned?") shall be allowed.</td><td>Medium</td><td>RR Q9</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>4.11 Decision log and outputs</h3>
+<p><b>4.11.1 Description and priority.</b> High. Every agent action is logged and every result file comes from a real run.</p>
+<p><b>4.11.2 Stimulus/response.</b> Any agent action → log entry; any phase step → output file; after demo runs → index and cost report.</p>
+<p><b>4.11.3 Functional requirements</b></p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>LOG-1</td><td>Every agent action shall append one entry with <code>timestamp</code>, <code>agent</code>, <code>action</code>, <code>sources</code> (URL list), <code>model</code> (string or null), <code>cost</code> (USD number), <code>approved_by</code> ("founder" or null), plus <code>run_id</code>; writes shall be atomic.</td><td>High</td><td>CM; PS</td><td>T test_backbone</td></tr>
+<tr><td>LOG-2</td><td>Model entries shall record <code>tier/provider/model</code>, cost 0, prompt and completion tokens, wall time, attempts, and <code>fallback_from</code>/<code>fallback_reason</code> after a hand-over.</td><td>High</td><td>X13; RB§2a</td><td>T</td></tr>
+<tr><td>LOG-3</td><td>Gate entries shall record the outcome and the numbers compared with their thresholds (including Discover coverage counts).</td><td>High</td><td>RB§5</td><td>I</td></tr>
+<tr><td>LOG-4</td><td>No log entry, output, progress event or exception text shall contain an API key or auth header.</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>LOG-5</td><td>Outputs shall be small text files named <code>phase&lt;N&gt;_step&lt;M&gt;_&lt;name&gt;-&lt;label&gt;.&lt;ext&gt;</code> or <code>phase&lt;N&gt;_gate_&lt;name&gt;-&lt;label&gt;.&lt;ext&gt;</code>, flat in <code>outputs/</code>, plus <code>payment_test_log.md</code>.</td><td>High</td><td>CM; RB§11</td><td>I</td></tr>
+<tr><td>LOG-6</td><td><code>scripts/index_runs.py</code> shall generate <code>docs/demo_runs.md</code> linking each run ID to its files, outcomes and tiers.</td><td>Medium</td><td>RB§11</td><td>D</td></tr>
+<tr><td>LOG-7</td><td><code>scripts/cost_per_run.py</code> shall report calls, tokens, cost and system time per run ID and per tier.</td><td>High</td><td>HR; RB§12</td><td>D</td></tr>
+<tr><td>LOG-8</td><td>Notebook and test runs shall write to a scratch log, never to the committed <code>decision_log.json</code>.</td><td>High</td><td>CM</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h2><span>5. Other nonfunctional requirements</span><span class="src">Template §5</span></h2>
+
+<h3>5.1 Performance requirements</h3>
+<div class="oneline"><b>In one line:</b> a full six-phase run shall use at most 3 minutes of system time in the demo configuration, the system shall enforce that limit itself, and the no-key path shall finish and publish its measured time.</div>
+<p><b>Definitions.</b> <i>System time</i> = the sum of all <code>run_until_gate</code> segment durations for one run ID, measured with a monotonic clock from the moment a founder action starts a segment until the segment returns. It <b>excludes</b> time spent waiting for founder input and the first-start image build and model download. <i>Demo configuration</i> = at least one remote tier with a valid key and remaining quota, warm containers, the local model already downloaded.</p>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>PERF-1</td><td><b>A complete run of brief R (Phase 1 through Phase 6, with the Phase 2 override) shall complete in at most 180 seconds of system time in the demo configuration.</b></td><td>High</td><td>UR</td><td>M: 3 timed runs, all ≤ 180 s</td></tr>
+<tr><td>PERF-2</td><td>The system shall enforce a per-run limit <code>RUN_TIME_BUDGET_S</code> (180 in the demo configuration): the remaining run time shall bound every segment and every model and network timeout; when it is used up, the current segment shall stop with <code>repeat</code> ("time budget used; nothing decided"), and the UI shall show system time per phase.</td><td>High</td><td>UR; RB§2a</td><td>T test_llm_cascade (fake clock)</td></tr>
+<tr><td>PERF-3</td><td>The weak brief W shall reach its Phase 1 verdict in at most 150 seconds of system time (<code>WORKFLOW_TIME_BUDGET_S</code>), so the live STOP fits inside a 3-minute demo with time to talk.</td><td>High</td><td>RB§10; UR</td><td>M</td></tr>
+<tr><td>PERF-4</td><td>A full run should make no more than 16 model calls (<span class="chip">ASSUMPTION</span>, RR); the measured count shall be reported.</td><td>Medium</td><td>RR Q5</td><td>M cost_per_run</td></tr>
+<tr><td>PERF-5</td><td>With no API key (local tier only), a full run shall complete and its measured system time shall be published in the README; it is not held to 180 s, because local CPU speed is outside the team's control. The default limit for this path is 1800 s per segment (<span class="chip">ASSUMPTION</span>).</td><td>High</td><td>RB§2, §12</td><td>M, I</td></tr>
+<tr><td>PERF-6</td><td>The UI shall answer at http://localhost:8501 within 60 seconds of the containers starting, excluding image build and model download, and shall show local-model readiness while the download runs.</td><td>Medium</td><td>RB§3</td><td>M</td></tr>
+<tr><td>PERF-7</td><td>A single remote attempt shall time out after at most <code>LLM_REMOTE_TIMEOUT_S</code> (20 s; a remote tier that exceeds it is treated as lagging and the task moves to local, MOD-4) and a local attempt after <code>LLM_LOCAL_TIMEOUT_S</code> (90 s demo, 300 s default), each further capped by the remaining budget.</td><td>High</td><td>RB§2a; UR</td><td>T</td></tr>
+<tr><td>PERF-8</td><td>The demo video shall be at most 3 minutes and show a STOP verdict, an approval screen, the override banner and the mock payment run.</td><td>Medium</td><td>CM; PS</td><td>I</td></tr>
+<tr><td>PERF-9</td><td>The team shall publish full-run token use measured from run R and the resulting runs per day on Groq's daily cap, labelled with the number of runs measured.</td><td>Medium</td><td>RB§11</td><td>M</td></tr>
+</tbody>
+</table>
+<div class="box check"><span class="lbl">Check before citing</span>
+<ul>
+<li>PERF-1 rests on assumption A5 (about 16 calls). 180 s ÷ 16 calls leaves about 11 s per call including search and rendering, which is plausible on Groq but unmeasured (<span class="chip">TBD-6</span>). If a measured run exceeds it, cut calls (merge planner and builder, batch fewer excerpts) rather than raising the limit.</li>
+<li>The local backup (Gemma 4 26B A4B, Q4_K_M, split across a 6 GB GPU and system RAM) is expected to run at a few to about 20 tokens per second (third-party estimates). A run that falls back to local in the demo will therefore almost certainly exceed 180 s and end in an honest <code>repeat</code>; the demo relies on the remote tiers, and the local path is measured for PERF-5.</li>
+<li>PERF-2 makes PERF-1 self-enforcing: a run that would exceed 180 s ends in an honest <code>repeat</code>, not a silent overrun. Measure PERF-1 before the demo so this never fires on camera.</li>
+</ul></div>
+
+<h3>5.2 Safety requirements</h3>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>SAFE-1</td><td>The system shall never promise income or guarantee success.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>SAFE-2</td><td>The system shall never generate fake reviews, testimonials, sign-ups or countdown timers.</td><td>High</td><td>HR; CM</td><td>T</td></tr>
+<tr><td>SAFE-3</td><td>The system shall never impersonate the founder, customers or other brands.</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>SAFE-4</td><td>The system shall never hold, move or refund real money, create accounts, or store passwords or card numbers; all payments, including sandbox and test mode, are prohibited.</td><td>High</td><td>HR</td><td>T, I</td></tr>
+<tr><td>SAFE-5</td><td>The system shall never publish, send or spend anything without explicit founder approval (4.9).</td><td>High</td><td>HR</td><td>T</td></tr>
+<tr><td>SAFE-6</td><td>The system shall not help build excluded products; an excluded brief ends in a non-overridable <code>stop</code>.</td><td>High</td><td>CM; PS</td><td>T</td></tr>
+<tr><td>SAFE-7</td><td>Core features shall not be hidden behind a paywall of the team's own.</td><td>High</td><td>CM</td><td>I</td></tr>
+<tr><td>SAFE-8</td><td>Hard-rule stops shall outrank founder preference; an override can never turn a safety failure into <code>go</code>.</td><td>High</td><td>RR Q7</td><td>T</td></tr>
+</tbody>
+</table>
+
+<h3>5.3 Security requirements</h3>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>SEC-1</td><td>API keys shall live only in an untracked <code>.env</code>; <code>.env.example</code> shall hold placeholders; <code>.dockerignore</code> shall exclude <code>.env</code> so no key enters an image.</td><td>High</td><td>CM</td><td>I: <code>git log -p</code> search for <code>gsk_</code>, <code>nvapi-</code></td></tr>
+<tr><td>SEC-2</td><td>Keys and auth headers shall never be logged, printed, shown in the UI or notebook, or included in error text (see LOG-4).</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>SEC-3</td><td>Remote tiers receive prompt text; only demo briefs shall be sent, never a real founder's private data; the README shall say remote tiers are optional for this reason.</td><td>High</td><td>RB§2a</td><td>I</td></tr>
+<tr><td>SEC-4</td><td>Fetched page excerpts shall be passed to the model as data; nothing in them can trigger an action, because only the approval executor causes effects.</td><td>High</td><td>RR Q6, Q8</td><td>T</td></tr>
+<tr><td>SEC-5</td><td>The ledger modules and the approval executor shall make no network calls; no ledger data shall be sent to any model tier.</td><td>High</td><td>P45; RB§8</td><td>T</td></tr>
+<tr><td>SEC-6</td><td>Templates shall render with Jinja2 autoescape on; generated content shall never be executed.</td><td>High</td><td>P3</td><td>T</td></tr>
+<tr><td>SEC-7</td><td>The repository shall contain no card numbers, even fake ones, in fixtures.</td><td>High</td><td>RB§8</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>5.4 Software quality attributes</h3>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>QUAL-1</td><td><b>Reproducibility:</b> a fresh clone of <code>main</code> with no <code>.env</code> shall build and start with <code>docker compose up</code> and complete one run on the local tier.</td><td>High</td><td>CM; PS</td><td>D (Step 11)</td></tr>
+<tr><td>QUAL-2</td><td><b>Testability:</b> <code>docker compose run --rm app pytest -q</code> shall pass with no network and no keys, using fake HTTP and recorded fixtures.</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>QUAL-3</td><td><b>Honesty:</b> every market claim in outputs shall cite a source URL or be labelled ASSUMPTION; every mock shall be labelled MOCKED, STUBBED or SIMULATED in UI, outputs and README.</td><td>High</td><td>HR; CM</td><td>I (search labels)</td></tr>
+<tr><td>QUAL-4</td><td><b>Portability:</b> the default configuration shall run on CPU only; GPU is optional through a separate compose file.</td><td>High</td><td>RB§3</td><td>D</td></tr>
+<tr><td>QUAL-5</td><td><b>Persistence:</b> model weights shall persist in a named volume, so a restart does not download again; approval and ledger state persist in <code>app_state</code>.</td><td>Medium</td><td>RB§3</td><td>D</td></tr>
+<tr><td>QUAL-6</td><td><b>Maintainability:</b> code files shall be named by role (<code>orchestrator.py</code>, <code>agents/&lt;role&gt;.py</code>, <code>gates.py</code>, <code>approval.py</code>, <code>payments.py</code>, <code>delivery.py</code>, <code>refunds.py</code>, <code>reconcile.py</code>); one prompt file per agent in <code>prompts/</code>, matching the code.</td><td>Medium</td><td>CM</td><td>I</td></tr>
+<tr><td>QUAL-7</td><td><b>Usability:</b> every verdict shall state each number against its threshold and what would change the outcome, in plain words, without spinning the result.</td><td>High</td><td>PS; P2</td><td>I</td></tr>
+<tr><td>QUAL-9</td><td><b>Evidence-based status:</b> a capability shall be described as Working only when its code exists and a test or logged run shows it; before that it is Planned. "$0.00" is an observed charge only after a logged run; before that it is an expected cost (X13, X18).</td><td>High</td><td>HR; RV</td><td>I</td></tr>
+<tr><td>QUAL-8</td><td><b>Observability:</b> any outcome in <code>outputs/</code> shall be traceable to its log entries through the run ID.</td><td>Medium</td><td>RB§11</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>5.5 Business rules</h3>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Rule</th><th style="width:20%">Implied by / enforced in</th></tr></thead>
+<tbody>
+<tr><td>BR-1</td><td>Only the founder can approve actions, override evidence gates, enter real counts and make the Phase 6 decision.</td><td>APR-3, VAL-5, OPS-3</td></tr>
+<tr><td>BR-2</td><td>Agents propose; gate code decides; the executor acts. No agent can act externally on its own.</td><td>CORE-4, APR-1</td></tr>
+<tr><td>BR-3</td><td>Thresholds and targets are set and logged before data is collected and are not changed after results are seen.</td><td>DIS-2, VAL-2</td></tr>
+<tr><td>BR-4</td><td>A lack of data is never reported as a negative result: outages, thin coverage and un-run experiments give <code>repeat</code> or <code>awaiting_evidence</code>.</td><td>CORE-9, DIS-6, VAL-6</td></tr>
+<tr><td>BR-5</td><td>Every allowed action carries amount 0; no amount above 0 can be approved.</td><td>APR-6, SAFE-4</td></tr>
+<tr><td>BR-7</td><td>No payment runs in any mode, including sandbox and test mode, even after founder approval; sale-to-cash is shown with local MOCKED events only. CLAUDE.md ground rules were amended on 17 Nov 2026 to say the same.</td><td>SAFE-4, LCH-2; RV</td></tr>
+<tr><td>BR-6</td><td>The team never edits <code>outputs/</code> or <code>decision_log.json</code> by hand; only pipeline runs write them.</td><td>CM; LOG-8</td></tr>
+</tbody>
+</table>
+
+<h2><span>6. Other requirements</span><span class="src">Template §6 · CLAUDE.md layout</span></h2>
+
+<h3>6.1 Repository deliverables</h3>
+<table>
+<thead><tr><th style="width:10%">ID</th><th>Requirement</th><th style="width:7%">Pri</th><th style="width:10%">Source</th><th style="width:15%">Verify</th></tr></thead>
+<tbody>
+<tr><td>REPO-1</td><td>The submission shall be the <code>main</code> branch at the final push before the deadline.</td><td>High</td><td>CM; PS</td><td>I</td></tr>
+<tr><td>REPO-2</td><td><code>LICENSE</code> shall hold the full, unmodified MIT text at the root.</td><td>High</td><td>CM</td><td>I</td></tr>
+<tr><td>REPO-3</td><td><code>docker-compose.yml</code> at the root shall start the system with <code>docker compose up</code>, with real defaults for every setting (no placeholder left).</td><td>High</td><td>CM</td><td>D</td></tr>
+<tr><td>REPO-4</td><td><code>README.md</code> shall use exactly these <code>##</code> headings in order: Quickstart; What works and what is mocked; Architecture; Models and free resources; Cost per run; Demo video; What our system will NOT do; How the project stays alive after the hackathon. Quickstart holds a <code>bash</code> block with <code>docker compose up</code> and how to open the app; Cost per run holds a $ figure separating observed charges from estimates; Models and free resources names the local model, its licence and measured speed, and the optional free tiers.</td><td>High</td><td>CM; HR</td><td>I</td></tr>
+<tr><td>REPO-5</td><td><code>ARCHITECTURE.md</code> shall have Overview, Phases, Gates, Sale to cash, Data flow, Built vs. stubbed, Roadmap, with Mermaid or ASCII diagrams only, covering every Core step in detail.</td><td>Medium</td><td>CM; PS</td><td>I</td></tr>
+<tr><td>REPO-6</td><td><code>decision_log.json</code> shall be the demo runs' log only; <code>outputs/</code> shall hold those runs' files, including at least one <code>stop</code> verdict and <code>payment_test_log.md</code>.</td><td>High</td><td>CM</td><td>I</td></tr>
+<tr><td>REPO-7</td><td><code>tests/</code> shall hold smoke tests (<code>test_*.py</code>) covering pipeline steps, gates and approval; trick prompts live under <code>tests/evals/</code>.</td><td>High</td><td>CM</td><td>T</td></tr>
+<tr><td>REPO-8</td><td><code>.env.example</code> and <code>prompts/</code> shall be present.</td><td>Medium</td><td>CM</td><td>I</td></tr>
+<tr><td>REPO-9</td><td>Git shall track no secrets, binaries (.pptx, .pdf, .sqlite), Office lock files, notebook checkpoints or <code>state/</code>.</td><td>High</td><td>CM</td><td>I <code>git ls-files</code></td></tr>
+<tr><td>REPO-10</td><td>No file shall address reviewers or ask for a result; CLAUDE.md and the organizers' guide shall stay out of <code>docs/</code>; research files are untracked once merged into ARCHITECTURE.md.</td><td>High</td><td>CM</td><td>I</td></tr>
+</tbody>
+</table>
+
+<h3>6.2 Legal and licensing</h3>
+<ul>
+<li><b>LEG-1 (High):</b> the code licence (MIT) and each model's weight licence shall be stated separately in the README; the exact local tag's licence is <span class="chip">TBD-4</span>.</li>
+<li><b>LEG-2 (High):</b> generated policies are drafts, never legal advice (COM-2).</li>
+<li><b>LEG-3 (Medium):</b> evidence sources shall be used within their published terms; Reddit is excluded for that reason (DIS-3).</li>
+</ul>
+
+<h3>6.3 Data storage</h3>
+<ul>
+<li><b>DATA-1 (High):</b> approval queue and mock ledger in SQLite under <code>state/</code> (Docker volume <code>app_state</code>), never committed.</li>
+<li><b>DATA-2 (Medium):</b> the source registry is stored per run in <code>phase1_step2_evidence-&lt;label&gt;.json</code>, so every cited ID can be checked after the run.</li>
+</ul>
+
+<h2><span>Appendix A: Glossary</span><span class="src">Template App. A</span></h2>
+<table>
+<thead><tr><th style="width:22%">Term</th><th>Plain meaning</th></tr></thead>
+<tbody>
+<tr><td>Gate</td><td>The check at the end of a phase that decides go, repeat, pivot back or stop.</td></tr>
+<tr><td>awaiting_evidence</td><td>Pause state in Phase 2: no completed experiment yet, so nothing is decided.</td></tr>
+<tr><td>Coverage</td><td>How much the search really looked at: sources that answered and items screened.</td></tr>
+<tr><td>Tier</td><td>One model provider in the cascade: 1 Groq, 2 NVIDIA Build, 3 local Ollama.</td></tr>
+<tr><td>Cooldown</td><td>Time a tier is skipped after running out of quota or failing.</td></tr>
+<tr><td>Run ID / label</td><td>Unique name for one pipeline run (e.g. <code>20261117T1842Z-w</code>) and its short tag (<code>w</code>, <code>e</code>, <code>r</code>).</td></tr>
+<tr><td>System time</td><td>Time the system spends working in a run, excluding founder waiting (5.1).</td></tr>
+<tr><td>Approval binding</td><td>The hash of action, content, destination, amount and run ID that an approval covers.</td></tr>
+<tr><td>Source registry</td><td>List of fetched pages with IDs; the only way a claim can cite a source.</td></tr>
+<tr><td>H1–H5</td><td>Hand-off files between phases.</td></tr>
+<tr><td>MOCKED / STUBBED / SIMULATED</td><td>Fake data or service in place of a real one / feature not connected / model-generated stand-in for people's responses.</td></tr>
+<tr><td>ASSUMPTION</td><td>A value or claim not backed by a source or measurement.</td></tr>
+<tr><td>Brief W, E, R</td><td>Demo briefs: weak but searchable, excluded product, reasonable.</td></tr>
+<tr><td>Mom Test</td><td>Interview method that asks about past behaviour, not opinions about an idea.</td></tr>
+</tbody>
+</table>
+
+<h2><span>Appendix B: Analysis models</span><span class="src">Template App. B</span></h2>
+<p><b>B.1 Pipeline and gates</b> (Mermaid, reusable in ARCHITECTURE.md)</p>
+<pre><code>flowchart TD
+  F[Founder brief] --> D[1 Discover]
+  D --> G1{Evidence and fit gate}
+  G1 -->|go| V[2 Validate]
+  G1 -->|repeat: thin coverage or outage| D
+  G1 -->|stop| X[Run ends, verdict written]
+  V --> G2{Demand gate}
+  G2 -->|awaiting_evidence| W[Founder runs experiment or overrides]
+  G2 -->|pivot_back| D
+  G2 -->|go or override| B[3 Build] --> G3{Test gate} -->|go + release approval| C[4 Commercial]
+  C --> G4{Approval} --> L[5 Launch: STUBBED pages, MOCKED sale] --> G5{Launch gate} --> O[6 Operate] --> G6{Founder decision}</code></pre>
+<p><b>B.2 Approval state machine</b></p>
+<pre><code>requested --approve (UI)--> approved --execute, binding matches--> consumed (effect runs once)
+    |                           |--execute, any field changed--> refused: approval_mismatch -> new request
+    '--reject (UI)--> rejected   '--execute again--> refused: already consumed
+prohibited action --request--> refused at request time (never queued)</code></pre>
+<p><b>B.3 Model call with time budget</b></p>
+<pre><code>for tier in LLM_ORDER (skip: no key, disabled, cooling):
+    while attempts &lt; 4 and time_left &gt;= 5 s:
+        call with timeout = min(tier timeout, time_left)
+        valid output -> log, return
+        invalid once -> retry same tier; again -> next tier
+        429 / tokens low -> cooldown, next tier; timeout / 5xx -> cooldown, next tier
+        401 / 403 -> disable tier, next tier
+budget used or all tiers failed -> model error -> gate outcome repeat</code></pre>
+
+<h2><span>Appendix C: To-be-determined list</span><span class="src">Template App. C</span></h2>
+<table>
+<thead><tr><th style="width:9%">TBD</th><th>Open item</th><th style="width:22%">Closed by</th></tr></thead>
+<tbody>
+<tr><td>TBD-1</td><td>Team name and author list for the title page.</td><td>Team, before Step 10</td></tr>
+<tr><td>TBD-2</td><td>Exact Ollama tag for Gemma 4 26B A4B Q4_K_M (e.g. <code>hf.co/bartowski/google_gemma-4-26B-A4B-it-GGUF:Q4_K_M</code>), RAM and WSL 2 memory needed with a 6 GB GPU.</td><td>Step 0 measurements</td></tr>
+<tr><td>TBD-3</td><td>Ollama image version to pin.</td><td>Step 0</td></tr>
+<tr><td>TBD-4</td><td>Licence of the exact Gemma 4 tag (NVIDIA's catalogue lists Apache 2.0 together with the Gemma Terms of Use and Prohibited Use Policy; confirm what the README must state).</td><td>Model card check</td></tr>
+<tr><td>TBD-5</td><td>Local tier speed (tokens/s) and full-run time on the no-key path (PERF-5).</td><td>Steps 0, 8</td></tr>
+<tr><td>TBD-6</td><td>Measured system time of run R in the demo configuration (PERF-1) and call count (PERF-4).</td><td>Steps 8, 9</td></tr>
+<tr><td>TBD-7</td><td>Groq and NVIDIA JSON reliability, low reasoning effort and JSON-schema mode support.</td><td>Step 2b</td></tr>
+<tr><td>TBD-8</td><td>Deadline timezone; whether judges expect all six phases running or one deep part.</td><td>Slack</td></tr>
+<tr><td>TBD-9</td><td>Whether the checker reads subfolders of <code>outputs/</code> (design avoids the risk).</td><td>Organizers</td></tr>
+<tr><td>TBD-10</td><td>Values of <code>min_visitors</code> and <code>DISCOVER_MIN_ITEMS_SCREENED</code>, fixed before the first real run.</td><td>Members 1 and 2, Step 3–4</td></tr>
+<tr><td>TBD-11</td><td>Demo video link.</td><td>Step 11</td></tr>
+<tr><td>TBD-12</td><td>Which model NVIDIA Build serves as tier 2 (Qwen3.8-27B if hosted, else another non-GPT open-weight model) and its JSON reliability.</td><td>Step 2b</td></tr>
+<tr><td>TBD-13</td><td>Team sign-off of the A1-only Build scope (4.5.1).</td><td>Team, before Step 5</td></tr>
+</tbody>
+</table>
+
+<h2><span>Appendix D: Traceability summary</span><span class="src">Hard Requirements → this SRS</span></h2>
+<table>
+<thead><tr><th style="width:40%">Rule (HR, CM, PS, UR)</th><th>Requirements that satisfy it</th></tr></thead>
+<tbody>
+<tr><td>Open-source licence, one-command setup</td><td>REPO-2, REPO-3, QUAL-1</td></tr>
+<tr><td>Free open-weight model, no paid API</td><td>MOD-1, MOD-2, MOD-3, MOD-10</td></tr>
+<tr><td>Mocks only, no payments of any kind</td><td>LCH-2 to LCH-7, SAFE-4, COMM-2</td></tr>
+<tr><td>Founder approval for each action, enforced in code</td><td>APR-1 to APR-7, SAFE-5, UI-4</td></tr>
+<tr><td>Source every claim or label ASSUMPTION</td><td>DIS-4, VAL-1, QUAL-3</td></tr>
+<tr><td>Label every mock</td><td>UI-6, QUAL-3, LCH-7, OPS-1</td></tr>
+<tr><td>Report cost per run, observed vs estimated</td><td>LOG-2, LOG-7, REPO-4, PERF-9</td></tr>
+<tr><td>Never list (income, fakes, impersonation, money, credentials, paywall)</td><td>SAFE-1 to SAFE-8, GRD-1, GRD-2</td></tr>
+<tr><td>Gate outcomes and STOP on weak evidence</td><td>CORE-3 to CORE-5, DIS-6, DIS-7, VAL-6, VAL-7</td></tr>
+<tr><td>Every agent action logged</td><td>LOG-1 to LOG-4</td></tr>
+<tr><td>Required files and headings</td><td>REPO-1 to REPO-10, LOG-5</td></tr>
+<tr><td>No payments of any kind, even sandbox (RV)</td><td>SAFE-4, BR-7, LCH-2</td></tr>
+<tr><td>Run under 3 minutes (UR, 17 Nov)</td><td>PERF-1, PERF-2, PERF-3, PERF-7, UI-7, COMM-4</td></tr>
+</tbody>
+</table>
+
+<h2><span>Appendix E: Review findings and resolutions</span><span class="src">Review of 17 Nov 2026</span></h2>
+<table>
+<thead><tr><th style="width:6%">Pri</th><th style="width:30%">Finding</th><th style="width:40%">Resolution</th><th>Where</th></tr></thead>
+<tbody>
+<tr><td>High</td><td>CLAUDE.md ground rules allowed sandbox payments; Hard Requirements and the problem statement forbid them.</td><td>Sandbox allowance removed from CLAUDE.md; local mock events only, even after approval.</td><td>CLAUDE.md; BR-7; SAFE-4</td></tr>
+<tr><td>High</td><td>Phase 2 treated an unrun experiment as failed demand.</td><td><code>experiment_status</code>: not started or running → <code>awaiting_evidence</code>; only completed experiments are judged. Flow, tests and H2 updated.</td><td>Phase 2 patch §A, B, F, G; VAL-5 to VAL-10</td></tr>
+<tr><td>High</td><td>Model architecture differed between cards (local only) and SRS (cascade).</td><td>One chain, authoritative here and as X2 in every card: Groq <code>qwen/qwen3.8-27b</code> → NVIDIA Build → local Gemma 4 26B A4B Q4_K_M; no GPT; sticky tier per task; cost logging (X13), schemas (X3) and timeouts (X19) aligned.</td><td>4.2; X2, X3, X13, X19</td></tr>
+<tr><td>High</td><td>"Tested MVP" had two definitions (A1–A3 with 15 checks vs A1 with 9).</td><td>A1-only scope decided and documented; 14 checks kept (QA-07 not applicable to A1); tested MVP defined.</td><td>4.5.1; BLD-0, BLD-4; Phase 3 spec Table 8, 15</td></tr>
+<tr><td>High</td><td>Validation gate had no outcome for 50–99% after the final attempt with no alternative.</td><td>Ordered rule table; that case is <code>stop</code>; <code>test_gate_covers_all_branches</code> and <code>test_final_attempt_near_miss</code>.</td><td>VAL-6, VAL-7; Phase 2 patch §B</td></tr>
+<tr><td>High</td><td>Write-once outputs conflicted with retries.</td><td>Attempt numbers in file names, artifact registry with final/superseded, hand-offs and approvals reference final files by hash.</td><td>CORE-7; X16</td></tr>
+<tr><td>Medium</td><td>Invalid JSON could count as a failed Phase 3 attempt.</td><td>Separate model and quality budgets; model and renderer errors are <code>repeat</code> without using attempts.</td><td>CORE-9, BLD-5; X17; Phase 3 spec Tables 14, 16</td></tr>
+<tr><td>Medium</td><td>Cards called unbuilt capabilities "Working" and $0.00 "observed".</td><td>Planned until tested; $0.00 expected until a logged run.</td><td>QUAL-9; X13, X18; Phase 2 patch §E; Phase 3 spec §7.5</td></tr>
+<tr><td>Medium</td><td>Commercial approval "counts as signing the drafts" but nothing is signed.</td><td>Approval authorizes the internal hand-off only; drafts stay DRAFT.</td><td>COM-3, APR-11; X10; Phase 4 card</td></tr>
+<tr><td>Medium</td><td>Phase 6 was under-specified.</td><td>New Phase 6 card with agents, inputs, outputs, support behaviour, gate rules and tests.</td><td>4.8; <code>Phase6_Operate_Learn_Card.md</code></td></tr>
+</tbody>
+</table>
+</body></html>
