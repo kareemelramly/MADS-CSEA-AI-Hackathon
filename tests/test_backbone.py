@@ -118,3 +118,13 @@ def test_override_rules(env):
     assert text.startswith("UNVALIDATED · FOUNDER OVERRIDE")
     c.log("x", "after_override")
     assert json.load(open(env / "decision_log.json"))[-1]["override"] is True
+
+
+def test_gate_record_reads_plainly():
+    import gates
+    g = gates.GateResult("phase6_gate", "repeat", "No real data.", [], {"targets": {"waitlist_signups": 100.0}, "visitors": None,
+                                                                   "threshold_min_fit": 3.0, "phase2_completed": False})
+    md = gates.write_verdict(g, "Phase 6 gate")
+    assert "{" not in md and "None" not in md and "False" not in md
+    assert "## What was measured" in md and "## Thresholds (locked before any data, ASSUMPTION)" in md
+    assert "REPEAT" in md and "Waitlist signups: 100" in md

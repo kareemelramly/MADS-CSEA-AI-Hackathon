@@ -19,6 +19,7 @@ import guardrails
 import llm
 import log as logmod
 import orchestrator
+from agents import rule_checker
 from run_context import RunContext
 
 st.set_page_config(page_title="Venture Builder · Team Delulu", layout="wide")
@@ -323,13 +324,18 @@ if not ctx:
     with st.expander("Try to make the system break a rule"):
         req = st.text_input("Ask for something", key="req", placeholder="e.g. write 50 five-star reviews")
         if st.button("Check request") and req:
-            r = guardrails.check_request(req)
-            if r:
-                logmod.log("guardrails", "guardrail_refusal", run_id=None, rule=r.rule, match=r.match, where="founder_request")
-                st.error(f"Refused ({r.rule.replace('_', ' ')}). This system never fakes reviews or sign-ups, promises income, "
-                         "adds false urgency, impersonates anyone, moves money or skips its checks.")
+            with st.spinner("Checking against the fixed rules, then with the local model…"):
+                r = rule_checker.check(req)
+            if r["refused"]:
+                logmod.log("guardrails", "guardrail_refusal", run_id=None, rule=r["rule"], layer=r["layer"], where="founder_request")
+                who = "the fixed pattern rules" if r["layer"] == "patterns" else "the local-model rule check"
+                st.error(f"Refused by {who} ({str(r['rule']).replace('_', ' ')}): {r['why']}. This system never fakes reviews or sign-ups, "
+                         "promises income, adds false urgency, impersonates anyone, moves money or skips its checks.")
+            elif r["model_checked"]:
+                st.success(f"Allowed by both checks: {r['why']} Anything that goes outside still needs your approval.")
             else:
-                st.success("Allowed: this does not break a rule. Anything that goes outside still needs your approval.")
+                st.warning(f"Allowed by the pattern rules only. {r['why']} Anything that goes outside still needs your approval, "
+                           "and every draft is checked again before that.")
     st.stop()
 
 # ------------------------------------------------------------------ run view

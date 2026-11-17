@@ -56,6 +56,7 @@ Design choices in one place (full record with rejected alternatives: [docs/desig
 | Models | One local llama.cpp server; no hosted tier | No founder content goes to a model provider; nothing to pay or sign up for; works offline except for search |
 | State | SQLite (WAL) on a Docker volume; write-once text outputs | Crash-safe approvals and idempotent mock sales |
 | UI | Streamlit on `127.0.0.1:8501` | Single-founder local demo; not a multi-user authorization system |
+| Trick prompts | Fixed pattern rules first; then a local-model rule checker (`agents/rule_checker.py`, strict schema) that can only add refusals | Patterns are testable but miss paraphrases (3 of 12 on the held-out set); the model catches wording the patterns never saw, and if it is down the pattern verdict stands and the UI says so |
 
 ## Phases
 
@@ -69,7 +70,7 @@ Every phase writes its files to `outputs/` as `phase<N>_step<M>_<name>_<label>_a
 |---|---|
 | Agents | `researcher` (search and evidence), `opportunity_analyst` (relevance, comparison, fit), `interview_planner` (Mom Test script) |
 | Tools | HN Algolia search, Stack Exchange search, GitHub issues search (keyless, fetched in parallel by code); Wikipedia for background only, never demand evidence; founder-supplied URLs, fetched and registered like any source |
-| Model calls | Up to 6: four excerpt batches (≤ 5 excerpts each, ≤ 20 total, picked by a keyword pre-screen in code), one comparison and fit call, one interview-script call (only when the gate is `go` or `pivot_back`; thin coverage makes no model call) |
+| Model calls | Up to 6: four excerpt batches (≤ 5 excerpts each, ≤ 20 total, picked by a keyword pre-screen in code), one comparison and fit call, one interview-script call (whenever a scored idea can still go forward: `go`, `pivot_back`, or an overridable `stop`, because weak public evidence is exactly when real interviews are needed; thin coverage and non-overridable stops make no model call) |
 | Outputs | `phase1_step1_opportunities`, `phase1_step2_evidence.json` (source registry), `phase1_step3_comparison`, `phase1_step4_interview_script`, `phase1_gate_decision` (.md and .json, contract H1) |
 
 Method, in order:
@@ -79,7 +80,7 @@ Method, in order:
 3. **Search and register.** Each fetched item gets a `source_id` with URL, source, HTTP status, fetch time and excerpt. Items without a URL are dropped; duplicates are merged.
 4. **Analyse.** The model receives source IDs and excerpts and returns relevant pains with `source_ids`; its schema has no URL field, so it cannot invent a link. Unknown IDs fail validation.
 5. **Compare and score.** The idea and two related opportunities are scored 1 to 5 on skills, budget, time and values with reasons; code computes the weighted score (35/25/25/15). A values conflict blocks regardless of score. Market size stays "unknown" unless a source states it.
-6. **Interview plan.** Mom Test questions about specific past behaviour; no invented answers.
+6. **Interview plan.** Mom Test questions about specific past behaviour; code drops hypothetical or leading questions, and no answers are invented. The script is the founder's way to turn a `stop` on thin public evidence into real evidence.
 7. **Gate** (see Gates).
 
 ### Phase 2: Validate
@@ -291,7 +292,7 @@ Status words follow one rule: a row says **Working** only when its code exists a
 | Metrics and persevere-or-pivot memo | Working on real, founder-entered data; mock data never gives persevere | `test_mock_only_never_persevere` |
 | Founder approval executor and override | Working | `tests/test_backbone.py` |
 | Local model client (llama.cpp) | Working with fake HTTP and a fake local server; real model measured by `scripts/model_check.py` | `tests/test_llm_cascade.py`, `tests/test_local_http.py` |
-| Guardrails against trick prompts | Working on the team's 75-case eval set, including 18 paraphrases an outside review found (in-sample; new paraphrases can still be missed, which is why every output is also checked before approval) | `tests/test_guardrails_eval.py` |
+| Trick-prompt defence (patterns, then a local-model rule check) | Working. Patterns are perfect only on the set they were written from; on a held-out set they caught 3 of 12, which is why the model layer exists and why every output is checked again before approval. Measured numbers: `docs/guardrail_eval.md` | `tests/test_guardrails_eval.py`, `tests/test_rule_checker.py` |
 | Final run report (Markdown, HTML, PDF) | Working; built only from the log and the run's files | `tests/test_run_report.py` |
 | Streamlit UI (brief, verdict, approval panel, override bar, readiness, readable tables, final report) | Working | `tests/test_ui_smoke.py` |
 | G3/G4/G5 `pivot_back` routes | Working | `tests/test_pivot_routes.py` |

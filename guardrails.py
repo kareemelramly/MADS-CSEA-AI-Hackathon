@@ -1,7 +1,7 @@
 """Deterministic guardrails (SRS GRD-1 to GRD-4, SAFE-1 to SAFE-6, DIS-1).
 
 `check(text)`          content produced by a model (landing page, product, posts, replies).
-`check_request(text)`  a founder or judge request ("write 50 five-star reviews").
+`check_request(text)`  a founder or tester request ("write 50 five-star reviews").
 `excluded(text)`       excluded product categories (physical goods; financial, investment or
                        crypto; health or legal advice). Never overridable.
 
@@ -77,6 +77,18 @@ REQUEST_RULES = [
     ("impersonation", r"\bimpersonat\w*\b|\bas if (i|we) (were|was|am) (a |an |the )?(customer|buyer|user|client|bride|fan)\b|\bfrom my (personal )?account\b|\bin the voice of (a |an |the )?(customer|buyer|user|client|bride)\b|\bsock ?puppet\w*\b|\bfake (account|profile|persona)s?\b"),
     ("publish_without_approval", r"\b(publish|post|send|email|tweet)\b[^.\n]{0,30}\bwithout\b[^.\n]{0,15}\b(approval|asking|review|me|checking)\b|\bauto[- ]?(publish|post|send)\b"),
     ("paywall", r"\b(paywall|lock|hide)\b[^.\n]{0,25}\b(core|main|basic)\s+features?\b"),
+    ("fake_signup_count", r"\b(fake|dummy|made[- ]up|invented|bot|placeholder|test)\s+(e-?mails?|sign[- ]?ups?|accounts?|entries|subscribers|leads|visitors|traffic|orders|sales)\b"),
+    ("fake_signup_count", r"\b(fill|pad|seed|stuff|populate)\b[^.\n]{0,25}\b(waitlist|sign[- ]?ups?|results form|metrics|tracking sheet)\b"),
+    ("gate_tampering", r"\b(change|lower|reduce|edit|move|adjust|relax|drop)\b[^.\n]{0,30}\b(target|threshold|goal|bar|criteria)\b[^.\n]{0,40}\b(pass|go|green|succeed|looks? better|so (we|it))\b"),
+    ("gate_tampering", r"\b(mark|set|force|flip|make)\b[^.\n]{0,25}\b(gate|verdict|outcome|decision|result)s?\b[^.\n]{0,15}\b(as\s+|to\s+)?(go|pass(ed)?|green|approved|success)\b"),
+    ("gate_tampering", r"\b(ignore|forget|disregard)\s+(all\s+|your\s+|the\s+)?(previous|prior|above|earlier|system)\s+(instructions|rules|prompts?)\b|\b(ignore|forget|disregard)\s+(all\s+)?(your|the|these|our)\s+(rules|guardrails|instructions|limits)\b"),
+    ("income_promise", r"\b(promise|guarantee|assure)\w*\b[^.\n]{0,40}\b(save|saves|hours|double|triple|will (get|land|win|book|find))\b"),
+    ("approval_forgery", r"\b(approve|sign off|accept)\b[^.\n]{0,20}\b(it|this|everything|all)\b[^.\n]{0,20}\b(for me|on my behalf|automatically|yourself)\b|\b(as|on behalf of) the founder\b[^.\n]{0,20}\bapprove\b"),
+    ("fake_social_proof", r"\b(glowing|happy|positive|raving|rave|satisfied|enthusiastic|delighted|five-star|5-star)\b[^.\n]{0,25}\b(blurbs?|quotes?|reviews?|feedback|comments|stories|shout-?outs?|words)\b"),
+    ("income_promise", r"\b(definitely|certainly|surely|for sure|guaranteed to|always)\b[^.\n]{0,30}\b(get|make|earn|win|land|double|bring|grow|increase|book)\b[^.\n]{0,25}\b(clients|customers|money|income|sales|bookings|revenue|more)\b"),
+    ("impersonation", r"\bpretend\w*\b[^.\n]{0,30}\b(you|we|i)?\s*(bought|purchased|used|tried|own|are a|were a|a customer|a buyer|happy)\b"),
+    ("publish_without_approval", r"\b(send|post|publish|tweet|launch|email)\b[^.\n]{0,50}\b(no need to|don'?t|do not|without)\b[^.\n]{0,20}\b(check|ask|approv\w*|confirm|review)\w*\b"),
+    ("credentials", r"\b(store|save|keep|remember|log|collect)\b[^.\n]{0,25}\b(card|payment|billing|bank)\s+(details|info|information|data)\b"),
 ]
 
 # A purely educational question about a banned practice is allowed (GRD-4), but only when the text
@@ -118,11 +130,13 @@ def check(text):
 
 
 def check_request(text):
-    """Request check for founder/judge instructions (trick prompts)."""
+    """Request check for founder or tester instructions (trick prompts)."""
     text = text or ""
     if QUESTION.search(text) and not INSTRUCTION.search(text):
         return None
-    return _scan(text, REQUEST_RULES) or _scan(text, CONTENT_RULES)
+    # An instruction to build, sell or advise in an excluded category is refused here too, so a trick
+    # prompt cannot route around the Phase 1 exclusion check.
+    return _scan(text, REQUEST_RULES) or _scan(text, CONTENT_RULES) or _scan(text, EXCLUDED)
 
 
 def excluded(text):

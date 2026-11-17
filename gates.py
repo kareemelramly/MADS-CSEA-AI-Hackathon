@@ -33,6 +33,10 @@ class GateResult:
         return asdict(self)
 
 
+def _n(k, word):
+    return f"{k} {word}" + ("" if k == 1 else "s")
+
+
 def canonical(obj):
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
@@ -68,9 +72,10 @@ def discover_gate(*, missing_fields, excluded, values_conflict, coverage, releva
             " No ranked alternative passes evidence and fit, so the system recommends stopping."
         return GateResult("phase1_gate", out,
                           f"{relevant['count']} relevant of {coverage['items_screened']} screened across "
-                          f"{len(set(relevant['sources']))} sources; threshold {thresholds['min_relevant']} across "
-                          f"{thresholds['min_relevant_sources']} sources. This means not enough public evidence of the pain, "
-                          f"not proof that no market exists.{tail} What would change it: founder evidence URLs showing the pain.",
+                          f"{_n(len(set(relevant['sources'])), 'source')}; threshold {thresholds['min_relevant']} across "
+                          f"{_n(thresholds['min_relevant_sources'], 'source')}. This means not enough public evidence of the pain, "
+                          f"not proof that no market exists.{tail} What would change it: founder evidence URLs showing the pain, "
+                          "or real answers from the Mom Test interviews in the interview script.",
                           ["evidence_weak"], n)
     if fit < thresholds["min_fit"]:
         out = "pivot_back" if alt_pass else "stop"
@@ -194,11 +199,48 @@ def operate_gate(*, targets, metrics, phase2_completed, alternative_left):
     return GateResult("phase6_gate", "stop", "Real values miss targets: " + ", ".join(missed) + ", and no alternative is left. Recommend stopping.", ["targets_missed"], n)
 
 
+_PLAIN = {
+    "go": "GO: the evidence meets the thresholds set before the data; the next phase may start.",
+    "repeat": "REPEAT: redo this step; nothing was concluded against the idea.",
+    "pivot_back": "PIVOT BACK: the evidence points to a better-fitting alternative or an earlier phase.",
+    "stop": "STOP: the system recommends not continuing on the current evidence.",
+    PAUSE: "WAITING FOR REAL EVIDENCE: nothing is decided until a real experiment finishes.",
+}
+
+
+def _label(k):
+    k = k.replace("threshold_", "").replace("min_", "minimum ").replace("max_", "maximum ").replace("_", " ")
+    return k[:1].upper() + k[1:]
+
+
+def _fmt(v):
+    if v is None:
+        return "not measured"
+    if isinstance(v, bool):
+        return "yes" if v else "no"
+    if isinstance(v, float) and v.is_integer():
+        return str(int(v))
+    if isinstance(v, dict):
+        return "; ".join(f"{_label(str(a))}: {_fmt(b)}" for a, b in v.items()) or "none"
+    if isinstance(v, (list, tuple)):
+        return ", ".join(_fmt(x) for x in v) or "none"
+    return str(v).replace("|", "/")
+
+
 def write_verdict(g, title):
+    """Gate record for humans: plain verdict first, observed numbers, then the thresholds locked before the data."""
     lines = [f"# {title}", "", f"**Outcome:** `{g.outcome}`" + ("  (pause: nothing decided)" if g.outcome == PAUSE else ""), "",
-             g.verdict, "", "| Measure | Value |", "|---|---|"]
-    for k, v in g.numbers.items():
-        lines.append(f"| {k} | {v} |")
-    lines += ["", f"Founder override allowed: {'yes (typed reason, at least 20 characters)' if g.overridable and g.outcome != 'go' else 'no'}",
-              "", "Thresholds are planning values (ASSUMPTION) fixed before the run and logged as criteria before any data."]
+             f"> {_PLAIN.get(g.outcome, g.outcome)}", "", g.verdict, ""]
+    observed = {k: v for k, v in g.numbers.items() if not k.startswith("threshold_")}
+    limits = {k: v for k, v in g.numbers.items() if k.startswith("threshold_")}
+    if observed:
+        lines += ["## What was measured", "", "| Measure | Value |", "|---|---|"]
+        lines += [f"| {_label(k)} | {_fmt(v)} |" for k, v in observed.items()]
+        lines.append("")
+    if limits:
+        lines += ["## Thresholds (locked before any data, ASSUMPTION)", "", "| Threshold | Value |", "|---|---|"]
+        lines += [f"| {_label(k)} | {_fmt(v)} |" for k, v in limits.items()]
+        lines.append("")
+    lines += [f"Founder override allowed: {'yes (typed reason, at least 20 characters; later outputs are stamped UNVALIDATED)' if g.overridable and g.outcome != 'go' else 'no'}",
+              "", "Code decided this gate; no model voted. Thresholds are planning values (ASSUMPTION) fixed before the run and logged as criteria before any data."]
     return "\n".join(lines) + "\n"

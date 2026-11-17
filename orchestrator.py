@@ -144,7 +144,9 @@ def phase1(ctx, prog):
                             relevant={"count": len(relevant), "sources": [x["source"] for x in relevant]},
                             fit=idea["fit"], alternatives=(scored or {}).get("alternatives", []), thresholds=th)
     questions = None
-    if g.outcome in ("go", "pivot_back") and scored:
+    if scored and (g.outcome in ("go", "pivot_back") or g.overridable):
+        # Weak evidence is exactly when the founder needs real interviews, so the Mom Test script is
+        # written for every scored idea the founder may still act on (not for a non-overridable stop).
         questions = once(ctx, k + "interview", lambda: interview_planner.run(ctx, scored["segment"]["text"], prog))
 
     def outputs():
@@ -620,6 +622,8 @@ def phase6(ctx, prog):
                                                     recommendation=g.outcome) or True)
     once(ctx, "p6.gate_out", lambda: ctx.out("phase6_gate_decision", "md", gates.write_verdict(g, "Phase 6 gate: persevere or pivot") +
                                              f"\n## Founder decision\n\n**{dec['choice']}** (recommendation: `{g.outcome}`; both kept).\n") and True)
+    once(ctx, "p6.gate_json", lambda: ctx.out("phase6_gate_decision", "json", {"run_id": ctx.run_id, "gate": g.to_dict(),
+                                                                                "founder_decision": dec["choice"]}) or True)
     finish(ctx, {"persevere": "go", "pivot": "pivot_back", "stop": "stop"}.get(dec["choice"], "stop"), "Phase 6 decision recorded")
 
 

@@ -1,0 +1,11 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "type": "object",
+ "properties": {
+  "breaks_rule": {"type": "boolean"},
+  "rule": {"type": "string", "enum": ["none", "fake_social_proof", "fake_signup_count", "income_promise", "urgency", "impersonation", "money_or_payment", "credentials_or_accounts", "publish_without_approval", "skip_checks_or_gates", "excluded_product", "paywall"]},
+  "why": {"type": "string", "maxLength": 240}
+ },
+ "required": ["breaks_rule", "rule", "why"],
+ "additionalProperties": false
+}

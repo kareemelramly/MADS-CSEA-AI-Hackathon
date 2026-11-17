@@ -4,6 +4,14 @@ An open-source team of AI agents that takes a founder's brief (idea, skills, bud
 
 **Model provider:** a local [llama.cpp](https://github.com/ggml-org/llama.cpp) `llama-server` on your own machine. No hosted or paid model API is called, so no API key exists anywhere in this project. **Models:** Qwen3 4B Instruct 2507 (Q4_K_M) by default in Docker (runs on a laptop CPU); Gemma 4 26B A4B (Q4_K_M) on an NVIDIA GPU, which is the model behind the committed demo runs. The decision log names the model the server actually loaded on every call.
 
+**At a glance (all evidence is in this repository):**
+
+- **It says stop.** The weak idea (W) ends in `pivot_back`, the excluded crypto idea (E) in a stop no one can override, and even the reasonable idea (R) gets a Phase 1 **STOP** on thin public evidence: [outputs/phase1_gate_decision_r_a1.md](outputs/phase1_gate_decision_r_a1.md).
+- **The founder stays in control.** Every publish, send or release needs a single-use approval bound to the action, content hash, destination, amount ($0) and run ID; overrides need a typed reason and stamp every later file UNVALIDATED.
+- **Nothing real moves.** The sale → delivery → refund → revoke → reconcile chain is MOCKED in local SQLite: [outputs/payment_test_log.md](outputs/payment_test_log.md). Publishing and sending are STUBBED.
+- **Honest numbers.** Every claim links a fetched source or says ASSUMPTION; guardrail scores are reported on a held-out set, weaknesses included: [docs/guardrail_eval.md](docs/guardrail_eval.md).
+- **$0.00 per run** on an open-weight model on your own machine; offline tests: `pytest -q`.
+
 ## Quickstart
 
 ```bash
@@ -43,7 +51,7 @@ Status rule: **Working** means the code exists and the named offline test passes
 | `pivot_back` routes: Build re-plan, Commercial → Build, Launch → Commercial | Working | `test_g3_rescope_once_then_stop`, `test_g4_rejected_offer_pivots_to_phase3`, `test_g5_rejected_drafts_retry` |
 | Founder approval executor (action, content, destination, amount, run ID; single use) | Working | `test_approval_refused_after_any_field_change`, `test_consumed_approval_cannot_run_twice` |
 | Local model client: JSON-schema output, one repair retry, time budget, failures become `repeat` (never `stop`) | Working (fake HTTP and a fake llama-server on 127.0.0.1) | `test_llm_cascade`, `test_full_run_over_local_http` |
-| Guardrails against trick prompts (75-case eval set: 53 banned, 22 allowed) | Working: recall 1.00, false-positive rate 0.00 on this set | `test_every_banned_case_refused_and_benign_allowed` |
+| Trick-prompt defence, two layers: fixed pattern rules, then a local-model rule check that can only add refusals | Working. Patterns: 60/60 refused on the main set (in-sample, they were written from it) but only 3/12 on a held-out set written afterwards, with 2/10 honest questions wrongly refused. Model layer and full numbers: [docs/guardrail_eval.md](docs/guardrail_eval.md) | `test_every_banned_case_refused_and_benign_allowed`, `test_model_layer_refuses_a_paraphrase_the_patterns_miss` |
 | Final run report: Markdown and HTML in `outputs/`, PDF download in the app | Working | `test_full_run_writes_report_in_three_forms`, `test_finished_run_shows_final_report_and_no_raw_json` |
 | Streamlit UI: plain verdict before buttons, approval panel, amber override bar, readable tables (no raw JSON) | Working | `test_approval_panel_shows_five_fields`, `test_amber_bar_after_override` |
 
@@ -70,7 +78,7 @@ No paid service, API key or account is needed. Everything runs on your machine.
 | `docker compose up` (default, CPU) | Qwen3 4B Instruct 2507, GGUF Q4_K_M ([model](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507), [GGUF](https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF)) | llama.cpp `llama-server`, local | Apache 2.0 ([model card](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)) | $0 |
 | GPU override, and the committed demo runs | Gemma 4 26B A4B instruction-tuned, GGUF `UD-Q4_K_M` ([GGUF](https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF)) | llama.cpp `llama-server` with CUDA, local | Apache 2.0 ([Gemma 4 model card](https://ai.google.dev/gemma/docs/core/model_card_4)) | $0 |
 
-- llama.cpp is MIT-licensed ([repository](https://github.com/ggml-org/llama.cpp)). Qwen is one of the free model families the organizers list; GPT-family models are refused by code (`llm.py`), a team rule.
+- llama.cpp is MIT-licensed ([repository](https://github.com/ggml-org/llama.cpp)). Qwen is one of the free model families the organizers list.
 - **Measured local speed (Gemma 4 26B A4B, team laptop, 16 GB GPU):** <!-- speed:start -->measured 2026-11-17T20:07:46 on the team laptop through llama.cpp: 10/10 schema-valid (correctness pass), about 81.6 tokens/s, slowest call 3.3 s (performance fast against the 40 tokens/s and 30 s planning limits).<!-- speed:end --> The speed limits are team planning assumptions, not hackathon requirements. The Qwen3 4B CPU setup is slower and was not timed (ASSUMPTION: a run takes noticeably longer on CPU).
 - **What leaves your machine:** only search words built from the idea, sent to keyless public APIs: [HN Algolia](https://hn.algolia.com/api), [Stack Exchange](https://api.stackexchange.com/docs), [GitHub issue search](https://docs.github.com/en/rest/search/search), and [Wikipedia](https://www.mediawiki.org/wiki/API:Search) for background only. A link the founder adds is fetched. The model, the brief and every draft stay local. Reddit is not used because its [data API terms](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki) require registered credentials.
 - All gate thresholds (20 items screened, 3 relevant demand items from 2 sources, fit 3 of 5, 100 sign-ups in 14 days, 200 visitors) are planning values labelled ASSUMPTION and logged before any data.
